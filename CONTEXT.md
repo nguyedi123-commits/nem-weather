@@ -69,6 +69,8 @@
   first jobs by hand: light 4 min (IFS + AIFS + BOM), seasonal 2 min (after fixing a hidden character in the key),
   full (ensemble) running. New Weather.zip (20 Oct, evening) fills itself from the cloud ~20 s after start, then hourly.
   Scheduled jobs: 21:30 UTC (7:30 am NEM, light) and 10:00 UTC (8 pm NEM, full).
+- [ ] 21 Oct (user): put the NEW Weather.zip (cloud pick-up) on the trading PC; check the first scheduled cloud runs
+  (7:30 am light, 8 pm full) and that the trading PC picked them up. GitHub: all jobs green after the key fix.
 - Backlog for later (user, 18 Oct): W-009 AIFS ENS, W-010 NOAA GFS/GEFS, W-011 other seasonal centres.
 - First look: BOM's Brisbane highs sit 2–3 °C above the whole ECMWF ensemble range (ECMWF too cool there →
   W-008 BOM correction). BOM ACCESS-S2 leans warmer than ECMWF SEAS5 (e.g. Sydney Oct +1.8 vs +1.0 °C).

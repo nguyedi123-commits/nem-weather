@@ -22,4 +22,5 @@
 | W-016 | Download progress (%) on screen while a refresh runs (header + A1) | Built 20 Oct |
 | W-017 | Compare runs: run + vs pickers on S1 / M1 / L1 / G1 (dashed older run, Change column, change map) + new D1 "What changed" panel | Built 20 Oct |
 | W-019 | Cloud refresh on GitHub (public project `nem-weather`): a GitHub job downloads ECMWF at 7 am (no ensemble) and 7 pm (full), keeps only the NEM east coast, publishes it (last 30 days); Weather.exe picks it up. Copernicus key = GitHub secret. Direct ECMWF download kept as back-up | Built 20 Oct – first jobs OK (light 4 min, seasonal 2 min) |
+| W-020 | Keep the GitHub schedule alive: GitHub turns off scheduled jobs after 60 days without code uploads – add a small monthly "still alive" upload (due before ~19 Dec 2026) | Idea 20 Oct |
 | W-014 | "Forecast check" panel: ECMWF / BOM forecast vs what actually happened, per city | Idea – after W-008b |

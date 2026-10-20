@@ -46,13 +46,16 @@ heat event, a wind lull, a dull or wet spell?
 - Confidence usually drops after day 5–7; days 10–15 are about the trend (warmer / cooler spell), not the exact number.
 
 ## Limits
-- Days 8–15 have only 2 values a day (4 am / 4 pm), so peaks between can be missed in the chart; the table still uses
-  the true max/min. Days 1–7 highs use 3-hour max windows every 6 hours – can read slightly low.
+- Days 8–15 have only 2 values a day (4 am / 4 pm), so peaks between can be missed in the **chart**. The table and I1
+  use the true daily high / low: since 21 Oct (W-022) the ensemble's max / min covers **all 24 hours** of every day
+  (extra max/min-only steps, feed `ensx`). Runs before that covered only part of the day (lows too warm, late or
+  early peaks missed).
 - Ensemble "control" run (51st) not downloaded.
 - Raw model, no BOM correction yet.
 
 ## Change log
 - 18 Oct 2026 – built.
 - 18 Oct 2026 – W-006 agreed and built: BOM high / low markers + BOM column.
+- 20 Oct 2026 – W-022 agreed: full-day max / min for the ensemble (extra max/min-only steps).
 - 20 Oct 2026 – W-017 built: run + vs pickers, dashed older run, Change column.
 - 20 Oct 2026 – W-015 built: free panel, own region + field picker, ⓘ help.

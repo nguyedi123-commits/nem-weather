@@ -24,4 +24,5 @@
 | W-019 | Cloud refresh on GitHub (public project `nem-weather`): a GitHub job downloads ECMWF at 7 am (no ensemble) and 7 pm (full), keeps only the NEM east coast, publishes it (last 30 days); Weather.exe picks it up. Copernicus key = GitHub secret. Direct ECMWF download kept as back-up | Built 20 Oct – first jobs OK (light 4 min, seasonal 2 min) |
 | W-020 | Keep the GitHub schedule alive: GitHub turns off scheduled jobs after 60 days without code uploads – add a small monthly "still alive" upload (due before ~19 Dec 2026) | Idea 20 Oct |
 | W-021 | I1 Insights panel (rules, plain words) for Short / Medium / AI vs IFS / Seasonal: what stands out + what changed vs yesterday, NSW/QLD/VIC/SA; on each page where TAS was. Built-in pages follow the user's layout without TAS | Built 20 Oct |
+| W-022 | Ensemble max / min over all 24 hours: extra max/min-only steps (feed `ensx`, ~2.8 GB / run in the cloud) – fixes too-warm lows and missed late / early peaks in M1 table + I1 | Agreed 20 Oct (option B) |
 | W-014 | "Forecast check" panel: ECMWF / BOM forecast vs what actually happened, per city | Idea – after W-008b |

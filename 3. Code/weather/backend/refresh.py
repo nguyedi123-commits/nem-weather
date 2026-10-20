@@ -10,7 +10,7 @@ import threading
 from . import bom, cloud, ecmwf, obs, progress, seasonal, system
 
 log = logging.getLogger("weather.refresh")
-MODES = {"cloud": (), "full": ("ifs", "aifs", "ens"), "light": ("ifs", "aifs"), "bom": (), "test": ()}
+MODES = {"cloud": (), "full": ("ifs", "aifs", "ens", "ensx"), "light": ("ifs", "aifs"), "bom": (), "test": ()}
 # "test" (not on screen): 2 steps of the newest IFS run (~15 MB) -> *_test2 files, not shown – checks a new install
 _thread = None
 

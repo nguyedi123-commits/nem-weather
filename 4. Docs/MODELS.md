@@ -28,6 +28,10 @@ ECMWF is widely rated the most accurate global forecaster for the medium range.
   and the middle run (median).
 - Same ~9 km model as the single run. To 15 days.
 
+- **Full-day max / min (W-022, from 21 Oct):** the ensemble's own steps cover only part of each day, so a second, small
+  download (feed `ensx`) fetches just the max / min temperature at the missing steps: 3-hourly to day 6, 6-hourly to
+  day 15. Every hour of every day is then covered (~2.8 GB extra per run, on GitHub's computer).
+
 ### AIFS Single – Artificial Intelligence Forecasting System ("the AI model")
 - ECMWF's machine-learning model (operational since early 2025). Trained on decades of past weather (ERA5) and
   ECMWF's own analyses; starts each run from the same starting weather as IFS.

@@ -229,9 +229,12 @@ def _do_step(feed, run, step, work, geo):
     t0 = time.time()
     items, blocks = _select(feed, _get(_path(feed, run, step, "index")).decode())
     expected = len([p for p in C.FEEDS[feed]["params"] if p not in C.MAXMIN])
-    if feed == "ens":
+    if feed in ("ens", "ensx"):
         expected *= 50
-    if len([d for d in items if d["param"] not in C.MAXMIN]) < expected:
+    got = len([d for d in items if d["param"] not in C.MAXMIN])
+    if expected == 0:   # max/min-only feed (ensx): 50 members x max + min
+        expected, got = 100, len(items)
+    if got < expected:
         raise IOError(f"{feed} {run_id(run)} step {step}: {len(items)} fields, expected {expected}")
 
     grib = _path(feed, run, step, "grib2")
@@ -330,8 +333,32 @@ def _derive(get, hours, has, sc):
     return f
 
 
+def _finish_maxmin(feed, run, steps, work, tag=""):
+    """ensx (W-022): only max / min temperature per member and city – no map. Merged into the ensemble by views."""
+    rows = []
+    for s in steps:
+        f = np.load(work / f"s{s:03d}.npz")
+        members = f["members"]
+        hi, lo = f["c_mx2t"] - 273.15, f["c_mn2t"] - 273.15        # (member, city)
+        for mi, m in enumerate(members):
+            for ci, (region, city, *_) in enumerate(C.CITIES):
+                rows.append((s, int(m), region, city, float(hi[mi, ci]), float(lo[mi, ci])))
+        f.close()
+    df = pd.DataFrame(rows, columns=["step_h", "member", "region", "city", "tmax_c", "tmin_c"])
+    df.insert(0, "run_utc", run.replace(tzinfo=None))
+    df.insert(1, "valid_utc", df["run_utc"] + pd.to_timedelta(df["step_h"], unit="h"))
+    out = C.DATA / "cities" / feed
+    out.mkdir(parents=True, exist_ok=True)
+    df.round({"tmax_c": 2, "tmin_c": 2}).to_parquet(out / f"{run_id(run)}{tag}.parquet", index=False)
+    shutil.rmtree(work, ignore_errors=True)
+    if not tag:
+        _mark_done(feed, run, len(steps))
+
+
 def _finish(feed, run, steps, work, geo, tag=""):
     """tag = "_testN" for test runs: own file names, not added to the catalog."""
+    if feed == "ensx":
+        return _finish_maxmin(feed, run, steps, work, tag)
     files = [np.load(work / f"s{s:03d}.npz") for s in steps]
     has = {k[2:] for f in files for k in f.files if k.startswith(("g_", "c_"))}
     hours = np.array(steps, dtype=np.float32)

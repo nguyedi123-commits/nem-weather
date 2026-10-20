@@ -102,7 +102,17 @@ def _cities(feed, rid):
     for col in ("tmax_c", "tmin_c"):   # files saved before 18 Oct fix had zeros (-273) at 0 h
         if col in df:
             df.loc[df["step_h"] == 0, col] = np.nan
-    df["period_h"] = df["step_h"] - df.groupby(["city"] + (["member"] if "member" in df else []))["step_h"].shift()
+    if feed == "ens":   # W-022: add the extra max/min-only steps, so daily highs / lows cover all 24 hours
+        fx = C.DATA / "cities" / "ensx" / f"{rid}.parquet"
+        if fx.exists():
+            x = pd.read_parquet(fx)
+            x["t"] = x["valid_utc"] + AEST
+            df = pd.concat([df, x], ignore_index=True).sort_values(["city", "member", "step_h"], ignore_index=True)
+    # period length from the previous step that has the full fields (extra max/min rows don't count as periods)
+    full = df["temp_c"].notna() if "temp_c" in df else pd.Series(True, index=df.index)
+    keys = ["city"] + (["member"] if "member" in df else [])
+    df["period_h"] = np.nan
+    df.loc[full, "period_h"] = df[full]["step_h"] - df[full].groupby(keys)["step_h"].shift()
     df["solar_kwh"] = df["solar_wm2"] * df["period_h"] / 1000
     df["pday"] = (df["t"] - pd.Timedelta(minutes=1)).dt.normalize()   # day a period (or max/min window) belongs to
     df["iday"] = df["t"].dt.normalize()                                 # day of an instant value
@@ -145,6 +155,7 @@ def _day_label(d):
 
 
 def _quant(x, col, by):
+    x = x[x[col].notna()]   # the extra max/min-only rows have no temperature etc.
     return x.groupby(by)[col].quantile([0.1, 0.5, 0.9]).unstack()
 
 

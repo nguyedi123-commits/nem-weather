@@ -23,7 +23,7 @@ from backend import bom, config as C, ecmwf, obs, seasonal   # noqa: E402
 
 TAG = "data"
 KEEP_DAYS = {"seasonal": 400, "seasonal_bom": 400}   # others: 30
-MODES = {"full": ("ifs", "aifs", "ens"), "light": ("ifs", "aifs"), "bom": ()}
+MODES = {"full": ("ifs", "aifs", "ens", "ensx"), "light": ("ifs", "aifs"), "bom": ()}
 REPO = os.environ.get("GITHUB_REPOSITORY", "nguyedi123-commits/nem-weather")
 URL = f"https://github.com/{REPO}/releases/download/{TAG}"
 OUT = C.DATA / "publish"

@@ -73,6 +73,9 @@ SHORT = _steps((0, 90, 3))                       # 06z/18z quick update
 AI = _steps((0, 360, 6))
 # 6-hourly to day 7, then 4 pm / 4 am AEST (06z / 18z UTC) to day 15
 ENS = _steps((0, 168, 6), (174, 354, 12))
+# W-022: the max/min-only steps the ensemble is missing, so every hour of every day is covered:
+# 3-hourly windows to 144 h (ENS has the even ones), 6-hourly windows 168–360 h (ENS has 174, 186, …)
+ENS_MAXMIN = _steps((3, 141, 6), (180, 360, 12))
 
 FEEDS = {
     "ifs": dict(label="IFS main model", model="ifs", stream="oper", type="fc",
@@ -81,4 +84,6 @@ FEEDS = {
                  params=ALL_PARAMS, runs={0: AI, 12: AI}),
     "ens": dict(label="IFS ensemble", model="ifs", stream="enfo", type="ef",
                 params=ENS_PARAMS + list(MAXMIN), runs={0: ENS}),
+    "ensx": dict(label="IFS ensemble max/min (extra steps)", model="ifs", stream="enfo", type="ef",
+                 params=list(MAXMIN), runs={0: ENS_MAXMIN}),
 }

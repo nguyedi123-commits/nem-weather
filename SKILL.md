@@ -38,6 +38,23 @@ py -3.14 -m venv .venv                     (from the project root)
 - BOM only: `run_download.py --bom` = city forecasts (`backend\bom.py`, FTP XML) + observations (`backend\obs.py`), seconds.
 - Refresh = `--update` = BOM forecasts + BOM observations + all ECMWF feeds + seasonal. **Only when the user asks** (~18 GB).
 
+## Cloud (W-019) – GitHub
+- Project: https://github.com/nguyedi123-commits/nem-weather (public: code + docs only – see `.gitignore`).
+  Git identity in this repo = GitHub no-reply address (never the personal email).
+- GitHub tool: `"C:\Program Files\GitHub CLI\gh.exe"` (logged in as nguyedi123-commits).
+- Job: `.github/workflows/refresh.yml` → `3. Code/weather/cloud/publish.py --mode light|full|bom`
+  (21:30 UTC light, 10:00 UTC full; "Run workflow" button for by-hand runs):
+  ```
+  gh workflow run refresh.yml --repo nguyedi123-commits/nem-weather -f mode=light
+  gh run list --repo nguyedi123-commits/nem-weather --limit 5
+  ```
+- Output: release `data` – one zip per run (`<feed>__<run>.zip`), `obs.zip`, `static.zip`, `manifest.json` (the list,
+  uploaded last). Kept 30 days (seasonal 400).
+- Copernicus key = repo secret `CDSAPI_KEY` (set from `C:\Users\nguye\.cdsapirc`, never printed).
+- Weather.exe side: `backend\cloud.py` – reads manifest every hour (`EVERY_S`), downloads only missing runs, merges obs,
+  state in `data\cloud.json`. Refresh → "From the cloud".
+- Publish code changes: `git add -A`, `git commit`, `git push` (from the project root).
+
 ## Docs rule
 - Every panel has a card in `4. Docs\panels\` (index `4. Docs\README.md`, requests `4. Docs\BACKLOG.md`, models
   `4. Docs\MODELS.md`). Change a panel → update its card (and change log) first, then code.

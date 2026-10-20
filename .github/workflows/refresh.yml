@@ -40,8 +40,10 @@ jobs:
         env:
           CDSAPI_KEY: ${{ secrets.CDSAPI_KEY }}
         run: |
-          if [ -n "$CDSAPI_KEY" ]; then
-            printf 'url: https://cds.climate.copernicus.eu/api\nkey: %s\n' "$CDSAPI_KEY" > ~/.cdsapirc
+          # strip invisible characters (e.g. a byte-order mark) and spaces around the key
+          KEY=$(printf '%s' "$CDSAPI_KEY" | sed 's/^\xEF\xBB\xBF//' | tr -d '[:space:]')
+          if [ -n "$KEY" ]; then
+            printf 'url: https://cds.climate.copernicus.eu/api\nkey: %s\n' "$KEY" > ~/.cdsapirc
           fi
 
       - name: Download, keep the NEM east coast, publish

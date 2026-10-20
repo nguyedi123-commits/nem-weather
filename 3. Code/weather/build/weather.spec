@@ -8,7 +8,7 @@ ROOT = os.path.abspath(os.path.join(SPECPATH, ".."))
 
 datas = [(os.path.join(ROOT, "web"), "web")]
 binaries = []
-hiddenimports = ["clr", "pandas", "pyarrow", "winreg"] + collect_submodules("ecmwf.datastores")
+hiddenimports = ["clr", "pandas", "pyarrow", "winreg", "truststore"] + collect_submodules("ecmwf.datastores")
 # window (pywebview + .NET), the ECMWF file reader (eccodes: DLLs + its cffi bindings), Copernicus client
 for pkg in ("webview", "clr_loader", "pythonnet", "eccodes", "gribapi", "findlibs", "cdsapi", "multiurl"):
     d, b, h = collect_all(pkg)

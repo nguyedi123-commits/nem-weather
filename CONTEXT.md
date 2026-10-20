@@ -26,7 +26,8 @@ day and keeps only the NEM region; Weather.exe picks the small files up **every 
 - If problems: ask for `C:\Weather\Weather\data\weather.log` + a screenshot.
 
 ## Next
-- [ ] Trading PC: running, step 5 OK? (user)
+- [ ] Trading PC: first try said "Cloud not reachable: CERTIFICATE_VERIFY_FAILED" (office network checks secure traffic).
+  Fix: Weather.exe now uses the Windows certificate list (`truststore`). Update zip 21 Oct 09:48 → step 5 OK? (user)
 - [ ] **Tonight 8:07 pm NEM**: does the scheduled full job start by itself? (first with `ensx` on a schedule).
   The 7:30 am job on 21 Oct never started → light job run by hand at 8:01 am (OK: IFS + AIFS 20 Oct 22:00 run,
   BOM 7:42 am). Times moved off round minutes to **7:37 am / 8:07 pm NEM** (pushed). If it still doesn't start:

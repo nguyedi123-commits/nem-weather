@@ -6,7 +6,7 @@ Commands run from `3. Code\weather\` with the project venv `..\..\.venv` (git / 
 ## Python
 ```
 py -3.14 -m venv .venv                     (from the project root)
-.venv\Scripts\pip install eccodes pandas pyarrow requests cdsapi playwright pywebview==6.2.1 pythonnet==3.2.1 clr_loader==0.3.1 pyinstaller==6.22.3
+.venv\Scripts\pip install eccodes pandas pyarrow requests cdsapi playwright pywebview==6.2.1 pythonnet==3.2.1 clr_loader==0.3.1 pyinstaller==6.22.3 truststore==0.10.5
 ```
 - `eccodes` (the ECMWF file reader) ships its own Windows DLLs. A venv can't be moved: recreate it if the folder moves.
 - Cloud versions are pinned in `requirements-cloud.txt` (same as the venv).

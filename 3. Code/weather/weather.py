@@ -12,6 +12,12 @@ import sys
 import threading
 import time
 
+try:   # trust the certificates Windows trusts (office networks that check secure traffic) – before any download
+    import truststore
+    truststore.inject_into_ssl()
+except Exception:
+    pass
+
 from backend import cloud, config as C, refresh, server, system
 
 

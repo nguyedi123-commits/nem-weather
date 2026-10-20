@@ -20,8 +20,8 @@ py -3.14 -m venv .venv                     (from the project root)
 - Project https://github.com/nguyedi123-commits/nem-weather (public: code + docs only – `.gitignore` keeps out data,
   settings, zips, keys). Git identity in this repo = GitHub no-reply address (never the personal email).
 - GitHub tool: `"C:\Program Files\GitHub CLI\gh.exe"` (logged in as nguyedi123-commits).
-- Job `.github/workflows/refresh.yml` → `cloud/publish.py --mode light|full|bom`: 21:30 UTC (7:30 am NEM) light,
-  10:00 UTC (8 pm NEM) full. Publishes release `data`: `<feed>__<run>.zip`, `obs.zip`, `static.zip`, `manifest.json`
+- Job `.github/workflows/refresh.yml` → `cloud/publish.py --mode light|full|bom`: 21:37 UTC (7:37 am NEM) light,
+  10:07 UTC (8:07 pm NEM) full (off round minutes – GitHub is late on :00 / :30). Publishes release `data`: `<feed>__<run>.zip`, `obs.zip`, `static.zip`, `manifest.json`
   (the list, uploaded last). Keeps 30 days (seasonal 400).
 ```
 gh workflow run refresh.yml --repo nguyedi123-commits/nem-weather -f mode=light      by hand (light | full | bom)

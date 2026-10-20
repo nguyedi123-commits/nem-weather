@@ -1,12 +1,13 @@
 # Weather cloud refresh (W-019): downloads ECMWF / BOM / Copernicus on GitHub's computer, keeps only the NEM east coast,
 # publishes small files on the release "data". Weather.exe picks them up every hour.
-# Times are UTC: 21:30 = 7:30 am NEM (overnight run, without ensemble), 10:00 = 8 pm NEM (morning run, with ensemble).
+# Times are UTC: 21:37 = 7:37 am NEM (overnight run, without ensemble), 10:07 = 8:07 pm NEM (morning run, with ensemble).
+# Off the round :00 / :30 minutes – GitHub starts round-time schedules late or skips them when busy (seen 21 Oct).
 name: Weather refresh
 
 on:
   schedule:
-    - cron: "30 21 * * *"
-    - cron: "0 10 * * *"
+    - cron: "37 21 * * *"
+    - cron: "7 10 * * *"
   workflow_dispatch:
     inputs:
       mode:
@@ -49,5 +50,5 @@ jobs:
       - name: Download, keep the NEM east coast, publish
         env:
           GH_TOKEN: ${{ github.token }}
-          MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || (github.event.schedule == '0 10 * * *' && 'full' || 'light') }}
+          MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || (github.event.schedule == '7 10 * * *' && 'full' || 'light') }}
         run: python "3. Code/weather/cloud/publish.py" --mode "$MODE"

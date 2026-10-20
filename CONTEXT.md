@@ -18,7 +18,8 @@ day and keeps only the NEM region; Weather.exe picks the small files up **every 
 
 ## Next (21 Oct)
 - [ ] User puts the NEW Weather.zip on the trading PC (cloud pick-up). Old zip from 20 Oct morning had no cloud.
-- [ ] Check the first scheduled cloud runs: **7:30 am NEM** (light) and **8 pm NEM** (full) – `gh run list` (SKILL.md).
+- [ ] 21 Oct: the 7:30 am scheduled job never started (GitHub late on round times) → light job run by hand 8:01 am (OK,
+  IFS + AIFS 20 Oct 22:00 run). Times moved to **7:37 am / 8:07 pm NEM**. Check tonight's 8:07 pm job starts by itself.
 - [ ] Check the trading PC picked them up (About panel: "Cloud last made data" / "This PC last checked").
 - [ ] User review of the screen → changes.
 - Later: W-020 keep the GitHub schedule alive (monthly upload, due before ~19 Dec), W-008b BOM correction (~mid Nov),

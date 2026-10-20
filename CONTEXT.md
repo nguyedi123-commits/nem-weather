@@ -13,6 +13,7 @@ day and keeps only the NEM region; Weather.exe picks the small files up **every 
 | Cloud – GitHub job + hourly pick-up (W-019, W-012) | **Built 20 Oct.** By-hand jobs all green; first scheduled runs 21 Oct |
 | Weather.exe | **New zip 20 Oct night** (`2. Output\Weather.zip` / `(update).zip`, 73 MB) – fills itself from the cloud ~20 s after start |
 | I1 Insights panel (W-021) – plain-words headlines + what changed, NSW/QLD/VIC/SA, on each page where TAS was | **Built 20 Oct night**, in the new zip |
+| Ensemble full-day max/min (W-022, feed `ensx`) + map Play button (W-023) | **Built 20 Oct night**, cloud job OK, in the new zip |
 | BOM correction (W-008b) | Recording observations since 18 Oct (history from 1 Sep). Correction from ~mid Nov |
 
 ## Next (21 Oct)

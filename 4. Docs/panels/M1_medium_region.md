@@ -56,6 +56,6 @@ heat event, a wind lull, a dull or wet spell?
 ## Change log
 - 18 Oct 2026 – built.
 - 18 Oct 2026 – W-006 agreed and built: BOM high / low markers + BOM column.
-- 20 Oct 2026 – W-022 agreed: full-day max / min for the ensemble (extra max/min-only steps).
+- 20 Oct 2026 – W-022 built: full-day max / min for the ensemble (extra max/min-only steps).
 - 20 Oct 2026 – W-017 built: run + vs pickers, dashed older run, Change column.
 - 20 Oct 2026 – W-015 built: free panel, own region + field picker, ⓘ help.

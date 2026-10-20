@@ -333,7 +333,9 @@ const SCALES = {
   anomRain: ["#8c510a", "#d8b365", "#f6e8c3", "#f5f5f5", "#c7eae5", "#5ab4ac", "#01665e"],
 };
 function mapPanel(body, panel) {
-  body.innerHTML = `<div class="chart"></div><div class="map-strip"><button class="ctl m-prev" title="Earlier">◀</button>
+  body.innerHTML = `<div class="chart"></div><div class="map-strip"><button class="ctl m-play" title="Play: step through the times by itself">⏵ Play</button>
+    <select class="m-speed" title="Play speed"><option value="1500">Slow</option><option value="800" selected>Normal</option><option value="400">Fast</option></select>
+    <button class="ctl m-prev" title="Earlier">◀</button>
     <input type="range" class="m-i" min="0" max="0" value="0"><button class="ctl m-next" title="Later">▶</button>
     <span class="m-time"></span><span class="note m-note"></span></div>`;
   const el = body.querySelector(".chart"), $ = (s) => body.querySelector(s);
@@ -415,16 +417,33 @@ function mapPanel(body, panel) {
       ],
     }, true);
   }
-  $(".m-i").oninput = (e) => { i = +e.target.value; load(); };
-  $(".m-prev").onclick = () => { i = Math.max(0, (i ?? 0) - 1); load(); };
-  $(".m-next").onclick = () => { i = Math.min(+$(".m-i").max, (i ?? 0) + 1); load(); };
+  // W-023: Play steps through the times by itself (back to the first time at the end); manual moves pause it
+  let playing = false, timer = null;
+  const setPlay = (on) => {
+    playing = on;
+    clearTimeout(timer);
+    $(".m-play").textContent = on ? "⏸ Pause" : "⏵ Play";
+    $(".m-play").classList.toggle("on", on);
+    if (on) tick();
+  };
+  async function tick() {
+    if (!playing) return;
+    const n = +$(".m-i").max + 1;
+    i = ((i ?? 0) + 1) % Math.max(n, 1);
+    await load();
+    if (playing) timer = setTimeout(tick, +$(".m-speed").value);
+  }
+  $(".m-play").onclick = () => setPlay(!playing);
+  $(".m-i").oninput = (e) => { setPlay(false); i = +e.target.value; load(); };
+  $(".m-prev").onclick = () => { setPlay(false); i = Math.max(0, (i ?? 0) - 1); load(); };
+  $(".m-next").onclick = () => { setPlay(false); i = Math.min(+$(".m-i").max, (i ?? 0) + 1); load(); };
   panel.onPick = (key) => { if (key === "src" || key === "run") i = panel.opts.src === "seasonal" ? 0 : null; load(); };
   load();
   return {
     update() { load(); },   // new data after a refresh
     redraw: draw,
     resize() { chart.resize(); draw(); },
-    dispose() { chart.dispose(); },
+    dispose() { playing = false; clearTimeout(timer); chart.dispose(); },
   };
 }
 

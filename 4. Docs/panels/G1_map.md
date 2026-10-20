@@ -13,6 +13,8 @@ heat reach – at a chosen time?
 ## What you see
 - **Title bar:** code G1 · model picker (IFS / AIFS (AI) / Ensemble middle / Seasonal) · field picker ·
   ⓘ · ▁. **Bottom strip:** time (NEM) with ◀ / ▶ and a slider; opens at the next forecast time from now.
+  **⏵ Play / ⏸ Pause (W-023):** steps through the times by itself and starts again from the first time at the end;
+  speed Slow / Normal / Fast (about 1.5 / 0.8 / 0.4 s per step). Moving the slider or ◀ / ▶ pauses it.
   Model, field are remembered per panel.
 - **Run pickers (W-017):** **run** (default: latest; maps are kept 30 days) and **vs** (– none – or an earlier run).
 - **With a vs run = change map:** colours show **chosen run minus vs run** at the same time
@@ -39,5 +41,6 @@ from normal, average of 51 runs). Fields: temperature, wind 100 m (seasonal: 10 
 
 ## Change log
 - 18 Oct 2026 – built.
+- 20 Oct 2026 – W-023 built: Play / Pause button with speed.
 - 20 Oct 2026 – W-017 built: run + vs pickers, change map.
 - 20 Oct 2026 – W-015 built: map controls moved into the panel (G2 retired).

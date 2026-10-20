@@ -158,3 +158,7 @@ body.empty-page #grid::before { content: "Empty page – click Edit (Ctrl+E), th
 .ins-change::marker { color: #e65100; }
 .ins-info { color: var(--muted); }
 .theme-dark .ins-heat { color: #ff8a80; } .theme-dark .ins-cold { color: #82b1ff; }
+/* G1 map Play (W-023) */
+.map-strip .m-play { font-weight: 600; min-width: 5.2em; }
+.map-strip .m-play.on { background: var(--accent); color: #fff; }
+.map-strip select.m-speed { font: inherit; font-size: 0.9em; }

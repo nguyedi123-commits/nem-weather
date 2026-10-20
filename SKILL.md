@@ -45,6 +45,9 @@ gh secret set CDSAPI_KEY --repo nguyedi123-commits/nem-weather --body <key>     
 ```
 - How it works: file `.index` → byte-range only needed fields → decode in memory → keep east-coast box + 5 city squares
   → `data\work\` per step (resume) → `data\cities\<feed>\<run>.parquet` + `data\grid\<feed>\<run>.npz` + `catalog.json`.
+- Feed `ensx` (W-022): ensemble max/min only at the steps `ens` lacks (`ENS_MAXMIN`), merged into the ensemble's
+  daily high/low in `views._cities`. A new feed also needs an entry in `BACKFILL_HOURS` (ecmwf.py) and in the
+  "full" mode of `refresh.py` and `cloud/publish.py`.
 - Change places / area / feeds / steps / fields in `config.py` (`CITIES`, `CITY_SQUARE`, `GRID`, `FEEDS`, `MAXMIN`).
 - Units read from each file; rain / solar "since start" → per period. Times stored UTC, shown NEM (UTC+10).
 - `DownloadLock` = one downloader at a time (app, cloud pick-up, command line). Progress: `data\progress.json`.

@@ -29,7 +29,7 @@ log = logging.getLogger("weather.ecmwf")
 
 STEP_WORKERS = 3    # time steps downloaded at once
 RANGE_WORKERS = 4   # connections per time step
-BACKFILL_HOURS = {"ifs": 0, "aifs": 0, "ens": 0}   # 0 = newest run only (user, 18 Oct); hours > 0 also fetches missed older runs
+BACKFILL_HOURS = {"ifs": 0, "aifs": 0, "ens": 0, "ensx": 0}   # 0 = newest run only (user, 18 Oct); hours > 0 also fetches missed older runs
 
 _local = threading.local()
 _decode_lock = threading.Lock()

@@ -27,6 +27,8 @@ const PICKER = {
   field: { opts: Object.entries(FIELDS), def: "temp", title: "What to show" },
   src: { opts: Object.entries(MAP_SOURCES), def: "ifs", title: "Model" },
   model: { opts: [["ens", "Ensemble middle"], ["ifs", "IFS"], ["aifs", "AIFS (AI)"]], def: "ens", title: "Model" },
+  ipage: { opts: [["short", "Short"], ["medium", "Medium"], ["compare", "AI vs IFS"], ["seasonal", "Seasonal"]], def: "short",
+    title: "Which page's data the insights read" },
 };
 
 // run / vs pickers (W-017): runs on disk for the panel's feed; vs = an older run, "auto" or none
@@ -93,7 +95,7 @@ function makePanel(item) {
       saveSoon();
       if (key === "src" || key === "model") fillRuns(panel);   // other model, other runs
       if (panel.onPick) panel.onPick(key);
-      else if (key === "model") loadData().then(() => feed(panel));
+      else if (key === "model" || key === "ipage") loadData().then(() => feed(panel));
       else panel.impl.redraw?.();
     };
     sel.onmousedown = (e) => e.stopPropagation();   // don't start a drag in edit mode

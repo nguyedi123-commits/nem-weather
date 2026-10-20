@@ -10,7 +10,7 @@ import re
 
 ROOT = Path(__file__).resolve().parents[1]
 CARDS = ROOT.parents[1] / "4. Docs" / "panels"
-KIND = {"S1": "short", "M1": "medium", "C1": "compare", "L1": "seasonal", "G1": "map", "A1": "about", "D1": "changes"}
+KIND = {"S1": "short", "M1": "medium", "C1": "compare", "L1": "seasonal", "G1": "map", "A1": "about", "D1": "changes", "I1": "insights"}
 SECTIONS = ["How to read it", "What you see", "Limits"]
 
 

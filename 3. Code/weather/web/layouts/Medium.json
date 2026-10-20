@@ -30,19 +30,6 @@
    }
   },
   {
-   "id": "medium-vic",
-   "kind": "medium",
-   "x": 16,
-   "y": 0,
-   "w": 8,
-   "h": 18,
-   "font": 1,
-   "opts": {
-    "region": "VIC",
-    "field": "temp"
-   }
-  },
-  {
    "id": "medium-sa",
    "kind": "medium",
    "x": 0,
@@ -56,7 +43,7 @@
    }
   },
   {
-   "id": "medium-tas",
+   "id": "medium-vic",
    "kind": "medium",
    "x": 8,
    "y": 18,
@@ -64,7 +51,7 @@
    "h": 18,
    "font": 1,
    "opts": {
-    "region": "TAS",
+    "region": "VIC",
     "field": "temp"
    }
   },
@@ -72,11 +59,23 @@
    "id": "about",
    "kind": "about",
    "x": 16,
-   "y": 18,
+   "y": 0,
    "w": 8,
    "h": 18,
    "font": 1,
    "opts": {}
+  },
+  {
+   "id": "insights",
+   "kind": "insights",
+   "x": 16,
+   "y": 18,
+   "w": 8,
+   "h": 18,
+   "font": 1,
+   "opts": {
+    "ipage": "medium"
+   }
   }
  ]
 }

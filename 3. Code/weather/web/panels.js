@@ -450,6 +450,29 @@ function changesPanel(body, panel) {
   };
 }
 
+// ---------- I1 Insights: what the latest run says + what changed (rules, card I1) ----------
+const IKIND = { heat: "ins-heat", cold: "ins-cold", wind: "ins-wind", solar: "ins-solar", rain: "ins-rain", change: "ins-change", info: "ins-info" };
+function insightsPanel(body, panel) {
+  body.innerHTML = '<div class="insights"></div>';
+  const box = body.firstChild;
+  const li = (b) => `<li class="${IKIND[b.kind] || ""}">${esc(b.text)}</li>`;
+  return {
+    update(d) {
+      if (!d) { box.innerHTML = '<div class="empty">Loading…</div>'; return; }
+      if (d.error) { box.innerHTML = `<div class="err">${esc(d.error)}</div>`; return; }
+      panel.setSub(d.vs_text ? `${d.run_text} vs ${d.vs_text}` : d.run_text);
+      const regions = Object.entries(d.regions).map(([r, items]) => `<div class="ins-region">
+        <h5><span class="dot" style="background:${REGION_COLOURS[r]}"></span>${esc(r)}</h5>
+        <ul>${items.length ? items.map(li).join("") : '<li class="ins-info">Nothing stands out</li>'}</ul></div>`).join("");
+      box.innerHTML = `<h4>Headlines</h4><ul class="ins-head">${d.headlines.length ? d.headlines.map(li).join("") : '<li class="ins-info">Nothing stands out</li>'}</ul>
+        <h4>By region</h4><div class="ins-grid">${regions}</div>
+        <h4>${d.vs_text ? `Changed since ${esc(d.vs_text)}` : "Changed"}</h4>
+        ${d.note ? `<p class="note">${esc(d.note)}</p>` : `<ul>${d.changes.length ? d.changes.map(li).join("") : '<li class="ins-info">No big changes</li>'}</ul>`}`;
+    },
+    resize() {},
+  };
+}
+
 // ---------- A1 About: runs on screen + download progress ----------
 export function progressText(p) {
   if (!p) return "";
@@ -512,6 +535,8 @@ export const PANELS = {
     query: runQ, create: regionPanel(seasonalChart, seasonalTable, () => "Forecast") },
   map: { code: "G1", title: "East-coast map", source: null, pickers: ["src", "field"], create: mapPanel, map: true,
     runFeed: (o) => o.src, vsDefault: "none" },
+  insights: { code: "I1", title: "Insights", source: "insights", pickers: ["ipage"],
+    query: (o) => ({ page: o.ipage || "short" }), create: insightsPanel },
   changes: { code: "D1", title: "What changed", source: "changes", pickers: ["model"], runFeed: (o) => o.model,
     query: (o) => ({ model: o.model || "ens", ...runQ(o) }), create: changesPanel },
   about: { code: "A1", title: "About · runs · download", source: null, pickers: [], create: aboutPanel, status: true },

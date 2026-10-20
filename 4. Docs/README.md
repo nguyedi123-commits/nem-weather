@@ -14,13 +14,14 @@ model it uses and how to read it. No new or changed panel without its card being
 | ~~G2~~ | ~~Map controls~~ – retired 20 Oct (inside G1 now) | – | [G2](panels/G2_map_controls.md) |
 | A1 | About: runs on screen + download progress | all built-in pages | [A1](panels/A1_about.md) |
 | D1 | What changed between two runs (all regions, notable changes only) | – (add it) | [D1](panels/D1_what_changed.md) |
+| I1 | Insights: what the latest run says + what changed (NSW, QLD, VIC, SA), page picker | Short, Medium, AI vs IFS, Seasonal | [I1](panels/I1_insights.md) |
 
 Since 20 Oct (W-015) every panel can be added to any page ("+ Add panel" in Edit mode), moved, resized, minimised
 and removed; pages can be added, renamed, copied, deleted and reset. Built-in page = the default layout of a page.
 The ⓘ in each title bar shows the card's "How to read it" (`web\help.json`, built from the cards by
 `tools\build_help.py` – rebuild after changing a card).
 
-Group letters: S Short · M Medium · C Compare · L Long (seasonal) · G Map · A About · D Difference (what changed). Codes are never reused.
+Group letters: S Short · M Medium · C Compare · L Long (seasonal) · G Map · A About · D Difference (what changed) · I Insights. Codes are never reused.
 
 ## Header (not panels)
 - Tabs (pages) · Edit tools (Edit mode) · status: download progress (W-016) + runs on screen · **Refresh** (W-018):

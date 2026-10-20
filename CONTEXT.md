@@ -12,6 +12,7 @@ day and keeps only the NEM region; Weather.exe picks the small files up **every 
 | Screen – pages Short / Medium / AI vs IFS / Seasonal / Map, Edit mode, region + field + run / vs pickers, ⓘ | Built, tested (W-015, W-017) |
 | Cloud – GitHub job + hourly pick-up (W-019, W-012) | **Built 20 Oct.** By-hand jobs all green; first scheduled runs 21 Oct |
 | Weather.exe | **New zip 20 Oct night** (`2. Output\Weather.zip` / `(update).zip`, 73 MB) – fills itself from the cloud ~20 s after start |
+| I1 Insights panel (W-021) – plain-words headlines + what changed, NSW/QLD/VIC/SA, on each page where TAS was | **Built 20 Oct night**, in the new zip |
 | BOM correction (W-008b) | Recording observations since 18 Oct (history from 1 Sep). Correction from ~mid Nov |
 
 ## Next (21 Oct)
@@ -32,7 +33,8 @@ day and keeps only the NEM region; Weather.exe picks the small files up **every 
   + the job strips it).
 
 ## User decisions (keep)
-- Region order: NSW, QLD, VIC (top) · SA, TAS (bottom). Times: NEM time (AEST). Charts + daily table.
+- Pages (user, 20 Oct): TAS removed everywhere – NSW, QLD, About (top) · SA, VIC, I1 Insights (bottom).
+  Built-in pages match. Insights cover NSW, QLD, VIC, SA (rules in card I1). Times: NEM time (AEST). Charts + daily table.
 - Keep **city data forever**, **maps 30 days**. Newest run only on direct downloads (`BACKFILL_HOURS` 0).
 - One screen, one window (no multi-monitor). Every panel has a card in `4. Docs\panels\` (card first, then code).
 - No .exe / zip until the user says "release" (released 20 Oct, twice).

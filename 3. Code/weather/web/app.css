@@ -142,3 +142,19 @@ body.empty-page #grid::before { content: "Empty page – click Edit (Ctrl+E), th
 .modal button.choice span { font-size: 0.85rem; color: var(--muted); }
 .modal button.choice:hover { border-color: var(--accent); background: var(--head); }
 .modal .hint-text { color: var(--muted); font-size: 0.85rem; margin: 0.3rem 0 0; }
+
+/* I1 insights (W-021) */
+.insights { padding: 0.3em 0.6em; overflow: auto; font-size: 0.85em; line-height: 1.35; }
+.insights h4 { margin: 0.4em 0 0.15em; }
+.insights h5 { margin: 0.2em 0 0.1em; font-size: 1em; }
+.insights ul { margin: 0.1em 0 0.3em; padding-left: 1.1em; }
+.insights .ins-head li { font-weight: 600; }
+.insights .ins-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(14em, 1fr)); gap: 0 0.8em; }
+.insights .dot { display: inline-block; width: 0.6em; height: 0.6em; border-radius: 2px; margin-right: 0.3em; }
+.ins-heat::marker { color: #d32f2f; } .ins-heat { color: #c62828; }
+.ins-cold::marker { color: #1565c0; } .ins-cold { color: #1565c0; }
+.ins-wind::marker, .ins-solar::marker { color: #e6a100; }
+.ins-rain::marker { color: #2a7ab0; }
+.ins-change::marker { color: #e65100; }
+.ins-info { color: var(--muted); }
+.theme-dark .ins-heat { color: #ff8a80; } .theme-dark .ins-cold { color: #82b1ff; }

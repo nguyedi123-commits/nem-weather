@@ -14,7 +14,7 @@ import sys
 import threading
 from urllib.parse import parse_qs, unquote, urlparse
 
-from . import cloud, config as C, progress, refresh, views
+from . import cloud, config as C, insights, progress, refresh, views
 
 log = logging.getLogger("weather.server")
 WEB = (Path(sys._MEIPASS) if getattr(sys, "frozen", False) else Path(__file__).resolve().parents[1]) / "web"
@@ -24,9 +24,9 @@ TYPES = {".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=u
          ".json": "application/json", ".txt": "text/plain; charset=utf-8", ".svg": "image/svg+xml"}
 
 ROUTES = {"short": views.short, "medium": views.medium, "compare": views.compare, "seasonal": views.seasonal,
-          "changes": views.changes}
+          "changes": views.changes, "insights": insights.insights}
 ARGS = {"short": ("run", "vs"), "medium": ("run", "vs"), "seasonal": ("run", "vs"), "changes": ("model", "run", "vs"),
-        "compare": ()}
+        "compare": (), "insights": ("page", "run", "vs")}
 
 
 class Cache:

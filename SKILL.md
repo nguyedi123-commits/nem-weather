@@ -1,107 +1,90 @@
 # SKILL – How to work on Weather (ECMWF)
 
-All commands run from `3. Code\weather\` using the project venv `..\..\.venv`. **What** we build is in PLAN.md;
-this file is **how**.
+Commands run from `3. Code\weather\` with the project venv `..\..\.venv` (git / GitHub from the project root).
+**What** we build is in PLAN.md and `4. Docs\`; where we are in CONTEXT.md; this file is **how**.
 
 ## Python
 ```
 py -3.14 -m venv .venv                     (from the project root)
-.venv\Scripts\pip install ecmwf-opendata xarray cfgrib eccodes pandas pyarrow cdsapi requests playwright
+.venv\Scripts\pip install eccodes pandas pyarrow requests cdsapi playwright pywebview==6.2.1 pythonnet==3.2.1 clr_loader==0.3.1 pyinstaller==6.22.3
 ```
-- `eccodes` (the ECMWF file reader) ships its own binary for Windows – no separate install.
-- A venv can't be moved: recreate it if the folder moves.
+- `eccodes` (the ECMWF file reader) ships its own Windows DLLs. A venv can't be moved: recreate it if the folder moves.
+- Cloud versions are pinned in `requirements-cloud.txt` (same as the venv).
 
 ## Keys
-- Copernicus: `C:\Users\nguye\.cdsapirc` (`url: https://cds.climate.copernicus.eu/api` + `key: ...`). Never paste the
-  key in chat or in code. Licence accepted for `seasonal-postprocessed-single-levels`; other seasonal datasets may
-  need their own licence click (error says "required licences not accepted" + a link).
-- ECMWF open data: no key.
+- Copernicus: `C:\Users\nguye\.cdsapirc` (`url:` + `key:`). Never paste the key in chat or code. In the cloud it is the
+  GitHub secret `CDSAPI_KEY`. Weather.exe also reads a `.cdsapirc` next to it (direct downloads only).
+- ECMWF open data, BOM: no key (BOM needs a browser-like User-Agent – done in the code).
 
-## Downloader – `backend\ecmwf.py`, settings `backend\config.py`
-```
-..\..\.venv\Scripts\python run_download.py --update                   catch up all feeds (what the app will do)
-..\..\.venv\Scripts\python run_download.py --feed ifs                 latest run of one feed (ifs | aifs | ens)
-..\..\.venv\Scripts\python run_download.py --feed ens --max-steps 3   quick test → files named *_test3
-```
-- How it works: read the file's `.index` → byte-range only the fields we need → decode in memory (eccodes) →
-  keep the east-coast box + 5 city squares → `data\work\<feed>\<run>\sNNN.npz` per step → when all steps are in,
-  combine to `data\cities\<feed>\<run>.parquet` + `data\grid\<feed>\<run>.npz`, add to `data\catalog.json`, delete work.
-- Change places / area / feeds / steps / fields in `config.py` (`CITIES`, `CITY_SQUARE`, `GRID`, `FEEDS`, `MAXMIN`).
-- Units: read from each file (`_scale`); rain and solar are "total since run start" → per-period (`_per_period`).
-- Output units: °C, km/h, %, mm per period, W/m² average over period. Times stored in UTC; show in AEST (UTC+10).
-- `DownloadLock` stops two downloaders running at once. Log: `data\download.log`.
-- Files on the ECMWF server: `{date}/{HH}z/{ifs|aifs-single}/0p25/{oper|enfo}/{date}{HH}0000-{step}h-{oper-fc|enfo-ef}.grib2`
-  (+ `.index`). Max/min temp: `mx2t3`/`mn2t3` to 144 h, `mx2t6`/`mn2t6` after.
-
-- Seasonal only: `run_download.py --seasonal` (`backend\seasonal.py`) – ECMWF SEAS5 (feed `seasonal`) + BOM
-  ACCESS-S2 (feed `seasonal_bom`), both from Copernicus. Each request queues 1–5 min.
-- BOM only: `run_download.py --bom` = city forecasts (`backend\bom.py`, FTP XML) + observations (`backend\obs.py`), seconds.
-- Refresh = `--update` = BOM forecasts + BOM observations + all ECMWF feeds + seasonal. **Only when the user asks** (~18 GB).
-
-## Cloud (W-019) – GitHub
-- Project: https://github.com/nguyedi123-commits/nem-weather (public: code + docs only – see `.gitignore`).
-  Git identity in this repo = GitHub no-reply address (never the personal email).
+## Cloud (W-019) – the normal way data arrives
+- Project https://github.com/nguyedi123-commits/nem-weather (public: code + docs only – `.gitignore` keeps out data,
+  settings, zips, keys). Git identity in this repo = GitHub no-reply address (never the personal email).
 - GitHub tool: `"C:\Program Files\GitHub CLI\gh.exe"` (logged in as nguyedi123-commits).
-- Job: `.github/workflows/refresh.yml` → `3. Code/weather/cloud/publish.py --mode light|full|bom`
-  (21:30 UTC light, 10:00 UTC full; "Run workflow" button for by-hand runs):
-  ```
-  gh workflow run refresh.yml --repo nguyedi123-commits/nem-weather -f mode=light
-  gh run list --repo nguyedi123-commits/nem-weather --limit 5
-  ```
-- Output: release `data` – one zip per run (`<feed>__<run>.zip`), `obs.zip`, `static.zip`, `manifest.json` (the list,
-  uploaded last). Kept 30 days (seasonal 400).
-- Copernicus key = repo secret `CDSAPI_KEY` (set from `C:\Users\nguye\.cdsapirc`, never printed).
-- Weather.exe side: `backend\cloud.py` – reads manifest every hour (`EVERY_S`), downloads only missing runs, merges obs,
-  state in `data\cloud.json`. Refresh → "From the cloud".
-- Publish code changes: `git add -A`, `git commit`, `git push` (from the project root).
+- Job `.github/workflows/refresh.yml` → `cloud/publish.py --mode light|full|bom`: 21:30 UTC (7:30 am NEM) light,
+  10:00 UTC (8 pm NEM) full. Publishes release `data`: `<feed>__<run>.zip`, `obs.zip`, `static.zip`, `manifest.json`
+  (the list, uploaded last). Keeps 30 days (seasonal 400).
+```
+gh workflow run refresh.yml --repo nguyedi123-commits/nem-weather -f mode=light      by hand (light | full | bom)
+gh run list --repo nguyedi123-commits/nem-weather --limit 5                           did the jobs work?
+gh run view <id> --repo nguyedi123-commits/nem-weather --log                          a job's log
+gh release view data --repo nguyedi123-commits/nem-weather --json assets              what is published
+gh secret set CDSAPI_KEY --repo nguyedi123-commits/nem-weather --body <key>           NOT via a PowerShell pipe (adds a hidden BOM)
+```
+- Weather.exe side `backend\cloud.py`: reads the manifest every hour (`EVERY_S`), downloads only runs it doesn't have,
+  merges obs, unpacks into `data\` (only expected paths). State `data\cloud.json`. Refresh → "From the cloud".
+- Publish code changes: `git add -A`, `git commit` (end with the Co-Authored-By line), `git push` – from the project root.
+- GitHub turns schedules off after 60 days without code uploads (W-020).
 
-## Docs rule
-- Every panel has a card in `4. Docs\panels\` (index `4. Docs\README.md`, requests `4. Docs\BACKLOG.md`, models
-  `4. Docs\MODELS.md`). Change a panel → update its card (and change log) first, then code.
-
-## Checking data against BOM
-- BOM city forecasts (XML, FTP): `ftp://ftp.bom.gov.au/anon/gen/fwo/` – IDQ11295 (QLD), IDN11060 (NSW),
-  IDV10753 (VIC), IDS10044 (SA), IDT16710 (TAS). Area `description` = city name, `type="location"`.
-- Compare daily max/min by local day; max/min values cover the 3 h (or 6 h) *before* their time.
+## Direct downloader (back-up) – `backend\ecmwf.py`, settings `backend\config.py`
+```
+..\..\.venv\Scripts\python run_download.py --update                   everything (~18 GB) – only when the user asks
+..\..\.venv\Scripts\python run_download.py --feed ifs                 newest run of one feed (ifs | aifs | ens)
+..\..\.venv\Scripts\python run_download.py --feed ens --max-steps 3   quick test → files named *_test3
+..\..\.venv\Scripts\python run_download.py --seasonal                 ECMWF + BOM seasonal (Copernicus, 1–5 min per request)
+..\..\.venv\Scripts\python run_download.py --bom                      BOM forecasts + observations (seconds)
+```
+- How it works: file `.index` → byte-range only needed fields → decode in memory → keep east-coast box + 5 city squares
+  → `data\work\` per step (resume) → `data\cities\<feed>\<run>.parquet` + `data\grid\<feed>\<run>.npz` + `catalog.json`.
+- Change places / area / feeds / steps / fields in `config.py` (`CITIES`, `CITY_SQUARE`, `GRID`, `FEEDS`, `MAXMIN`).
+- Units read from each file; rain / solar "since start" → per period. Times stored UTC, shown NEM (UTC+10).
+- `DownloadLock` = one downloader at a time (app, cloud pick-up, command line). Progress: `data\progress.json`.
 
 ## Run the app (dev copy)
 ```
-..\..\.venv\Scripts\python weather.py --browser --port 8892      dev: server only, open http://127.0.0.1:8892
+..\..\.venv\Scripts\python weather.py --browser --port 8892      server only → http://127.0.0.1:8892 (also picks up the cloud hourly)
 ..\..\.venv\Scripts\python weather.py                             the program window (as Weather.exe)
 ..\..\.venv\Scripts\python tests\e2e_pages.py http://127.0.0.1:8892 "..\..\2. Output\screenshots" [light|dark]
 ..\..\.venv\Scripts\python tests\e2e_edit.py http://127.0.0.1:8892 "..\..\2. Output\screenshots"
-..\..\.venv\Scripts\python tests\e2e_runs.py http://127.0.0.1:8892 "..\..\2. Output\screenshots"   (W-017 compare runs)
+..\..\.venv\Scripts\python tests\e2e_runs.py http://127.0.0.1:8892 "..\..\2. Output\screenshots"
 ..\..\.venv\Scripts\python tools\build_help.py      after changing a card: rebuilds web\help.json (the ⓘ text)
 ```
-- NEM Trader is on 8890, Nem Watch 8891. Look copied from NEM Trader (`web\app.css` colours, ECharts 6.1 in `web\vendor\`).
-- Files:
-  - `backend\views.py` – data → JSON per source (short / medium / compare / seasonal / map), no downloads.
-  - `backend\server.py` – http, cache (rebuilt when `data\catalog.json` changes), pages `/api/layout/<page>`
-    (GET / PUT / DELETE), `/api/layouts`, `/api/settings`, `/api/status` (+ download progress).
-  - `backend\progress.py` – the downloader writes `data\progress.json`; > 10 min without news = "stopped".
-  - `web\app.js` – grid (GridStack 24 × 36), pages, Edit mode, dialogs, status (copied from NEM Trader's app.js).
-  - `web\panels.js` – panel kinds `PANELS` (code, title, source, pickers, create) + all chart code.
-  - `web\layouts\<page>.json` – built-in pages (Reset); saved pages in `settings\layouts\`.
-- New panel: card first → `PANELS` entry in `web\panels.js` (+ data in `views.py` / route in `server.py` if new)
-  → code in `tools\build_help.py` KIND → rebuild help → tests.
-- `backend\` changes need a server restart; `web\` changes only a page reload.
-- The page polls `/api/status` every 60 s and redraws when a refresh has added data.
-- e2e tests (Playwright + Edge): `e2e_pages` = every built-in page, field / model pickers, ⓘ, screenshots;
-  `e2e_edit` = Edit mode like a user (add / pick / drag / resize / A+ / minimise / remove, page add / copy / rename /
-  delete / reset) and checks what was saved. Both clean up after themselves.
-- When stopping processes: check the command line first (`weather.py`) – NEM Trader's dev server is also `python.exe`.
+- NEM Trader is on 8890, Nem Watch 8891. `backend\` changes need a server restart; `web\` changes only a reload.
+- Files: `backend\views.py` (data → JSON, run / vs), `server.py` (http, cache, pages, settings, status, `/api/refresh`),
+  `refresh.py` (Refresh button: cloud / full / light / bom / test), `cloud.py`, `progress.py`, `system.py` (Windows bits);
+  `web\app.js` (grid, pages, Edit mode, pickers), `web\panels.js` (`PANELS` + charts), `web\layouts\` (built-in pages).
+- New panel: card first → `PANELS` entry → data in `views.py` / route in `server.py` if new → `KIND` in
+  `tools\build_help.py` → rebuild help → tests.
+- Stopping processes: check the command line first (`weather.py`) – NEM Trader's dev server is also `python.exe`.
 
-## Release (only when the user says "release") – first release 20 Oct
+## Docs rule
+- Every panel has a card in `4. Docs\panels\` (index `4. Docs\README.md`, requests `4. Docs\BACKLOG.md` W-numbers,
+  models `4. Docs\MODELS.md`). Change a panel → card (and change log) first, then code.
+
+## Release (only when the user says "release")
 ```
 build\build.bat                                     rebuilds web\help.json, then PyInstaller -> build\dist\Weather\
 ..\..\.venv\Scripts\python build\make_zip.py     -> 2. Output\Weather.zip + Weather (update).zip
 ```
-- Recipe: `build\weather.spec` (copied from NEM Trader; bundles web\, pywebview + .NET, eccodes DLLs, cdsapi).
-  Icon: `build\make_icon.py`. Notes in the zip: `build\READ ME - install.txt` / `update.txt`.
-- Test before handing over: unzip into an EMPTY folder, start Weather.exe, then (server port in data\weather.log,
-  8893 if the dev copy has 8892):  POST /api/refresh {"mode":"bom"}  and  {"mode":"test"} (2 IFS steps, ~15 MB, files *_test2,
-  proves eccodes works inside the exe). Close it, delete the folder.
-- Screenshots of the real window: PowerShell must call SetProcessDPIAware first (this PC is scaled 125 %), else the
-  picture is cut off.
-- The exe: one window (maximised), data\ + settings\ next to Weather.exe (or %LOCALAPPDATA%\Weather if not writable),
-  log data\weather.log, next free port from 8892, only one copy at a time.
+- Recipe `build\weather.spec` (from NEM Trader). Icon `build\make_icon.py`. Notes `build\READ ME - install.txt` / `update.txt`.
+- Test: unzip into an EMPTY folder, start Weather.exe → within ~20 s `data\weather.log` says "cloud: N new files"
+  and the pages fill. Direct checks (port in the log, 8893 if the dev copy has 8892): POST `/api/refresh`
+  `{"mode":"bom"}` and `{"mode":"test"}` (2 IFS steps, ~15 MB, proves eccodes in the exe). Close it, delete the folder.
+- Screenshots of the real window: PowerShell must call SetProcessDPIAware first (this PC is scaled 125 %).
+- The exe: one window (maximised), `data\` + `settings\` next to it (or `%LOCALAPPDATA%\Weather`), log
+  `data\weather.log`, next free port from 8892, one copy at a time.
+
+## Checking data against BOM
+- BOM city forecast XML: `ftp://ftp.bom.gov.au/anon/gen/fwo/` IDQ11295, IDN11060, IDV10753, IDS10044, IDT16710.
+- Observations: daily `bom.gov.au/climate/dwo/<YYYYMM>/text/<IDCJDW…>.<YYYYMM>.csv` (Adelaide = IDCJDW5081),
+  half-hourly `bom.gov.au/fwo/<product>.json`.
+- Compare daily max/min by local day; ECMWF max/min values cover the 3 h (or 6 h) *before* their time.

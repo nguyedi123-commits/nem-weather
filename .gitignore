@@ -1,0 +1,15 @@
+# Never in the public project: data, saved pages / settings, keys, builds, zips
+data/
+settings/
+.venv/
+2. Output/
+1. Input/
+**/__pycache__/
+*.pyc
+.cdsapirc
+**/.cdsapirc
+3. Code/weather/build/dist/
+3. Code/weather/build/work/
+*.zip
+*.log
+.claude/

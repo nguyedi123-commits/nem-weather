@@ -1,0 +1,82 @@
+{
+ "name": "Short",
+ "columns": 24,
+ "rows": 36,
+ "panels": [
+  {
+   "id": "short-nsw",
+   "kind": "short",
+   "x": 0,
+   "y": 0,
+   "w": 8,
+   "h": 18,
+   "font": 1,
+   "opts": {
+    "region": "NSW",
+    "field": "temp"
+   }
+  },
+  {
+   "id": "short-qld",
+   "kind": "short",
+   "x": 8,
+   "y": 0,
+   "w": 8,
+   "h": 18,
+   "font": 1,
+   "opts": {
+    "region": "QLD",
+    "field": "temp"
+   }
+  },
+  {
+   "id": "short-vic",
+   "kind": "short",
+   "x": 16,
+   "y": 0,
+   "w": 8,
+   "h": 18,
+   "font": 1,
+   "opts": {
+    "region": "VIC",
+    "field": "temp"
+   }
+  },
+  {
+   "id": "short-sa",
+   "kind": "short",
+   "x": 0,
+   "y": 18,
+   "w": 8,
+   "h": 18,
+   "font": 1,
+   "opts": {
+    "region": "SA",
+    "field": "temp"
+   }
+  },
+  {
+   "id": "short-tas",
+   "kind": "short",
+   "x": 8,
+   "y": 18,
+   "w": 8,
+   "h": 18,
+   "font": 1,
+   "opts": {
+    "region": "TAS",
+    "field": "temp"
+   }
+  },
+  {
+   "id": "about",
+   "kind": "about",
+   "x": 16,
+   "y": 18,
+   "w": 8,
+   "h": 18,
+   "font": 1,
+   "opts": {}
+  }
+ ]
+}

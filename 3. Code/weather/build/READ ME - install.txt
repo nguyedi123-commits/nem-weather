@@ -1,0 +1,28 @@
+Weather – ECMWF + BOM forecasts for the NEM east coast
+=====================================================
+
+Install
+1. Unzip the "Weather" folder somewhere you can write to, e.g. C:\Weather or your Documents.
+   (Not "Program Files" – if you do, Weather keeps its data in %LOCALAPPDATA%\Weather instead.)
+2. Double-click Weather.exe. One window opens (maximised).
+3. The first time there is no data yet: click Refresh (top right) and choose:
+     Full              ~18 GB  – everything incl. the 50-run ensemble (home internet; ~30 min fast, ~4 h at 10 Mbit/s)
+     Without ensemble  ~1.5 GB – main model + AI model + BOM + seasonal
+     BOM only          a few KB
+   Progress shows in the header and in the About panel. The screen keeps working while it downloads.
+   If the PC is turned off, the next refresh carries on where it stopped.
+
+Seasonal forecasts (Copernicus) need a key
+- Put a file called .cdsapirc in the Weather folder (next to Weather.exe), with two lines:
+     url: https://cds.climate.copernicus.eu/api
+     key: <your Copernicus key>
+  (or keep it in C:\Users\<you>\.cdsapirc). Without it, everything else still works.
+
+Using it
+- Pages (tabs) across the top. Edit (or Ctrl+E): move / resize / add / remove panels, add / rename / copy / delete pages.
+- Each panel: region and field pickers; run / vs pickers to compare with an earlier run; ⓘ explains the panel.
+
+Where things are
+- data\       downloaded east-coast data (only the east coast is kept; the global files are never saved)
+- settings\   your pages and screen settings
+- data\weather.log   the program's log (send it if something goes wrong)

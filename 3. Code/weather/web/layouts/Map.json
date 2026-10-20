@@ -1,0 +1,30 @@
+{
+ "name": "Map",
+ "columns": 24,
+ "rows": 36,
+ "panels": [
+  {
+   "id": "map",
+   "kind": "map",
+   "x": 0,
+   "y": 0,
+   "w": 18,
+   "h": 36,
+   "font": 1,
+   "opts": {
+    "src": "ifs",
+    "field": "temp"
+   }
+  },
+  {
+   "id": "about",
+   "kind": "about",
+   "x": 18,
+   "y": 0,
+   "w": 6,
+   "h": 36,
+   "font": 1,
+   "opts": {}
+  }
+ ]
+}

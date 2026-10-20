@@ -1,0 +1,51 @@
+# Weather cloud refresh (W-019): downloads ECMWF / BOM / Copernicus on GitHub's computer, keeps only the NEM east coast,
+# publishes small files on the release "data". Weather.exe picks them up every hour.
+# Times are UTC: 21:30 = 7:30 am NEM (overnight run, without ensemble), 10:00 = 8 pm NEM (morning run, with ensemble).
+name: Weather refresh
+
+on:
+  schedule:
+    - cron: "30 21 * * *"
+    - cron: "0 10 * * *"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "full (~30 min, with ensemble) · light (without ensemble) · bom (BOM only)"
+        type: choice
+        options: [light, full, bom]
+        default: light
+
+permissions:
+  contents: write   # to publish the release files
+
+concurrency:
+  group: weather-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Install
+        run: pip install -r "3. Code/weather/requirements-cloud.txt"
+
+      - name: Copernicus key (from the hidden secret)
+        env:
+          CDSAPI_KEY: ${{ secrets.CDSAPI_KEY }}
+        run: |
+          if [ -n "$CDSAPI_KEY" ]; then
+            printf 'url: https://cds.climate.copernicus.eu/api\nkey: %s\n' "$CDSAPI_KEY" > ~/.cdsapirc
+          fi
+
+      - name: Download, keep the NEM east coast, publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || (github.event.schedule == '0 10 * * *' && 'full' || 'light') }}
+        run: python "3. Code/weather/cloud/publish.py" --mode "$MODE"

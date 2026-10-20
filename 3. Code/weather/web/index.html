@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Weather</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="vendor/gridstack.min.css">
+  <link rel="stylesheet" href="app.css">
+  <script src="vendor/gridstack-all.js"></script>
+  <script src="vendor/echarts.min.js"></script>
+</head>
+<body>
+  <header id="bar">
+    <div class="brand">Weather</div>
+    <div id="clock" title="NEM time (AEST)"></div>
+    <nav id="tabs" title="Pages: click to switch"></nav>
+    <span class="edit-tools">
+      <select id="add-panel" title="Add a panel (it goes in the first free space)"></select>
+      <button id="rename-page" title="Rename this page">Rename</button>
+      <button id="copy-page" title="Save a copy of this page under a new name">Copy…</button>
+      <button id="delete-page" title="Delete this page">Delete</button>
+      <button id="reset-page" title="Put this page back to its built-in layout">Reset</button>
+    </span>
+    <div id="status" title="Download progress and the forecast runs on screen (NEM time). New data only when you ask for a refresh."></div>
+    <button id="refresh" title="Download the newest forecasts (choose how much)">Refresh</button>
+    <button id="theme" title="Light / dark">Theme</button>
+    <button id="edit" title="Edit the screen: move, resize, text size, add / remove panels and pages (Ctrl+E)">Edit</button>
+  </header>
+  <main class="grid-stack" id="grid"></main>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

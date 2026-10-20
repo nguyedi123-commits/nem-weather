@@ -1,0 +1,7 @@
+Weather – update
+================
+
+1. Close Weather.
+2. Unzip this over the existing Weather folder (say yes to replace files).
+   Your data\ (forecast history) and settings\ (your pages) are not touched.
+3. Start Weather.exe.

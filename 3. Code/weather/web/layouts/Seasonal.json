@@ -1,0 +1,82 @@
+{
+ "name": "Seasonal",
+ "columns": 24,
+ "rows": 36,
+ "panels": [
+  {
+   "id": "seasonal-nsw",
+   "kind": "seasonal",
+   "x": 0,
+   "y": 0,
+   "w": 8,
+   "h": 18,
+   "font": 1,
+   "opts": {
+    "region": "NSW",
+    "field": "temp"
+   }
+  },
+  {
+   "id": "seasonal-qld",
+   "kind": "seasonal",
+   "x": 8,
+   "y": 0,
+   "w": 8,
+   "h": 18,
+   "font": 1,
+   "opts": {
+    "region": "QLD",
+    "field": "temp"
+   }
+  },
+  {
+   "id": "seasonal-vic",
+   "kind": "seasonal",
+   "x": 16,
+   "y": 0,
+   "w": 8,
+   "h": 18,
+   "font": 1,
+   "opts": {
+    "region": "VIC",
+    "field": "temp"
+   }
+  },
+  {
+   "id": "seasonal-sa",
+   "kind": "seasonal",
+   "x": 0,
+   "y": 18,
+   "w": 8,
+   "h": 18,
+   "font": 1,
+   "opts": {
+    "region": "SA",
+    "field": "temp"
+   }
+  },
+  {
+   "id": "seasonal-tas",
+   "kind": "seasonal",
+   "x": 8,
+   "y": 18,
+   "w": 8,
+   "h": 18,
+   "font": 1,
+   "opts": {
+    "region": "TAS",
+    "field": "temp"
+   }
+  },
+  {
+   "id": "about",
+   "kind": "about",
+   "x": 16,
+   "y": 18,
+   "w": 8,
+   "h": 18,
+   "font": 1,
+   "opts": {}
+  }
+ ]
+}

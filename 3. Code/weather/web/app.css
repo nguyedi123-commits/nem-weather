@@ -1,0 +1,144 @@
+/* Weather screen. Same look as NEM Trader (colours, fonts, panel heads, edit mode). Sizes in rem: text grows with the screen. */
+:root { font-size: calc(0.5vw + 3px); }
+body {
+  margin: 0; height: 100vh; overflow: hidden; font-family: "Segoe UI", Arial, sans-serif;
+  background: var(--page); color: var(--text);
+}
+.theme-light {
+  --page: #d5d9de; --panel: #ffffff; --head: #e3e7eb; --head-text: #222; --text: #1d2327; --muted: #5f6b73;
+  --border: #b8c0c7; --grid: #e6e9ec; --accent: #1e88e5; --alert: #c62828; --alert-bg: #ffebee; --warn-bg: #fff4d6;
+}
+.theme-dark {
+  --page: #0e1116; --panel: #171b22; --head: #222833; --head-text: #e6e9ee; --text: #e1e5ea; --muted: #9aa5b1;
+  --border: #2d3540; --grid: #2a313b; --accent: #64b5f6; --alert: #ff6b6b; --alert-bg: #3a1d20; --warn-bg: #3a3320;
+}
+
+/* ---------- header ---------- */
+#bar {
+  display: flex; align-items: center; gap: 0.8rem; height: 2.2rem; padding: 0 0.8rem;
+  background: var(--head); color: var(--head-text); border-bottom: 1px solid var(--border); font-size: 0.95rem;
+}
+#bar .brand { font-weight: 700; font-size: 1.1rem; color: var(--accent); }
+#bar select, #bar > button, .edit-tools button {
+  font: inherit; padding: 0.1rem 0.5rem; border: 1px solid var(--border); border-radius: 4px;
+  background: var(--panel); color: var(--text); cursor: pointer;
+}
+#clock { font-weight: 600; white-space: nowrap; }
+#status { flex: 1; text-align: right; color: var(--muted); font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#status .old { color: var(--alert); font-weight: 600; }
+#status .dl { color: var(--accent); font-weight: 600; }
+#edit { font-weight: 600; }
+body.editing #edit { background: var(--accent); color: #fff; }
+
+#tabs { display: flex; gap: 0.2rem; overflow-x: auto; max-width: 45vw; align-self: flex-end; }
+#tabs .tab { font: inherit; padding: 0.15rem 0.7rem; border: 1px solid var(--border); border-bottom: none;
+  border-radius: 5px 5px 0 0; background: var(--panel); color: var(--muted); cursor: pointer; white-space: nowrap; }
+#tabs .tab.on { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+#tabs .tab.add { border-style: dashed; }
+
+/* ---------- grid + panels ---------- */
+#grid { min-height: calc(100vh - 2.2rem); }   /* GridStack sets the height from the panels; the edit grid needs the whole screen */
+.grid-stack-item-content { inset: 3px !important; }
+.panel {
+  position: absolute; inset: 0; display: flex; flex-direction: column; background: var(--panel);
+  border: 1px solid var(--border); border-radius: 4px; overflow: hidden; font-size: calc(1rem * var(--fs, 1));
+}
+.panel-head {
+  display: flex; align-items: center; gap: 0.4em; padding: 0.15em 0.5em; background: var(--head);
+  color: var(--head-text); font-weight: 600; font-size: 0.95em; border-bottom: 1px solid var(--border); white-space: nowrap;
+}
+.panel-head .code { font-size: 0.8em; color: var(--muted); border: 1px solid var(--grid); border-radius: 3px; padding: 0 0.3em; }
+.panel-head .swatch { width: 0.7em; height: 0.7em; border-radius: 2px; flex: none; }
+.panel-head .pickers { display: flex; gap: 0.3em; }
+.panel-head select { font: inherit; font-weight: 600; font-size: 0.9em; border: 1px solid var(--border); border-radius: 3px;
+  background: var(--panel); color: var(--text); padding: 0 0.2em; cursor: pointer; }
+.panel-head .title { white-space: nowrap; }
+.panel-head .sub { flex: 1; font-weight: 400; font-size: 0.8em; color: var(--muted); overflow: hidden; text-overflow: ellipsis; text-align: right; }
+.panel-head .ctls { display: flex; gap: 0.2em; }
+.ctl {
+  font: inherit; font-size: 0.85em; line-height: 1; padding: 0.1em 0.35em; border: 1px solid var(--border);
+  border-radius: 3px; background: var(--panel); color: var(--text); cursor: pointer;
+}
+.ctl:hover { background: var(--accent); color: #fff; }
+.panel-body { flex: 1; display: flex; flex-direction: column; min-height: 0; position: relative; }
+.chart { flex: 1 1 58%; min-height: 0; }
+.table { flex: 0 1 auto; max-height: 42%; overflow: auto; border-top: 1px solid var(--grid); }
+.note { color: var(--muted); font-size: 0.8em; padding: 0.2em 0.5em; }
+.empty { color: var(--muted); padding: 1em; text-align: center; }
+.err { color: var(--alert); padding: 1em; }
+.panel.min .panel-body { display: none; }
+.panel.min .panel-head { cursor: pointer; border-bottom: none; height: 100%; }
+
+table.grid { border-collapse: collapse; width: 100%; font-size: 0.82em; }
+table.grid th, table.grid td { padding: 0.1em 0.4em; border-bottom: 1px solid var(--grid); text-align: right; white-space: nowrap; }
+table.grid th { background: var(--head); position: sticky; top: 0; text-align: center; font-weight: 600; }
+table.grid td.l, table.grid th.l { text-align: left; }
+table.grid tr.part td { color: var(--muted); font-style: italic; }
+table.grid td.big { background: var(--warn-bg); font-weight: 600; }
+table.grid .rng { color: var(--muted); font-size: 0.9em; }
+
+/* map strip (G1) */
+.map-strip { display: flex; align-items: center; gap: 0.4em; padding: 0.2em 0.5em; border-top: 1px solid var(--grid); font-size: 0.9em; }
+.map-strip input[type=range] { flex: 0 1 40%; }
+.map-strip .m-time { font-weight: 600; white-space: nowrap; }
+.map-strip .m-note { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* about (A1) */
+.about { padding: 0.4em 0.7em; overflow: auto; font-size: 0.85em; line-height: 1.4; }
+.about h4 { margin: 0.5em 0 0.2em; }
+.about ul { margin: 0.2em 0; padding-left: 1.2em; }
+.about table { border-collapse: collapse; }
+.about td { padding: 0.05em 0.6em 0.05em 0; }
+.about .old { color: var(--alert); font-weight: 600; }
+.progress-box { border: 1px solid var(--accent); border-radius: 4px; padding: 0.3em 0.5em; font-weight: 600; color: var(--accent); }
+.progress-box .bar { height: 0.5em; background: var(--grid); border-radius: 3px; margin-top: 0.3em; overflow: hidden; }
+.progress-box .bar div { height: 100%; background: var(--accent); }
+
+/* ---------- edit mode ---------- */
+.edit-only, .edit-tools { display: none !important; }
+body.editing .edit-only { display: inline-block !important; }
+body.editing .edit-tools { display: flex !important; align-items: center; gap: 0.4rem; }
+.panel-head .ctl:not(.edit-only):not(.help-btn) { opacity: 0; transition: opacity 0.2s; }
+.panel-head:hover .ctl, .panel.min .ctl, body.editing .panel-head .ctl { opacity: 1; }
+body.editing .panel-head { cursor: move; background: repeating-linear-gradient(45deg, var(--head), var(--head) 8px,
+  rgba(30, 136, 229, 0.12) 8px, rgba(30, 136, 229, 0.12) 16px); }
+body.editing .panel { outline: 2px dashed var(--accent); outline-offset: -2px; }
+body.editing #grid { background-image: linear-gradient(rgba(30,136,229,.08) 1px, transparent 1px),
+  linear-gradient(90deg, rgba(30,136,229,.08) 1px, transparent 1px); background-size: calc(100% / 24) calc(100% / 36); }
+body.empty-page #grid::before { content: "Empty page – click Edit (Ctrl+E), then '+ Add panel…'";
+  position: absolute; top: 40%; width: 100%; text-align: center; color: var(--muted); font-size: 1.3rem; }
+
+/* ---------- in-page dialogs ---------- */
+.modal-back { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.45); display: flex; align-items: center;
+  justify-content: center; z-index: 1000; }
+.modal { background: var(--panel); color: var(--text); border: 1px solid var(--border); border-radius: 6px;
+  padding: 1rem 1.3rem; min-width: 26rem; max-width: 50vw; max-height: 85vh; overflow: auto;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35); font-size: 1rem; }
+.modal.wide { max-width: 60vw; }
+.modal h3 { margin: 0 0 0.8rem; }
+.modal h4 { margin: 0.8rem 0 0.2rem; }
+.modal p { margin: 0 0 0.6rem; }
+.modal ul { margin: 0.2rem 0 0.6rem; padding-left: 1.2rem; line-height: 1.45; }
+.modal .field { font: inherit; padding: 0.2rem 0.4rem; border: 1px solid var(--border); border-radius: 4px;
+  background: var(--page); color: var(--text); width: 100%; box-sizing: border-box; margin-bottom: 0.8rem; }
+.modal .btns { display: flex; justify-content: flex-end; gap: 0.6rem; margin-top: 0.8rem; }
+.modal button { font: inherit; padding: 0.25rem 0.9rem; border: 1px solid var(--border); border-radius: 4px;
+  background: var(--panel); color: var(--text); cursor: pointer; }
+.modal button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* run / vs pickers and changes (W-017) */
+.panel-head .runs { display: flex; gap: 0.3em; }
+.panel-head select.run-pick { font-weight: 400; font-size: 0.82em; max-width: 13em; }
+.panel-head select.run-pick.vs { color: #e65100; }
+.chg-big { background: var(--warn-bg); font-weight: 700; padding: 0 0.15em; border-radius: 2px; }
+.changes { padding: 0.2em 0.4em; overflow: auto; }
+.changes table.grid td { white-space: normal; vertical-align: top; }
+.changes .dot { display: inline-block; width: 0.6em; height: 0.6em; border-radius: 2px; margin-right: 0.3em; }
+
+/* Refresh (W-018) */
+#refresh.busy { background: var(--accent); color: #fff; }
+.refresh-choices { display: flex; flex-direction: column; gap: 0.5rem; }
+.modal button.choice { display: flex; flex-direction: column; align-items: flex-start; gap: 0.15rem; text-align: left; padding: 0.5rem 0.8rem; }
+.modal button.choice span { font-size: 0.85rem; color: var(--muted); }
+.modal button.choice:hover { border-color: var(--accent); background: var(--head); }
+.modal .hint-text { color: var(--muted); font-size: 0.85rem; margin: 0.3rem 0 0; }

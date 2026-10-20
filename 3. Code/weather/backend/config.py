@@ -1,0 +1,84 @@
+"""Settings for the ECMWF downloader: places, area, feeds, folders."""
+import os
+from pathlib import Path
+import sys
+
+
+def _writable(folder):
+    try:
+        folder.mkdir(parents=True, exist_ok=True)
+        t = folder / ".write-test"
+        t.write_text("ok")
+        t.unlink()
+        return True
+    except OSError:
+        return False
+
+
+# Data folder: next to the exe when frozen, project root when run from source.
+# If the exe sits somewhere Windows won't let it write (e.g. Program Files): %LOCALAPPDATA%\Weather instead.
+if getattr(sys, "frozen", False):
+    BASE = Path(sys.executable).resolve().parent
+    if not _writable(BASE / "data"):
+        BASE = Path(os.environ.get("LOCALAPPDATA", Path.home())) / "Weather"
+else:
+    BASE = Path(__file__).resolve().parents[3]
+DATA = BASE / "data"
+SETTINGS = BASE / "settings"   # saved pages (layouts) and screen settings
+
+# Copernicus key: a .cdsapirc next to the program (or in settings\) is used before the one in the user's folder
+for _rc in (BASE / ".cdsapirc", SETTINGS / ".cdsapirc"):
+    if _rc.exists():
+        os.environ.setdefault("CDSAPI_RC", str(_rc))
+        break
+
+CITIES = [  # (region, city, lat, lon)
+    ("QLD", "Brisbane", -27.47, 153.03),
+    ("NSW", "Sydney", -33.87, 151.21),
+    ("VIC", "Melbourne", -37.81, 144.96),
+    ("SA", "Adelaide", -34.93, 138.60),
+    ("TAS", "Hobart", -42.88, 147.33),
+]
+# Each city uses the nearest grid square that is >= 90% land (coastal squares read too cool).
+# Manual picks where that lands somewhere unrepresentative:
+CITY_SQUARE = {"Adelaide": (-34.75, 138.75)}   # nearest land square is in the cooler Adelaide Hills
+LAND_MIN = 0.9
+
+# East-coast map box (degrees), 0.25 deg grid
+GRID = dict(north=-9.0, south=-44.0, west=129.0, east=155.0)
+
+# AWS copy first (faster), ECMWF server as backup
+SOURCES = [
+    "https://ecmwf-forecasts.s3.eu-central-1.amazonaws.com",
+    "https://data.ecmwf.int/forecasts",
+]
+KEEP_DAYS = 4          # how far back ECMWF keeps runs
+GRID_KEEP_DAYS = 30    # map data kept on disk
+
+ALL_PARAMS = ["2t", "2d", "10u", "10v", "100u", "100v", "tcc", "tp", "ssrd"]
+ENS_PARAMS = ["2t", "100u", "100v", "tp", "ssrd"]
+# Highest / lowest temperature in the last 3 h (to day 6) or 6 h (after). Not in AIFS.
+MAXMIN = {"mx2t3": "mx2t", "mx2t6": "mx2t", "mn2t3": "mn2t", "mn2t6": "mn2t"}
+
+
+def _steps(*ranges):
+    out = []
+    for start, stop, by in ranges:
+        out += list(range(start, stop + 1, by))
+    return out
+
+
+LONG = _steps((0, 144, 3), (150, 360, 6))        # 15 days
+SHORT = _steps((0, 90, 3))                       # 06z/18z quick update
+AI = _steps((0, 360, 6))
+# 6-hourly to day 7, then 4 pm / 4 am AEST (06z / 18z UTC) to day 15
+ENS = _steps((0, 168, 6), (174, 354, 12))
+
+FEEDS = {
+    "ifs": dict(label="IFS main model", model="ifs", stream="oper", type="fc",
+                params=ALL_PARAMS + list(MAXMIN), runs={0: LONG, 6: SHORT, 12: LONG, 18: SHORT}),
+    "aifs": dict(label="AIFS AI model", model="aifs-single", stream="oper", type="fc",
+                 params=ALL_PARAMS, runs={0: AI, 12: AI}),
+    "ens": dict(label="IFS ensemble", model="ifs", stream="enfo", type="ef",
+                params=ENS_PARAMS + list(MAXMIN), runs={0: ENS}),
+}

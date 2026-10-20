@@ -1,0 +1,82 @@
+{
+ "name": "Medium",
+ "columns": 24,
+ "rows": 36,
+ "panels": [
+  {
+   "id": "medium-nsw",
+   "kind": "medium",
+   "x": 0,
+   "y": 0,
+   "w": 8,
+   "h": 18,
+   "font": 1,
+   "opts": {
+    "region": "NSW",
+    "field": "temp"
+   }
+  },
+  {
+   "id": "medium-qld",
+   "kind": "medium",
+   "x": 8,
+   "y": 0,
+   "w": 8,
+   "h": 18,
+   "font": 1,
+   "opts": {
+    "region": "QLD",
+    "field": "temp"
+   }
+  },
+  {
+   "id": "medium-vic",
+   "kind": "medium",
+   "x": 16,
+   "y": 0,
+   "w": 8,
+   "h": 18,
+   "font": 1,
+   "opts": {
+    "region": "VIC",
+    "field": "temp"
+   }
+  },
+  {
+   "id": "medium-sa",
+   "kind": "medium",
+   "x": 0,
+   "y": 18,
+   "w": 8,
+   "h": 18,
+   "font": 1,
+   "opts": {
+    "region": "SA",
+    "field": "temp"
+   }
+  },
+  {
+   "id": "medium-tas",
+   "kind": "medium",
+   "x": 8,
+   "y": 18,
+   "w": 8,
+   "h": 18,
+   "font": 1,
+   "opts": {
+    "region": "TAS",
+    "field": "temp"
+   }
+  },
+  {
+   "id": "about",
+   "kind": "about",
+   "x": 16,
+   "y": 18,
+   "w": 8,
+   "h": 18,
+   "font": 1,
+   "opts": {}
+  }
+ ]
+}

@@ -12,7 +12,7 @@ day and keeps only the NEM region; Weather.exe picks the small files up **every 
 | Screen – pages Short / Medium / AI vs IFS / Seasonal / Map, Edit mode, region + field + run / vs pickers, ⓘ, I1 Insights, map Play | Built, tested |
 | Cloud – GitHub job + hourly pick-up (W-019, W-012) | Built 20 Oct. All by-hand jobs green. **Scheduled jobs not yet seen running** (see below) |
 | Weather.exe | Latest zip **21 Oct 09:48** (`2. Output\Weather.zip`, 70 MB) – everything above + trusts Windows certificates (office network fix) |
-| Trading PC | **21 Oct: user installing now** – only `Weather.zip` needed (no key, no data folder) |
+| Trading PC | **21 Oct: installed and working** (on a non-office Wi-Fi – see below) |
 | BOM correction (W-008b) | Recording observations since 18 Oct (history from 1 Sep). Correction from ~mid Nov |
 
 ## Trading PC install (21 Oct)
@@ -26,8 +26,10 @@ day and keeps only the NEM region; Weather.exe picks the small files up **every 
 - If problems: ask for `C:\Weather\Weather\data\weather.log` + a screenshot.
 
 ## Next
-- [ ] Trading PC: first try said "Cloud not reachable: CERTIFICATE_VERIFY_FAILED" (office network checks secure traffic).
-  Fix: Weather.exe now uses the Windows certificate list (`truststore`). Update zip 21 Oct 09:48 → step 5 OK? (user)
+- [x] Trading PC working (21 Oct). The **office Wi-Fi** FortiGate firewall inspects github.com with a certificate
+  the PC doesn't trust → "Cloud not reachable". User uses another Wi-Fi. If needed later: IT installs the Fortinet
+  certificate (no rebuild – the exe uses Windows' certificates) or Weather.exe fetches from GitHub's file storage instead.
+  Check tool: `2. Output\Weather net check\RUN ME.bat`.
 - [ ] **Tonight 8:07 pm NEM**: does the scheduled full job start by itself? (first with `ensx` on a schedule).
   The 7:30 am job on 21 Oct never started → light job run by hand at 8:01 am (OK: IFS + AIFS 20 Oct 22:00 run,
   BOM 7:42 am). Times moved off round minutes to **7:37 am / 8:07 pm NEM** (pushed). If it still doesn't start:
@@ -70,4 +72,5 @@ day and keeps only the NEM region; Weather.exe picks the small files up **every 
 - Ensemble part-day max/min made lows too warm: full-day (`ensx`) lowers them up to 2.6 °C (SA), highs up to +1.1 °C.
 - Medium chart after day 7 has only 4 am / 4 pm points – the afternoon peak isn't drawn; table + I1 use true highs.
 - BOM ACCESS-S2 leans warmer than ECMWF SEAS5 (Sydney Oct +1.8 vs +1.0 °C).
+- Office Wi-Fi (FortiGate) blocks github.com only; GitHub file storage, ECMWF, BOM pass.
 - This PC: full direct refresh ~26 min (~12 MB/s). GitHub's computer ~3× faster.

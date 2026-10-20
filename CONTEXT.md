@@ -66,8 +66,9 @@
   (first "Without ensemble" ~1.5 GB, then "Full" if the office line allows). Copy `.cdsapirc` next to Weather.exe there.
   If problems: ask for `data\weather.log` + a screenshot.
 - 20 Oct: W-019 cloud refresh – GitHub project nem-weather (public) created, code pushed, Copernicus key as secret,
-  first job started by hand (light). Weather.exe picks up from the cloud every hour (`backend\cloud.py`) – not yet
-  in a released zip.
+  first jobs by hand: light 4 min (IFS + AIFS + BOM), seasonal 2 min (after fixing a hidden character in the key),
+  full (ensemble) running. New Weather.zip (20 Oct, evening) fills itself from the cloud ~20 s after start, then hourly.
+  Scheduled jobs: 21:30 UTC (7:30 am NEM, light) and 10:00 UTC (8 pm NEM, full).
 - Backlog for later (user, 18 Oct): W-009 AIFS ENS, W-010 NOAA GFS/GEFS, W-011 other seasonal centres.
 - First look: BOM's Brisbane highs sit 2–3 °C above the whole ECMWF ensemble range (ECMWF too cool there →
   W-008 BOM correction). BOM ACCESS-S2 leans warmer than ECMWF SEAS5 (e.g. Sydney Oct +1.8 vs +1.0 °C).

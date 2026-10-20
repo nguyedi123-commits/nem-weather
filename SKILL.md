@@ -20,9 +20,17 @@ py -3.14 -m venv .venv                     (from the project root)
 - Project https://github.com/nguyedi123-commits/nem-weather (public: code + docs only – `.gitignore` keeps out data,
   settings, zips, keys). Git identity in this repo = GitHub no-reply address (never the personal email).
 - GitHub tool: `"C:\Program Files\GitHub CLI\gh.exe"` (logged in as nguyedi123-commits).
-- Job `.github/workflows/refresh.yml` → `cloud/publish.py --mode light|full|bom`: 21:37 UTC (7:37 am NEM) light,
-  10:07 UTC (8:07 pm NEM) full (off round minutes – GitHub is late on :00 / :30). Publishes release `data`: `<feed>__<run>.zip`, `obs.zip`, `static.zip`, `manifest.json`
-  (the list, uploaded last). Keeps 30 days (seasonal 400).
+- Job `.github/workflows/refresh.yml` → `cloud/publish.py --mode light|full|bom`:
+  - 21:37 UTC (7:37 am NEM) light = BOM + IFS + AIFS + seasonal;
+  - 10:07 UTC (8:07 pm NEM) full = + ensemble + `ensx`.
+  - Off round minutes: GitHub starts :00 / :30 schedules late or skips them (the 7:30 am job on 21 Oct never ran).
+- Publishes release `data`: `<feed>__<run>.zip`, `obs.zip`, `static.zip`, `manifest.json` (the list, uploaded last).
+  Keeps 30 days (seasonal 400).
+- **Morning check:** `gh run list` (did the scheduled job run?) and the manifest's `last_job` (time, mode, errors, new):
+  ```
+  gh release download data --repo nguyedi123-commits/nem-weather --pattern manifest.json --output -
+  ```
+  If a scheduled job didn't start: run it by hand (`-f mode=light` morning, `-f mode=full` evening).
 ```
 gh workflow run refresh.yml --repo nguyedi123-commits/nem-weather -f mode=light      by hand (light | full | bom)
 gh run list --repo nguyedi123-commits/nem-weather --limit 5                           did the jobs work?
@@ -85,6 +93,12 @@ build\build.bat                                     rebuilds web\help.json, then
 - Screenshots of the real window: PowerShell must call SetProcessDPIAware first (this PC is scaled 125 %).
 - The exe: one window (maximised), `data\` + `settings\` next to it (or `%LOCALAPPDATA%\Weather`), log
   `data\weather.log`, next free port from 8892, one copy at a time.
+
+## Installing on the trading PC (user does this)
+- Give only `2. Output\Weather.zip` (no key, no data – the cloud fills it). Unzip to e.g. `C:\Weather`, start
+  `Weather\Weather.exe` (SmartScreen: More info → Run anyway). ~20 s later the About panel shows the cloud times.
+- Update later: `Weather (update).zip` unzipped over the folder (keeps `data\` and `settings\`).
+- Problems: ask for `data\weather.log` + a screenshot.
 
 ## Checking data against BOM
 - BOM city forecast XML: `ftp://ftp.bom.gov.au/anon/gen/fwo/` IDQ11295, IDN11060, IDV10753, IDS10044, IDT16710.

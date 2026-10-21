@@ -41,6 +41,8 @@ and do **ECMWF, BOM and the US model (CFS)** agree? The backdrop for monthly and
 ## Limits
 - Monthly averages only – says nothing about single heatwaves or wind lulls.
 - Seasonal skill in Australia is modest outside strong El Niño / La Niña / Indian Ocean signals.
+- CFS (US) solar leaned much sunnier than ECMWF and BOM in every month and region (Oct 2026 issue, 75–95 % of runs) –
+  treat its solar with care until we see more months.
 - BOM's own published outlooks (bom.gov.au/climate/ahead) use ACCESS-S2 with BOM's own processing – numbers can differ a little.
 
 ## Change log

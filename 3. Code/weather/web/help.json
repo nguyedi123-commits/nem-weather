@@ -2,7 +2,7 @@
  "about": {
   "code": "A1",
   "title": "About this page",
-  "html": "<h4>How to read it</h4><p>If a run is red (&gt; 30 h old), the screen is out of date – ask for a refresh.</p><h4>What you see</h4><ul><li>Short notes on the page&#x27;s panels (what the colours mean); full notes behind each panel&#x27;s ⓘ.</li><li><b>Forecast runs on screen</b> (NEM time): IFS, AIFS, ensemble run time + hours old (red if &gt; 30 h); seasonal month.</li><li><b>Download progress</b> while a refresh runs (W-016): which model, step x of y, %, GB so far.</li><li><b>Cloud (W-019):</b> when the cloud last made new data, when Weather last checked, next check (every hour).</li><li>Reminder: new data only when a refresh is asked for. Data credit: ECMWF, CC BY 4.0.</li></ul><h4>Limits</h4><p>Notes are a summary – the full explanation is in the tab&#x27;s card (S1, M1, C1, L1).</p>"
+  "html": "<h4>How to read it</h4><p>If a run is red (&gt; 30 h old), the screen is out of date – ask for a refresh.</p><h4>What you see</h4><ul><li>Short notes on the page&#x27;s panels (what the colours mean); full notes behind each panel&#x27;s ⓘ.</li><li><b>Forecast runs on screen</b> (NEM time): IFS, AIFS, ensemble run time + hours old (red if &gt; 30 h); seasonal month.</li><li><b>Download progress</b> while a refresh runs (W-016): which model, step x of y, %, GB so far.</li><li><b>Cloud (W-019):</b> when the cloud last made new data, when Weather last checked, next check (every 15 minutes).</li><li>Reminder: new data only when a refresh is asked for. Data credit: ECMWF, CC BY 4.0.</li></ul><h4>Limits</h4><p>Notes are a summary – the full explanation is in the tab&#x27;s card (S1, M1, C1, L1).</p>"
  },
  "compare": {
   "code": "C1",

@@ -254,7 +254,7 @@ const SEAS_COL = { temp: ["#2166ac", "#b2182b"], rain: ["#a6611a", "#018571"], w
 const WORD = { temp: ["warmer", "cooler"], rain: ["wetter", "drier"], wind: ["windier", "calmer"], solar: ["sunnier", "duller"] };
 // ECMWF solid, BOM lighter, CFS (US) outline only; each with its own whiskers and ◆ (W-007, W-011a)
 function seasModels(r, field) {
-  return [["ECMWF", r[field], r.vs, 1], ["BOM", r.bom?.[field], r.vs_bom, 0.45], ["CFS (US)", r.cfs?.[field], r.vs_cfs, 0.08]]
+  return [["ECMWF", r[field], r.vs, 1], ["BOM", r.bom?.[field], r.vs_bom, 0.45], ["CFS (US)", r.cfs?.[field], r.vs_cfs, 0]]
     .filter((m) => m[1]).map(([name, q, vs, op]) => ({ name, q, vs, op }));
 }
 function seasonalChart(c, r, field, a, d) {
@@ -272,9 +272,10 @@ function seasonalChart(c, r, field, a, d) {
       return `${esc(r.months[i])} vs normal<br>${ms.map((m) => one(m.name, m.q)).join("<br>")}`; } },
     series: [
       ...ms.map((m, k) => ({ name: m.name, type: "bar", barWidth: `${w * 100}%`, barGap: "0%",
-        itemStyle: { color: pos, opacity: m.op, borderColor: pos, borderWidth: m.op < 1 ? 1.5 : 0 },
-        data: m.q.mean.map((v) => { const col = v >= 0 ? pos : neg;
-          return { value: v, itemStyle: { color: col, opacity: m.op, borderColor: col, borderWidth: m.op < 1 ? (m.op < 0.2 ? 2 : 1.5) : 0 } }; }),
+        itemStyle: m.op ? { color: pos, opacity: m.op, borderColor: pos, borderWidth: m.op < 1 ? 1.5 : 0 } : { color: pos + "22", borderColor: pos, borderWidth: 2 },
+        data: m.q.mean.map((v) => { const col = v >= 0 ? pos : neg;   // op 0 = outline bar (CFS): faint fill, solid edge
+          return { value: v, itemStyle: m.op ? { color: col, opacity: m.op, borderColor: col, borderWidth: m.op < 1 ? 1.5 : 0 }
+            : { color: col + "22", borderColor: col, borderWidth: 2 } }; }),
         ...(k === 0 ? { markLine: { silent: true, symbol: "none", data: [{ yAxis: 0 }], lineStyle: { color: a.label.color }, label: { show: false } } } : {}) })),
       ...ms.map((m, k) => whiskers(`Range ${m.name}`, m.q.p10, m.q.p90, wc, shift(k))),
       ...ms.flatMap((m, k) => { const v = vsOf(m.vs); return v ? [diamonds(`${m.name} ${vsName(d)}`, v, "#e65100", shift(k))] : []; })],
@@ -370,7 +371,7 @@ function mapPanel(body, panel) {
     const baseUnit = d.anomaly ? `${SEAS_UNIT[o.field]} vs normal` : MAP_UNIT[o.field];
     const unit = d.diff ? `change, ${baseUnit}` : baseUnit;
     $(".m-note").textContent = d.note || (d.diff ? `Change map: ${d.run_text} minus ${d.vs_text} at the same time.`
-      : d.anomaly ? "Monthly difference from normal, average of 51 runs (1° squares)."
+      : d.anomaly ? `Monthly difference from normal, average of ${d.src === "seasonal_cfs" ? "120 CFS (US)" : "51 ECMWF"} runs (1° squares).`
       : `${o.src === "ens" ? "Middle of the 50 ensemble runs. " : ""}${o.field === "rain" ? "mm per hour over the step before this time. " : ""}${o.field === "solar" ? "Average over the step before this time. " : ""}`);
     const { lat, lon, values } = d;
     const pts = [];
@@ -534,11 +535,11 @@ function aboutPanel(body) {
         <li><b style="color:${C_AI}">Purple</b> = ECMWF AI model (AIFS).</li>
         <li><b style="color:${C_ENS}">Grey band / whiskers</b> = 8 in 10 of the 50 ensemble runs fall inside; grey line = middle run.</li>
         <li><b style="color:#d32f2f">▲</b> <b style="color:#1976d2">▼</b> = BOM's forecast high / low.</li>
-        <li>Seasonal: solid bars ECMWF, light bars BOM. Times are NEM time (AEST).</li>
+        <li>Seasonal: solid bars ECMWF, light bars BOM, outline bars CFS (US). Times are NEM time (AEST).</li>
         <li>Each panel's <b>ⓘ</b> explains it in full.</li></ul>
         <h4>Forecast runs on screen</h4><table>${rows.join("")}</table>
         ${cloudLines(st.cloud)}
-        <p class="note">New data only when you click Refresh. Data: ECMWF (CC BY 4.0), BOM.</p>`;
+        <p class="note">New data arrives from the cloud by itself (Refresh = check now). Data: ECMWF (CC BY 4.0), BOM, Copernicus (NOAA CFS).</p>`;
     },
     resize() {},
   };

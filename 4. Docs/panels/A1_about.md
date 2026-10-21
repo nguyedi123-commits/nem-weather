@@ -30,3 +30,4 @@ Notes are a summary – the full explanation is in the tab's card (S1, M1, C1, L
 - 20 Oct 2026 – W-019 agreed: cloud status lines.
 - 20 Oct 2026 – W-015 / W-016 built: free panel, download progress.
 - 21 Oct 2026 – W-024: cloud checked every 15 minutes (was hourly) so the 7 am data is in by ~7:15 am Sydney.
+- 21 Oct 2026 – colour note adds CFS (US) outline bars; footer: new data comes from the cloud by itself (Refresh = now).

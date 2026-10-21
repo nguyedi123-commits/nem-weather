@@ -25,6 +25,12 @@ py -3.14 -m venv .venv                     (from the project root)
   - 20:22 UTC light again = back-up if the first is skipped + later BOM issues – 7:22 am / 6:22 am;
   - 10:07 UTC full = + ensemble + `ensx` + seasonal (ensemble complete 08:01 UTC) – 9:07 pm / 8:07 pm.
   - Goal (W-024): overnight data on the trading PC by 8 am Sydney. GitHub cron is UTC only – no daylight-saving change needed.
+  - **GitHub's timer had not fired once by 22 Oct** → back-up on this PC: Windows Task Scheduler tasks
+    "Weather cloud morning 1" (6:52 am), "morning 2" (7:22 am), "evening" (9:07 pm, full) run
+    `3. Code\weather\tools\cloud_trigger.ps1 <mode>` (= `gh workflow run`), log `data\cloud_trigger.log`. They wake
+    the PC from sleep, not when it is off. Remove: `Unregister-ScheduledTask -TaskName "Weather cloud*"`.
+  - Order inside a job: BOM → ECMWF → **publish** → seasonal (Copernicus queue, can take hours – took 4.5 h on 21 Oct)
+    → publish again. Job limit 330 min.
   - Off round minutes: GitHub starts :00 / :30 schedules late or skips them (the 7:30 am job on 21 Oct never ran).
 - Publishes release `data`: `<feed>__<run>.zip`, `obs.zip`, `static.zip`, `manifest.json` (the list, uploaded last).
   Keeps 30 days (seasonal 400).

@@ -3,7 +3,7 @@
   python weather.py                  the program window (what Weather.exe does)
   python weather.py --browser        server only (dev copy): open http://127.0.0.1:8892 in the browser
 
-Shows what is in data\\. New data: every hour from the cloud (W-019, small NEM-only files made by the GitHub job),
+Shows what is in data\\. New data: every 15 minutes from the cloud (W-019, small NEM-only files made by the GitHub job),
 or the Refresh button (cloud, or directly from ECMWF as a back-up).
 """
 import argparse
@@ -42,7 +42,7 @@ def main():
     url = f"http://127.0.0.1:{srv.server_address[1]}/"
     log.info("Weather running at %s (data: %s)", url, C.DATA)
     print(f"Weather screen: {url}  (Ctrl+C to stop)", flush=True)
-    # W-019 / W-012: new NEM-only data from the cloud every hour (tiny when nothing is new)
+    # W-019 / W-012: new NEM-only data from the cloud every 15 minutes (tiny when nothing is new)
     threading.Thread(target=cloud.loop, args=(refresh.running,), daemon=True, name="cloud").start()
 
     if a.browser:

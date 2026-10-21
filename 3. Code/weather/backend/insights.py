@@ -179,7 +179,8 @@ def _seasonal(run, vs):
             q = reg.get(field)
             if not q:
                 continue
-            b = (reg.get("bom") or {}).get(field)
+            others = [(name, (reg.get(key) or {}).get(field)) for key, name in (("bom", "BOM"), ("cfs", "CFS"))]
+            others = [(name, b) for name, b in others if b]
             runs_ = []   # consecutive months leaning the same way
             for i, m in enumerate(reg["months"]):
                 a = q["above"][i]
@@ -193,14 +194,16 @@ def _seasonal(run, vs):
                 ch = [q["above"][i] for i in range(i0, i1 + 1)]
                 txt = (f"{ms} {lean} than normal (ECMWF {_pct_range(ch)} of runs)" if lean == up
                        else f"{ms} {lean} than normal (ECMWF: only {_pct_range(ch)} of runs above normal)")
-                if b:
+                agree = 0
+                for name, b in others:
                     bc = [b["above"][i] for i in range(i0, i1 + 1)]
                     same = all((x >= LEAN) if lean == up else (x <= 100 - LEAN) for x in bc)
                     other = all((x <= 100 - LEAN) if lean == up else (x >= LEAN) for x in bc)
-                    txt += (", BOM agrees" if same else f", BOM disagrees ({_pct_range(bc)})" if other
-                            else f", BOM less sure ({_pct_range(bc)})")
+                    agree += same
+                    txt += (f", {name} agrees" if same else f", {name} disagrees ({_pct_range(bc)})" if other
+                            else f", {name} less sure ({_pct_range(bc)})")
                 kind = {"temp": "heat" if lean == up else "cold", "rain": "rain", "wind": "wind", "solar": "solar"}[field]
-                items.append(_b(txt, kind, 4 + (i1 - i0) + (1 if b and "agrees" in txt else 0)))
+                items.append(_b(txt, kind, 4 + (i1 - i0) + agree))
             old = (reg.get("vs") or {}).get(field)
             if old:
                 for i, m in enumerate(reg["months"]):

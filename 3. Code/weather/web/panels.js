@@ -252,42 +252,46 @@ function compareTable(r) {
 // ---------- L1 Seasonal ----------
 const SEAS_COL = { temp: ["#2166ac", "#b2182b"], rain: ["#a6611a", "#018571"], wind: ["#5e3c99", "#e66101"], solar: ["#5e3c99", "#e6a100"] };
 const WORD = { temp: ["warmer", "cooler"], rain: ["wetter", "drier"], wind: ["windier", "calmer"], solar: ["sunnier", "duller"] };
+// ECMWF solid, BOM lighter, CFS (US) outline only; each with its own whiskers and ◆ (W-007, W-011a)
+function seasModels(r, field) {
+  return [["ECMWF", r[field], r.vs, 1], ["BOM", r.bom?.[field], r.vs_bom, 0.45], ["CFS (US)", r.cfs?.[field], r.vs_cfs, 0.08]]
+    .filter((m) => m[1]).map(([name, q, vs, op]) => ({ name, q, vs, op }));
+}
 function seasonalChart(c, r, field, a, d) {
-  const q = r[field], [neg, pos] = SEAS_COL[field];
-  const b = r.bom?.[field];
+  const [neg, pos] = SEAS_COL[field], ms = seasModels(r, field), n = ms.length;
+  const w = n === 1 ? 0.45 : n === 2 ? 0.30 : 0.26, shift = (k) => n === 1 ? 0 : (k - (n - 1) / 2) * w;
   const vsOf = (vs) => vs?.[field] ? r.months.map((m) => { const k = vs.months.indexOf(m); return k >= 0 ? vs[field].mean[k] : null; }) : null;
-  const ve = vsOf(r.vs), vb = vsOf(r.vs_bom);
   const wc = dark() ? "#cfd8dc" : "#37474f";
   c.setOption({
-    ...base(a), legend: { ...a.legend, data: ["ECMWF", "BOM"] },
+    ...base(a), legend: { ...a.legend, data: ms.map((m) => m.name) },
     xAxis: { type: "category", data: r.months.map((m) => m.slice(0, 3)), axisLabel: a.label },
     yAxis: [valueAxis(a, `vs normal, ${SEAS_UNIT[field]}`, { scale: false })],
     tooltip: { trigger: "axis", formatter: (ps) => { const i = ps[0].dataIndex;
       const one = (n, x) => `<b>${n}</b>: ${fmt(x.mean[i], 2)} ${SEAS_UNIT[field]} (range ${fmt(x.p10[i], 1)} to ${fmt(x.p90[i], 1)}),
         chance above normal ${fmt(x.above[i])}%`;
-      return `${esc(r.months[i])} vs normal<br>${one("ECMWF", q)}${b ? `<br>${one("BOM", b)}` : ""}`; } },
-    series: [{ name: "ECMWF", type: "bar", barWidth: b ? "30%" : "45%", barGap: "0%", itemStyle: { color: pos },
-      data: q.mean.map((v) => ({ value: v, itemStyle: { color: v >= 0 ? pos : neg } })),
-      markLine: { silent: true, symbol: "none", data: [{ yAxis: 0 }], lineStyle: { color: a.label.color }, label: { show: false } } },
-    ...(b ? [{ name: "BOM", type: "bar", barWidth: "30%", barGap: "0%", itemStyle: { color: pos, opacity: 0.45, borderColor: pos, borderWidth: 1.5 },
-      data: b.mean.map((v) => ({ value: v, itemStyle: { color: v >= 0 ? pos : neg, opacity: 0.45, borderColor: v >= 0 ? pos : neg, borderWidth: 1.5 } })) }] : []),
-    whiskers("Range ECMWF", q.p10, q.p90, wc, b ? -0.15 : 0),
-    ...(b ? [whiskers("Range BOM", b.p10, b.p90, wc, 0.15)] : []),
-    ...(ve ? [diamonds(`ECMWF ${vsName(d)}`, ve, "#e65100", b ? -0.15 : 0)] : []),
-    ...(vb ? [diamonds(`BOM ${vsName(d)}`, vb, "#e65100", 0.15)] : [])],
+      return `${esc(r.months[i])} vs normal<br>${ms.map((m) => one(m.name, m.q)).join("<br>")}`; } },
+    series: [
+      ...ms.map((m, k) => ({ name: m.name, type: "bar", barWidth: `${w * 100}%`, barGap: "0%",
+        itemStyle: { color: pos, opacity: m.op, borderColor: pos, borderWidth: m.op < 1 ? 1.5 : 0 },
+        data: m.q.mean.map((v) => { const col = v >= 0 ? pos : neg;
+          return { value: v, itemStyle: { color: col, opacity: m.op, borderColor: col, borderWidth: m.op < 1 ? (m.op < 0.2 ? 2 : 1.5) : 0 } }; }),
+        ...(k === 0 ? { markLine: { silent: true, symbol: "none", data: [{ yAxis: 0 }], lineStyle: { color: a.label.color }, label: { show: false } } } : {}) })),
+      ...ms.map((m, k) => whiskers(`Range ${m.name}`, m.q.p10, m.q.p90, wc, shift(k))),
+      ...ms.flatMap((m, k) => { const v = vsOf(m.vs); return v ? [diamonds(`${m.name} ${vsName(d)}`, v, "#e65100", shift(k))] : []; })],
   }, true);
 }
 function seasonalTable(r, field, d) {
-  const q = r[field], b = r.bom?.[field], [up, down] = WORD[field];
+  const ms = seasModels(r, field), q = ms[0].q, [up, down] = WORD[field];
   const vs = r.vs?.[field] ? r.vs : null;
   const was = (m) => { const k = vs ? vs.months.indexOf(m) : -1; return k >= 0 ? vs[field].above[k] : null; };
   const dp = field === "temp" ? 1 : 2;
   const avg = (x, i) => `${x.mean[i] > 0 ? "+" : ""}${fmt(x.mean[i], dp)}`;
   const ch = (x, i) => `<td class="${x.above[i] >= 70 || x.above[i] <= 30 ? "big" : ""}" title="${x.above[i] <= 30 ? `Lean ${down}` : ""}">${fmt(x.above[i])}%</td>`;
-  return `<table class="grid"><tr><th class="l">Month</th><th>ECMWF avg</th><th>Chance ${up}</th>
-    ${b ? `<th>BOM avg</th><th>Chance ${up}</th>` : ""}${vs ? `<th title="ECMWF chance ${up}: ${esc(d.vs_text)} forecast → this one">Change vs ${esc(d.vs_text)}</th>` : ""}</tr>
+  const short = (n) => n.replace(" (US)", "");
+  return `<table class="grid"><tr><th class="l">Month</th>${ms.map((m) => `<th>${short(m.name)} avg</th><th>Chance ${up}</th>`).join("")}
+    ${vs ? `<th title="ECMWF chance ${up}: ${esc(d.vs_text)} forecast → this one">Change vs ${esc(d.vs_text)}</th>` : ""}</tr>
     ${r.months.map((m, i) => `<tr><td class="l">${esc(m)}</td>
-    <td>${avg(q, i)}</td>${ch(q, i)}${b ? `<td>${avg(b, i)}</td>${ch(b, i)}` : ""}${vs ? `<td>${was(m) === null ? '<span class="rng">–</span>'
+    ${ms.map((x) => `<td>${avg(x.q, i)}</td>${ch(x.q, i)}`).join("")}${vs ? `<td>${was(m) === null ? '<span class="rng">–</span>'
       : `<span class="${Math.abs(q.above[i] - was(m)) >= 20 ? "chg-big" : ""}">${fmt(was(m))} → ${fmt(q.above[i])}%</span>`}</td>` : ""}</tr>`).join("")}</table>`;
 }
 
@@ -322,7 +326,7 @@ function regionPanel(draw, table, subtitle) {
 }
 
 // ---------- G1 Map (its controls inside the panel) ----------
-const MAP_SRC = { ifs: "IFS", aifs: "AIFS (AI)", ens: "Ensemble middle", seasonal: "Seasonal" };
+const MAP_SRC = { ifs: "IFS", aifs: "AIFS (AI)", ens: "Ensemble middle", seasonal: "Seasonal", seasonal_cfs: "Seasonal CFS (US)" };
 const MAP_UNIT = { temp: "°C", wind: "km/h", solar: "W/m²", rain: "mm/h" };
 const SCALES = {
   temp: ["#313695", "#4575b4", "#74add1", "#abd9e9", "#e0f3f8", "#ffffbf", "#fee090", "#fdae61", "#f46d43", "#d73027", "#a50026"],
@@ -437,7 +441,7 @@ function mapPanel(body, panel) {
   $(".m-i").oninput = (e) => { setPlay(false); i = +e.target.value; load(); };
   $(".m-prev").onclick = () => { setPlay(false); i = Math.max(0, (i ?? 0) - 1); load(); };
   $(".m-next").onclick = () => { setPlay(false); i = Math.min(+$(".m-i").max, (i ?? 0) + 1); load(); };
-  panel.onPick = (key) => { if (key === "src" || key === "run") i = panel.opts.src === "seasonal" ? 0 : null; load(); };
+  panel.onPick = (key) => { if (key === "src" || key === "run") i = panel.opts.src.startsWith("seasonal") ? 0 : null; load(); };
   load();
   return {
     update() { load(); },   // new data after a refresh
@@ -507,9 +511,9 @@ export function progressText(p) {
 }
 const nem = (iso) => iso ? new Date(new Date(iso).getTime() + 10 * 3600e3).toISOString().slice(5, 16).replace("T", " ") : "–";
 function cloudLines(c) {
-  if (!c || !c.last_check) return '<h4>Cloud</h4><p class="note">Not checked yet – first check shortly after start, then every hour.</p>';
+  if (!c || !c.last_check) return '<h4>Cloud</h4><p class="note">Not checked yet – first check shortly after start, then every 15 minutes.</p>';
   const job = c.last_job;
-  return `<h4>Cloud (GitHub, every hour)</h4><table>
+  return `<h4>Cloud (GitHub, every 15 min)</h4><table>
     <tr><td>Cloud last made data</td><td>${nem(c.cloud_updated)} NEM${job?.errors?.length ? ` <span class="old" title="${esc(job.errors.join("; "))}">(with problems)</span>` : ""}</td></tr>
     <tr><td>This PC last checked</td><td>${nem(c.last_check)} · next ${nem(c.next_check)}</td></tr>
     ${c.error ? `<tr><td colspan="2" class="old">${esc(c.error)}</td></tr>` : ""}</table>`;

@@ -1,17 +1,21 @@
 # Weather cloud refresh (W-019): downloads ECMWF / BOM / Copernicus on GitHub's computer, keeps only the NEM east coast,
-# publishes small files on the release "data". Weather.exe picks them up every hour.
-# Times are UTC: 21:37 = 7:37 am NEM (overnight run, without ensemble), 10:07 = 8:07 pm NEM (morning run, with ensemble).
+# publishes small files on the release "data". Weather.exe checks for them every 15 minutes.
+# Times are UTC (GitHub has no daylight saving; ECMWF works in UTC too, so these suit summer and winter):
+#   19:52 light – ECMWF's overnight (12z) IFS + AIFS are complete at 19:34 UTC. = 6:52 am Sydney summer / 5:52 am winter
+#   20:22 light – back-up if 19:52 is skipped or late; also picks up BOM's later morning issues. = 7:22 am / 6:22 am
+#   10:07 full  – + ensemble (complete 08:01 UTC) + seasonal. = 9:07 pm / 8:07 pm
 # Off the round :00 / :30 minutes – GitHub starts round-time schedules late or skips them when busy (seen 21 Oct).
 name: Weather refresh
 
 on:
   schedule:
-    - cron: "37 21 * * *"
+    - cron: "52 19 * * *"
+    - cron: "22 20 * * *"
     - cron: "7 10 * * *"
   workflow_dispatch:
     inputs:
       mode:
-        description: "full (~30 min, with ensemble) · light (without ensemble) · bom (BOM only)"
+        description: "full (~20 min, with ensemble + seasonal) · light (BOM + IFS + AIFS) · bom (BOM only)"
         type: choice
         options: [light, full, bom]
         default: light

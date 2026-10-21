@@ -21,8 +21,10 @@ py -3.14 -m venv .venv                     (from the project root)
   settings, zips, keys). Git identity in this repo = GitHub no-reply address (never the personal email).
 - GitHub tool: `"C:\Program Files\GitHub CLI\gh.exe"` (logged in as nguyedi123-commits).
 - Job `.github/workflows/refresh.yml` → `cloud/publish.py --mode light|full|bom`:
-  - 21:37 UTC (7:37 am NEM) light = BOM + IFS + AIFS + seasonal;
-  - 10:07 UTC (8:07 pm NEM) full = + ensemble + `ensx`.
+  - 19:52 UTC light = BOM + IFS + AIFS (ECMWF's 12z run is complete at 19:34 UTC) – 6:52 am Sydney summer / 5:52 winter;
+  - 20:22 UTC light again = back-up if the first is skipped + later BOM issues – 7:22 am / 6:22 am;
+  - 10:07 UTC full = + ensemble + `ensx` + seasonal (ensemble complete 08:01 UTC) – 9:07 pm / 8:07 pm.
+  - Goal (W-024): overnight data on the trading PC by 8 am Sydney. GitHub cron is UTC only – no daylight-saving change needed.
   - Off round minutes: GitHub starts :00 / :30 schedules late or skips them (the 7:30 am job on 21 Oct never ran).
 - Publishes release `data`: `<feed>__<run>.zip`, `obs.zip`, `static.zip`, `manifest.json` (the list, uploaded last).
   Keeps 30 days (seasonal 400).
@@ -38,7 +40,7 @@ gh run view <id> --repo nguyedi123-commits/nem-weather --log                    
 gh release view data --repo nguyedi123-commits/nem-weather --json assets              what is published
 gh secret set CDSAPI_KEY --repo nguyedi123-commits/nem-weather --body <key>           NOT via a PowerShell pipe (adds a hidden BOM)
 ```
-- Weather.exe side `backend\cloud.py`: reads the manifest every hour (`EVERY_S`), downloads only runs it doesn't have,
+- Weather.exe side `backend\cloud.py`: reads the manifest every 15 min (`EVERY_S`), downloads only runs it doesn't have,
   merges obs, unpacks into `data\` (only expected paths). State `data\cloud.json`. Refresh → "From the cloud".
 - Publish code changes: `git add -A`, `git commit` (end with the Co-Authored-By line), `git push` – from the project root.
 - GitHub turns schedules off after 60 days without code uploads (W-020).
@@ -62,7 +64,7 @@ gh secret set CDSAPI_KEY --repo nguyedi123-commits/nem-weather --body <key>     
 
 ## Run the app (dev copy)
 ```
-..\..\.venv\Scripts\python weather.py --browser --port 8892      server only → http://127.0.0.1:8892 (also picks up the cloud hourly)
+..\..\.venv\Scripts\python weather.py --browser --port 8892      server only → http://127.0.0.1:8892 (also picks up the cloud every 15 min)
 ..\..\.venv\Scripts\python weather.py                             the program window (as Weather.exe)
 ..\..\.venv\Scripts\python tests\e2e_pages.py http://127.0.0.1:8892 "..\..\2. Output\screenshots" [light|dark]
 ..\..\.venv\Scripts\python tests\e2e_edit.py http://127.0.0.1:8892 "..\..\2. Output\screenshots"

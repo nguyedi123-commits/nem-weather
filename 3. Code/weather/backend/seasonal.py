@@ -1,8 +1,9 @@
 """Seasonal outlook (ECMWF SEAS5, months 1-6) from Copernicus, cut to the east coast on their server.
 
 - Values are differences from normal ("anomalies"), all 51 members, 1 deg grid.
-- Two models: ECMWF SEAS5 (feed "seasonal", out on the 5th) and BOM ACCESS-S2 (feed "seasonal_bom", in the
-  Copernicus multi-model set by the 10th). Same grid, same units, each vs its own 1993-2016 normal.
+- Three models: ECMWF SEAS5 (feed "seasonal", out on the 5th), BOM ACCESS-S2 (feed "seasonal_bom", in the
+  Copernicus multi-model set by the 10th) and NCEP CFSv2 (feed "seasonal_cfs", US, by the 13th). Same grid, same
+  units, each vs its own 1993-2016 normal.
 - Saved as data/cities/<feed>/<YYYYMM>.parquet (members) + data/grid/<feed>/<YYYYMM>.npz
   (mean, p10, p90, chance above normal). Raw download deleted after reading.
 """
@@ -23,7 +24,8 @@ log = logging.getLogger("weather.seasonal")
 
 DATASET = "seasonal-postprocessed-single-levels"
 # feed -> (Copernicus centre, system, day of month it is out)
-CENTRES = {"seasonal": ("ecmwf", "51", 5), "seasonal_bom": ("bom", "2", 10)}
+CENTRES = {"seasonal": ("ecmwf", "51", 5), "seasonal_bom": ("bom", "2", 10), "seasonal_cfs": ("ncep", "2", 13)}
+NAMES = {"seasonal": "ECMWF SEAS5", "seasonal_bom": "BOM ACCESS-S2", "seasonal_cfs": "CFS (US)"}
 LEADS = 6
 # Copernicus variable -> (our name, multiplier by unit written in the file)
 VARS = {
@@ -83,7 +85,7 @@ def get_issue(year, month, feed="seasonal"):
     client = cdsapi.Client(quiet=True, progress=False)
     area = [C.GRID["north"], C.GRID["west"], C.GRID["south"], C.GRID["east"]]
     grid, rows, members = {}, None, []
-    progress.start(f"Seasonal {'BOM ACCESS-S2' if centre == 'bom' else 'ECMWF SEAS5'} (Copernicus queue)", len(VARS), "", issue)
+    progress.start(f"Seasonal {NAMES[feed]} (Copernicus queue)", len(VARS), "", issue)
     for var, (name, scale) in VARS.items():
         target = raw / f"{feed}_{issue}_{name}.grib"
         if target.exists():   # kept from an earlier try
@@ -143,8 +145,15 @@ def get_issue(year, month, feed="seasonal"):
 
 
 def update():
-    """Fetch the newest seasonal forecast of each model if we don't have it yet."""
+    """Fetch the newest seasonal forecast of each model if we don't have it yet (one model failing doesn't stop the others)."""
+    errors = []
     for feed, (_, _, day) in CENTRES.items():
         y, m = latest_issue(day)
         if f"{y}{m:02d}" not in load_catalog().get(feed, {}):
-            get_issue(y, m, feed)
+            try:
+                get_issue(y, m, feed)
+            except Exception as e:
+                log.exception("%s %d-%02d failed", feed, y, m)
+                errors.append(f"{NAMES[feed]}: {str(e)[:150]}")
+    if errors:
+        raise RuntimeError("; ".join(errors))

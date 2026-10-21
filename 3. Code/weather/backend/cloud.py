@@ -20,7 +20,7 @@ from . import config as C, ecmwf, obs, progress
 log = logging.getLogger("weather.cloud")
 REPO = "nguyedi123-commits/nem-weather"
 URL = f"https://github.com/{REPO}/releases/download/data"
-EVERY_S = 3600
+EVERY_S = 900   # 15 min: the morning cloud job (~6:56 am Sydney) reaches the screen by ~7:15 (W-024)
 SAFE = re.compile(r"^(cities|grid)/[a-z_]+/[0-9a-z_]+\.(parquet|npz)$|^obs/(daily|halfhourly)\.parquet$|^static/lsm\.npz$")
 _state_lock = threading.Lock()
 
@@ -137,7 +137,7 @@ def check():
 
 
 def loop(is_busy):
-    """Every hour (first time shortly after start): pick up new cloud data, unless a refresh is running."""
+    """Every 15 minutes (first time shortly after start): pick up new cloud data, unless a refresh is running."""
     time.sleep(15)
     while True:
         if not is_busy():

@@ -7,7 +7,7 @@ Weather screen for NEM trading (Australia's east coast: QLD, NSW, VIC, SA, TAS).
 - **Cloud job** (`.github/workflows/refresh.yml`): twice a day it downloads the forecasts on GitHub's computer and keeps
   only the NEM east coast. It publishes small files on the release
   [`data`](../../releases/tag/data), listed in `manifest.json`.
-- **Weather.exe** (`3. Code/weather`): one window. It picks up new cloud files every hour and shows pages of panels:
+- **Weather.exe** (`3. Code/weather`): one window. It picks up new cloud files every 15 minutes and shows pages of panels:
   Short, Medium, AI vs IFS, Seasonal and Map.
 - **Docs:** `4. Docs` (one card per panel, models, backlog), plus `PLAN.md`, `CONTEXT.md` and `SKILL.md`.
 

@@ -13,7 +13,7 @@ What am I looking at, and how fresh is it?
 - Short notes on the page's panels (what the colours mean); full notes behind each panel's ⓘ.
 - **Forecast runs on screen** (NEM time): IFS, AIFS, ensemble run time + hours old (red if > 30 h); seasonal month.
 - **Download progress** while a refresh runs (W-016): which model, step x of y, %, GB so far.
-- **Cloud (W-019):** when the cloud last made new data, when Weather last checked, next check (every hour).
+- **Cloud (W-019):** when the cloud last made new data, when Weather last checked, next check (every 15 minutes).
 - Reminder: new data only when a refresh is asked for. Data credit: ECMWF, CC BY 4.0.
 
 ## Model and data
@@ -29,3 +29,4 @@ Notes are a summary – the full explanation is in the tab's card (S1, M1, C1, L
 - 18 Oct 2026 – built.
 - 20 Oct 2026 – W-019 agreed: cloud status lines.
 - 20 Oct 2026 – W-015 / W-016 built: free panel, download progress.
+- 21 Oct 2026 – W-024: cloud checked every 15 minutes (was hourly) so the 7 am data is in by ~7:15 am Sydney.

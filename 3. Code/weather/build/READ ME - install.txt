@@ -6,7 +6,7 @@ Install
    (Not "Program Files" – if you do, Weather keeps its data in %LOCALAPPDATA%\Weather instead.)
 2. Double-click Weather.exe. One window opens (maximised).
 3. That's it: within about a minute it fetches the latest forecasts from the cloud (small NEM-only files,
-   ~20–60 MB per new forecast run) and then checks again every hour by itself.
+   ~20–60 MB per new forecast run) and then checks again every 15 minutes by itself.
 
 Where the data comes from
 - A job on GitHub (github.com/nguyedi123-commits/nem-weather) downloads ECMWF, BOM and the seasonal forecasts twice a

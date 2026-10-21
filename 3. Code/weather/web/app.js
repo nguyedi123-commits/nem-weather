@@ -45,11 +45,11 @@ function fillRuns(panel) {
   const rid = panel.runSel.value === "latest" ? list[0]?.id : panel.runSel.value;
   const older = list.filter((r) => r.id < rid);
   panel.vsSel.replaceChildren(new Option("vs – none –", "none"),
-    new Option(feed === "seasonal" ? "vs last month" : "vs yesterday (auto)", "auto"),
+    new Option(feed.startsWith("seasonal") ? "vs last month" : "vs yesterday (auto)", "auto"),
     ...older.map((r) => new Option(`vs ${short(r.text)}`, r.id)));
   const def = kind.vsDefault || "auto";
   panel.vsSel.value = [...panel.vsSel.options].some((x) => x.value === o.vs) ? o.vs : def;
-  panel.runSel.title = `Which ${feed === "seasonal" ? "forecast month" : "run"} this panel shows`;
+  panel.runSel.title = `Which ${feed.startsWith("seasonal") ? "forecast month" : "run"} this panel shows`;
   panel.vsSel.title = older.length ? "Compare with an earlier run (dashed / ◆ / change column; map: change map)"
     : "No earlier run on disk yet – each refresh adds one";
 }
@@ -377,7 +377,7 @@ async function refreshDialog() {
     if the PC is turned off, the next refresh carries on where it stopped.</p>
     <div class="refresh-choices">
       <button class="choice" data-mode="cloud"><b>From the cloud (recommended)</b><span>Only the new NEM-only files the GitHub job made ·
-        <b>~60 MB per new run</b>, seconds · happens by itself every hour</span></button>
+        <b>~60 MB per new run</b>, seconds · happens by itself every 15 minutes</span></button>
       <p class="hint-text">Back-up – download directly from ECMWF on this PC:</p>
       <button class="choice" data-mode="full"><b>Full</b><span>BOM + main model + AI model + <b>ensemble</b> + seasonal ·
         <b>~18 GB</b> · home internet (≈ 30 min fast, ≈ 4 h at 10 Mbit/s)</span></button>

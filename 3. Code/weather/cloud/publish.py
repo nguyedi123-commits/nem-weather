@@ -2,7 +2,7 @@
 
 Downloads with the same code as run_download.py (only the NEM east coast is kept), then publishes each NEW run as a
 small zip on the GitHub release "data", plus manifest.json = the list of what is there. Weather.exe reads that list
-every hour and fetches only what it doesn't have (backend/cloud.py). Cloud copies are deleted after 30 days
+every 15 minutes and fetches only what it doesn't have (backend/cloud.py). Cloud copies are deleted after 30 days
 (seasonal after 400) – each trading PC keeps its own history.
 
   python cloud/publish.py --mode full|light|bom      needs GH_TOKEN + GITHUB_REPOSITORY (set by GitHub) and the gh tool
@@ -22,7 +22,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from backend import bom, config as C, ecmwf, obs, seasonal   # noqa: E402
 
 TAG = "data"
-KEEP_DAYS = {"seasonal": 400, "seasonal_bom": 400}   # others: 30
+KEEP_DAYS = {"seasonal": 400, "seasonal_bom": 400, "seasonal_cfs": 400}   # others: 30
 MODES = {"full": ("ifs", "aifs", "ens", "ensx"), "light": ("ifs", "aifs"), "bom": ()}
 REPO = os.environ.get("GITHUB_REPOSITORY", "nguyedi123-commits/nem-weather")
 URL = f"https://github.com/{REPO}/releases/download/{TAG}"
@@ -91,7 +91,9 @@ def main():
     errors = []
     steps = [("BOM forecasts", bom.update), ("BOM observations", obs.update)]
     if MODES[a.mode]:
-        steps += [("ECMWF", lambda: ecmwf.update(MODES[a.mode])), ("Seasonal", seasonal.update)]
+        steps.append(("ECMWF", lambda: ecmwf.update(MODES[a.mode])))
+    if a.mode == "full":   # monthly, and the Copernicus queue can take minutes – keep it out of the morning job
+        steps.append(("Seasonal", seasonal.update))
     for name, fn in steps:
         try:
             fn()

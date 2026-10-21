@@ -10,7 +10,7 @@ ECMWF is widely rated the most accurate global forecaster for the medium range.
 | Short · 3 days | **IFS** main model (line) + **IFS ensemble** range band + **AIFS** line + **BOM** city forecast | IFS 00z/12z (+ 06z/18z to 90 h), ensemble 00z | IFS 3-hourly, band and AIFS 6-hourly |
 | Medium · 15 days | **IFS ensemble** (50 runs) + IFS line + AIFS line + **BOM** city forecast (7 days) | 00z | 6-hourly to day 7, then 4 am / 4 pm |
 | AI vs IFS | **IFS** vs **AIFS Single** | 00z, 12z | IFS 3-hourly, AIFS 6-hourly |
-| Seasonal · 6 months | **ECMWF SEAS5** (51 runs) + **BOM ACCESS-S2** (110 runs) | monthly (ECMWF 5th, BOM by 10th) | monthly averages vs normal |
+| Seasonal · 6 months | **ECMWF SEAS5** (51 runs) + **BOM ACCESS-S2** (110 runs) + **NCEP CFSv2** (US, 120 runs) | monthly (ECMWF 5th, BOM by 10th, CFS by 13th) | monthly averages vs normal |
 | Map | any of the above | | 0.25° (seasonal 1°) |
 
 (00z = 10:00 NEM time, 12z = 22:00 NEM time.)
@@ -44,6 +44,13 @@ ECMWF is widely rated the most accurate global forecaster for the medium range.
 - IFS-based coupled atmosphere–ocean model, 51 runs, started on the 1st, published on the 5th of each month.
 - Says whether a month is likely **warmer/cooler, wetter/drier than normal** (normal = 1993–2016), not daily weather.
 
+### CFSv2 – the US seasonal model (NOAA / NCEP) – since 21 Oct (W-011a)
+- NOAA's coupled atmosphere–ocean model; runs 4 times **every day** (sites like Tropical Tidbits show these daily runs).
+- We take the **monthly** version from Copernicus (centre "ncep", system 2): the month's runs grouped as one
+  ensemble, difference from its own 1993–2016 normal, same grid and units as SEAS5 / ACCESS-S2.
+- Why monthly: ready-made "vs normal" numbers, same code and key, fair against the other two. NOAA's daily runs
+  would need NOAA's own long-term averages and more work (not built).
+
 ## What BOM uses
 - BOM's own model family is **ACCESS** (now version APS4):
   - **ACCESS-G** – global, ~13 km, 4 times a day, to 10 days.
@@ -71,7 +78,7 @@ ECMWF is widely rated the most accurate global forecaster for the medium range.
 ## Other models we could add (backlog – ask first)
 | Option | What it adds | Cost / effort |
 |---|---|---|
-| **Other seasonal centres** (W-011: UK Met Office, Météo-France, DWD, US, Japan, Canada on Copernicus) | Agreement between centres | Free, same key, small |
+| **Other seasonal centres** (W-011: UK Met Office, Météo-France, DWD, Japan, Canada on Copernicus; US built 21 Oct) | Agreement between centres | Free, same key, small |
 | **AIFS ENS** (W-009) (ECMWF AI ensemble) | A range from the AI model too | Free, same source, ~+12 GB per refresh |
 | **NOAA GFS / GEFS** (W-010, US model + ensemble) | A fully independent second opinion | Free (public domain), +2–10 GB |
 | **BOM ACCESS-G / ACCESS-C raw data** | BOM's own model, high-detail city model | Not free for open download as far as we know – needs checking with BOM |

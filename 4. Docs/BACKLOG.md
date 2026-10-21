@@ -14,8 +14,10 @@
 | W-008b | BOM correction: learn each city's usual error (by lead time, time of day), show "ECMWF corrected" | Agreed – needs 2–4 weeks of pairs (from ~mid Nov) |
 | W-009 | **AIFS ENS** – ECMWF AI ensemble (range from the AI model), ~+12 GB per refresh | Idea – later |
 | W-010 | **NOAA GFS / GEFS** – US model + ensemble as independent second opinion, +2–10 GB | Idea – later |
-| W-011 | Other seasonal centres on Copernicus (UK Met Office, Météo-France, DWD, US, Japan, Canada) | Idea – later |
-| W-012 | Automatic refresh: Weather.exe checks the cloud every hour, fetches only new NEM-only runs (~60 MB each) | Built 20 Oct (with W-019) |
+| W-024 | **Overnight data on the trading PC by 8 am Sydney**: cloud jobs 6:52 + 7:22 am Sydney (19:52 / 20:22 UTC), seasonal only in the evening job, Weather.exe checks every 15 min | Built 21 Oct – exe not released |
+| W-011a | **CFS (US, NOAA CFSv2)** seasonal as a third model on L1 + map (Copernicus monthly, same key) | Built 21 Oct – not released |
+| W-011 | Other seasonal centres on Copernicus (UK Met Office, Météo-France, DWD, Japan, Canada) | Idea – later |
+| W-012 | Automatic refresh: Weather.exe checks the cloud (hourly; every 15 min since W-024), fetches only new NEM-only runs (~60 MB each) | Built 20 Oct (with W-019) |
 | W-013 | Package Weather.exe (one window, one screen) | **Released 20 Oct** – `2. Output\Weather.zip` + `Weather (update).zip` |
 | W-018 | Refresh button in the screen: Full (~18 GB) / Without ensemble (~1.5 GB) / BOM only; keeps the PC awake while downloading | Built 20 Oct (in the exe) |
 | W-015 | Editable screen like NEM Trader: Edit mode, add / move / resize / remove panels, pages add / rename / copy / delete / reset; region + field picker per panel; ⓘ help from cards. One window, one screen (no multi-monitor) | Built 20 Oct |

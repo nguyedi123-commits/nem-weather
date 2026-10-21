@@ -80,7 +80,7 @@ Kept on disk (`data\`):
   runs `run_download.py` on GitHub's computer, keeps only the NEM east coast, publishes each new run as a small
   download (GitHub "release" files, ~60 MB per run) + a list of what's there; deletes cloud copies older than 30 days.
 - Copernicus key stored as a GitHub secret (hidden, not in the public code).
-- Weather.exe: every hour reads the list (tiny), downloads only runs it doesn't have, unpacks into data\. History is
+- Weather.exe: every 15 minutes reads the list (tiny), downloads only runs it doesn't have, unpacks into data\. History is
   kept on the trading PC as before (cities forever, maps 30 days). Refresh button: "From the cloud" first; direct
   ECMWF download stays as back-up.
 - Free: GitHub minutes don't count downloads; public projects have no minute limit (private: ~1,080 of 2,000/month).

@@ -18,7 +18,7 @@ REGIONS = [r for r, *_ in C.CITIES]
 CITY = {r: c for r, c, *_ in C.CITIES}
 FEED_LABEL = {"ifs": "IFS main model", "aifs": "AIFS AI model", "ens": "IFS ensemble (50 runs)",
               "bom": "BOM city forecasts", "seasonal": "ECMWF SEAS5 seasonal (51 runs)",
-              "seasonal_bom": "BOM ACCESS-S2 seasonal (110 runs)"}
+              "seasonal_bom": "BOM ACCESS-S2 seasonal (110 runs)", "seasonal_cfs": "CFS (US) seasonal"}
 DAILY_KEYS = ("high", "low", "rain", "solar", "wind")
 
 
@@ -89,7 +89,7 @@ def resolve(feed, run="latest", vs="auto", have=None):
 def runs_view():
     """Run lists for the run / vs pickers (city data: all runs; maps: runs with a map file, 30 days)."""
     out = {}
-    for feed in ("ifs", "aifs", "ens", "seasonal"):
+    for feed in ("ifs", "aifs", "ens", "seasonal", "seasonal_cfs"):
         lst = runs(feed)
         out[feed] = [{"id": r, "text": run_text(feed, r), "map": _grid_file(feed, r).exists()} for r in lst]
     return out
@@ -189,7 +189,7 @@ def _same_or_latest(feed, rid, main_feed):
 def status():
     now = datetime.now(timezone.utc)
     feeds = []
-    for feed in ("ifs", "aifs", "ens", "bom", "seasonal", "seasonal_bom"):
+    for feed in ("ifs", "aifs", "ens", "bom", "seasonal", "seasonal_bom", "seasonal_cfs"):
         rid = latest(feed)
         if not rid:
             feeds.append({"feed": feed, "label": FEED_LABEL[feed], "run": None})
@@ -364,34 +364,39 @@ def _seas_read(feed, rid):
     return pd.read_parquet(C.DATA / "cities" / feed / f"{rid}.parquet") if rid else None
 
 
-def _bom_issue_for(rid):
-    """BOM seasonal issue that goes with an ECMWF issue: the same month, else the newest one before it."""
-    lst = [x for x in runs("seasonal_bom") if x <= rid] if rid else []
+def _issue_for(feed, rid):
+    """BOM / CFS seasonal issue that goes with an ECMWF issue: the same month, else the newest one before it."""
+    lst = [x for x in runs(feed) if x <= rid] if rid else []
     return lst[0] if lst else None
+
+
+OTHERS = (("bom", "seasonal_bom"), ("cfs", "seasonal_cfs"))   # shown beside ECMWF on L1
 
 
 def seasonal(run="latest", vs="auto"):
     rid, vid = resolve("seasonal", run, vs)
     if not rid:
         return {"error": "No seasonal data yet – click Refresh (top right)."}
-    df, rb = _seas_read("seasonal", rid), _bom_issue_for(rid)
-    bom = _seas_read("seasonal_bom", rb)
-    old, ob = _seas_read("seasonal", vid), (_bom_issue_for(vid) if vid else None)
-    old_bom = _seas_read("seasonal_bom", ob) if ob and ob != rb else None
-    out = {"issue": rid, "issue_text": run_text("seasonal", rid), "bom_issue_text": run_text("seasonal_bom", rb),
-           "vs": vid, "vs_text": run_text("seasonal", vid), "regions": {}}
+    df, old = _seas_read("seasonal", rid), _seas_read("seasonal", vid)
+    out = {"issue": rid, "issue_text": run_text("seasonal", rid), "vs": vid, "vs_text": run_text("seasonal", vid), "regions": {}}
+    other = {}
+    for key, feed in OTHERS:
+        cur = _issue_for(feed, rid)
+        was = _issue_for(feed, vid) if vid else None
+        other[key] = (_seas_read(feed, cur), _seas_read(feed, was) if was and was != cur else None)
+        out[f"{key}_issue_text"] = run_text(feed, cur)
+    brief = lambda st: {"months": st["months"], **{k: {"mean": v["mean"], "above": v["above"]} for k, v in st.items() if k != "months"}}
     for r in REGIONS:
         reg = {"city": CITY[r], **_seas_stats(df[df.region == r])}
-        if bom is not None:
-            b = _seas_stats(bom[bom.region == r])
-            reg["bom"] = {k: v for k, v in b.items() if k != "months"} if b["months"] == reg["months"] else {}
+        for key, (cur, was) in other.items():
+            if cur is not None:
+                b = _seas_stats(cur[cur.region == r])
+                reg[key] = {k: v for k, v in b.items() if k != "months"} if b["months"] == reg["months"] else {}
         if old is not None:   # by month name, so the caller can line months up
-            o = _seas_stats(old[old.region == r])
-            reg["vs"] = {"months": o["months"], **{k: {"mean": v["mean"], "above": v["above"]} for k, v in o.items() if k != "months"}}
-            if old_bom is not None:
-                ob_ = _seas_stats(old_bom[old_bom.region == r])
-                reg["vs_bom"] = {"months": ob_["months"],
-                                 **{k: {"mean": v["mean"], "above": v["above"]} for k, v in ob_.items() if k != "months"}}
+            reg["vs"] = brief(_seas_stats(old[old.region == r]))
+            for key, (cur, was) in other.items():
+                if was is not None:
+                    reg[f"vs_{key}"] = brief(_seas_stats(was[was.region == r]))
         out["regions"][r] = reg
     return out
 
@@ -485,9 +490,10 @@ def _grid(feed, rid):
 
 
 def _map_values(src, g, field, i):
-    key = MAP_FIELDS[field]["seasonal" if src == "seasonal" else ("ens" if src == "ens" else "det")]
+    seas = src.startswith("seasonal")
+    key = MAP_FIELDS[field]["seasonal" if seas else ("ens" if src == "ens" else "det")]
     vals = g[key][i].astype(float)
-    if field == "rain" and src != "seasonal":   # mm per period -> mm per hour, so 3 h / 6 h / 12 h steps compare
+    if field == "rain" and not seas:   # mm per period -> mm per hour, so 3 h / 6 h / 12 h steps compare
         steps = g["step_h"]
         vals = vals / (steps[i] - steps[i - 1] if i > 0 else np.nan)
     return vals
@@ -497,9 +503,10 @@ def map_view(src="ifs", field="temp", i=0, run="latest", vs="none"):
     have = [r for r in runs(src) if _grid_file(src, r).exists()]
     rid, vid = resolve(src, run, vs, have)
     if not rid:
-        return {"error": f"No {src} map data yet."}
+        return {"error": f"No {FEED_LABEL.get(src, src)} map data yet."}
     g = _grid(src, rid)
-    if src == "seasonal":
+    seas = src.startswith("seasonal")
+    if seas:
         keys = [str(m) for m in g["months"]]
         times = [datetime.strptime(m, "%Y-%m").strftime("%b %Y") for m in keys]
     else:
@@ -510,14 +517,14 @@ def map_view(src="ifs", field="temp", i=0, run="latest", vs="none"):
     note = None
     if vid:   # change map: chosen run minus vs run at the same time / month
         gv = _grid(src, vid)
-        vkeys = [str(m) for m in gv["months"]] if src == "seasonal" else list(gv["valid_utc"])
+        vkeys = [str(m) for m in gv["months"]] if seas else list(gv["valid_utc"])
         if keys[i] in vkeys:
             vals = vals - _map_values(src, gv, field, vkeys.index(keys[i]))
         else:
             vals = np.full_like(vals, np.nan)
             note = f"The {run_text(src, vid)} run doesn't cover this time – pick a later time."
     now_i = 0
-    if src != "seasonal":
+    if not seas:
         later = np.where(g["valid_utc"] >= datetime.now(timezone.utc).timestamp())[0]
         now_i = int(later[0]) if len(later) else len(times) - 1
     return {"src": src, "field": field, "i": i, "times": times, "run": rid, "run_text": run_text(src, rid),
@@ -525,4 +532,4 @@ def map_view(src="ifs", field="temp", i=0, run="latest", vs="none"):
             "lat": _num(g["lat"], 2), "lon": _num(g["lon"], 2),
             "values": _num(vals.ravel(), 1), "coast": coastline(),
             "cities": [{"city": c, "lat": la, "lon": lo} for _, c, la, lo in C.CITIES],
-            "anomaly": src == "seasonal"}
+            "anomaly": seas}

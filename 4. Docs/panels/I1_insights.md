@@ -26,7 +26,7 @@ Each page reads its own data and the same run as the page's default (latest, vs 
 | Short | IFS next 3 days (+ ensemble rain chance, BOM high/low) | IFS vs the IFS run 24 h before |
 | Medium | Ensemble next 15 days: middle + 10–90 % range | ensemble vs yesterday's ensemble (middle, rain chance) |
 | AI vs IFS | days where IFS and AIFS disagree | each model vs its own run 24 h before |
-| Seasonal | months with a clear lean (ECMWF and BOM) | chance above normal vs last month's forecast |
+| Seasonal | months with a clear lean (ECMWF; whether BOM and CFS (US) agree) | chance above normal vs last month's forecast |
 
 **Rules (starting limits, can be changed):**
 - **Heat** (day high): Sydney / Brisbane ≥ 32 °C, Melbourne ≥ 35 °C, Adelaide ≥ 36 °C. **Very hot** = 4 °C above.
@@ -51,3 +51,4 @@ Each page reads its own data and the same run as the page's default (latest, vs 
 
 ## Change log
 - 20 Oct 2026 – agreed and built (W-021). Built-in pages now: NSW, QLD, About · SA, VIC, I1 (no TAS).
+- 21 Oct 2026 – W-011a: seasonal lines also say whether CFS (US) agrees (after BOM).

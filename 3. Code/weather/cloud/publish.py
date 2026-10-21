@@ -69,6 +69,51 @@ def pack(name, files):
     return z
 
 
+def publish(man, now, mode, errors, new):
+    """Upload what is new since the last call, then the manifest (last). Called after each slow step.
+    new = run files published so far in this job (filled in here)."""
+    runs = man["runs"]
+    uploads = []
+    for feed, rs in ecmwf.load_catalog().items():
+        if feed == "obs" or not isinstance(rs, dict):
+            continue
+        for rid, info in rs.items():
+            if rid in runs.get(feed, {}) or not files_for(feed, rid):
+                continue
+            z = pack(f"{feed}__{rid}.zip", files_for(feed, rid))
+            uploads.append(z)
+            runs.setdefault(feed, {})[rid] = {"asset": z.name, "size": z.stat().st_size,
+                                              "finished": info.get("finished") or now.isoformat(timespec="seconds")}
+    obs_files = [f for f in (C.DATA / "obs" / "daily.parquet", C.DATA / "obs" / "halfhourly.parquet") if f.exists()]
+    if obs_files and man.get("obs", {}).get("updated") != now.isoformat(timespec="seconds"):
+        uploads.append(pack("obs.zip", obs_files))
+        man["obs"] = {"asset": "obs.zip", "updated": now.isoformat(timespec="seconds")}
+    lsm = C.DATA / "static" / "lsm.npz"
+    if lsm.exists() and "static" not in man:
+        uploads.append(pack("static.zip", [lsm]))
+        man["static"] = {"asset": "static.zip"}
+
+    # delete cloud copies past their time
+    old = []
+    for feed, rs in runs.items():
+        keep = timedelta(days=KEEP_DAYS.get(feed, 30))
+        for rid in [r for r in rs if now - run_time(feed, r) > keep]:
+            old.append(rs.pop(rid)["asset"])
+    for name in old:
+        gh("release", "delete-asset", TAG, name, "-y", check=False)
+
+    new += [z.name for z in uploads if z.name not in ("obs.zip", "static.zip")]
+    man["updated"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    man["last_job"] = {"time": now.isoformat(timespec="seconds"), "mode": mode, "errors": list(errors), "new": list(new)}
+    mf = OUT / "manifest.json"
+    OUT.mkdir(parents=True, exist_ok=True)
+    mf.write_text(json.dumps(man, indent=1))
+    for k in range(0, len(uploads), 10):   # files first, the list last: Weather.exe never sees a run before its file
+        gh("release", "upload", TAG, *[str(z) for z in uploads[k:k + 10]], "--clobber")
+    gh("release", "upload", TAG, str(mf), "--clobber")
+    log.info("published %d files, removed %d old; problems: %s", len(uploads), len(old), errors or "none")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--mode", choices=list(MODES), default="light")
@@ -88,60 +133,23 @@ def main():
     cat = {feed: {rid: {"finished": info.get("finished")} for rid, info in rs.items()} for feed, rs in runs.items()}
     (C.DATA / "catalog.json").write_text(json.dumps(cat))
 
-    errors = []
-    steps = [("BOM forecasts", bom.update), ("BOM observations", obs.update)]
-    if MODES[a.mode]:
-        steps.append(("ECMWF", lambda: ecmwf.update(MODES[a.mode])))
-    if a.mode == "full":   # monthly, and the Copernicus queue can take minutes – keep it out of the morning job
-        steps.append(("Seasonal", seasonal.update))
-    for name, fn in steps:
+    errors, new = [], []
+
+    def run(name, fn):
         try:
             fn()
         except Exception as e:
             log.exception("%s failed", name)
             errors.append(f"{name}: {str(e)[:200]}")
 
-    # publish what is new
-    uploads = []
-    for feed, rs in ecmwf.load_catalog().items():
-        if feed == "obs" or not isinstance(rs, dict):
-            continue
-        for rid, info in rs.items():
-            if rid in runs.get(feed, {}) or not files_for(feed, rid):
-                continue
-            z = pack(f"{feed}__{rid}.zip", files_for(feed, rid))
-            uploads.append(z)
-            runs.setdefault(feed, {})[rid] = {"asset": z.name, "size": z.stat().st_size,
-                                              "finished": info.get("finished") or now.isoformat(timespec="seconds")}
-    obs_files = [f for f in (C.DATA / "obs" / "daily.parquet", C.DATA / "obs" / "halfhourly.parquet") if f.exists()]
-    if obs_files:
-        uploads.append(pack("obs.zip", obs_files))
-        man["obs"] = {"asset": "obs.zip", "updated": now.isoformat(timespec="seconds")}
-    lsm = C.DATA / "static" / "lsm.npz"
-    if lsm.exists() and "static" not in man:
-        uploads.append(pack("static.zip", [lsm]))
-        man["static"] = {"asset": "static.zip"}
-
-    # delete cloud copies past their time
-    old = []
-    for feed, rs in runs.items():
-        keep = timedelta(days=KEEP_DAYS.get(feed, 30))
-        for rid in [r for r in rs if now - run_time(feed, r) > keep]:
-            old.append(rs.pop(rid)["asset"])
-    for name in old:
-        gh("release", "delete-asset", TAG, name, "-y", check=False)
-
-    man["updated"] = now.isoformat(timespec="seconds")
-    man["last_job"] = {"time": man["updated"], "mode": a.mode, "errors": errors,
-                       "new": [z.name for z in uploads if z.name not in ("obs.zip", "static.zip")]}
-    mf = OUT / "manifest.json"
-    OUT.mkdir(parents=True, exist_ok=True)
-    mf.write_text(json.dumps(man, indent=1))
-    for i in range(0, len(uploads), 10):   # files first, the list last: Weather.exe never sees a run before its file
-        gh("release", "upload", TAG, *[str(z) for z in uploads[i:i + 10]], "--clobber")
-    gh("release", "upload", TAG, str(mf), "--clobber")
-    log.info("published %d new run files, removed %d old; problems: %s",
-             len(man["last_job"]["new"]), len(old), errors or "none")
+    run("BOM forecasts", bom.update)
+    run("BOM observations", obs.update)
+    if MODES[a.mode]:
+        run("ECMWF", lambda: ecmwf.update(MODES[a.mode]))
+    publish(man, now, a.mode, errors, new)   # forecasts out first: the Copernicus queue below can take hours
+    if a.mode == "full":   # monthly – kept out of the morning jobs
+        run("Seasonal", seasonal.update)
+        publish(man, now, a.mode, errors, new)
     return 1 if errors else 0
 
 

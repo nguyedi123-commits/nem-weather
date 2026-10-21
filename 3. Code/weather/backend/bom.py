@@ -65,5 +65,5 @@ def update():
                                           "issued_utc": max(issues)}
         tmp = _catalog_file().with_suffix(".tmp")
         tmp.write_text(json.dumps(cat, indent=1))
-        os.replace(tmp, _catalog_file())
+        C.replace(tmp, _catalog_file())
     log.info("BOM city forecasts: issue %s, %d rows", max(issues), len(rows))

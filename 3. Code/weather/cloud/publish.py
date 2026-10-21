@@ -147,7 +147,7 @@ def main():
     if MODES[a.mode]:
         run("ECMWF", lambda: ecmwf.update(MODES[a.mode]))
     publish(man, now, a.mode, errors, new)   # forecasts out first: the Copernicus queue below can take hours
-    if a.mode == "full":   # monthly – kept out of the morning jobs
+    if MODES[a.mode]:   # only asks Copernicus when a new month is due (5th / 10th / 13th) – a no-op on other days
         run("Seasonal", seasonal.update)
         publish(man, now, a.mode, errors, new)
     return 1 if errors else 0

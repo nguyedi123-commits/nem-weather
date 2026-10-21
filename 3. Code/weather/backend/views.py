@@ -458,8 +458,8 @@ def coastline():
     f = C.DATA / "static" / "lsm.npz"
     if not f.exists():
         return []
-    z = np.load(f)
-    lat, lon, m = z["lat"], z["lon"], z["lsm"]
+    with np.load(f) as z:   # closed straight away, so the cloud pick-up can replace the file
+        lat, lon, m = z["lat"], z["lon"], z["lsm"]
     segs = []
     land = m >= 0.5
 
@@ -485,8 +485,8 @@ def coastline():
 
 @lru_cache(maxsize=8)
 def _grid(feed, rid):
-    z = np.load(_grid_file(feed, rid))
-    return {k: z[k] for k in z.files}
+    with np.load(_grid_file(feed, rid)) as z:
+        return {k: z[k] for k in z.files}
 
 
 def _map_values(src, g, field, i):

@@ -69,7 +69,7 @@ def _save_json(path, data):
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(".tmp")
     tmp.write_text(json.dumps(data, indent=1))
-    os.replace(tmp, path)
+    C.replace(tmp, path)
 
 
 def load_settings():

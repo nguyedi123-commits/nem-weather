@@ -30,7 +30,9 @@ py -3.14 -m venv .venv                     (from the project root)
     `3. Code\weather\tools\cloud_trigger.ps1 <mode>` (= `gh workflow run`), log `data\cloud_trigger.log`. They wake
     the PC from sleep, not when it is off. Remove: `Unregister-ScheduledTask -TaskName "Weather cloud*"`.
   - Order inside a job: BOM → ECMWF → **publish** → seasonal (Copernicus queue, can take hours – took 4.5 h on 21 Oct)
-    → publish again. Job limit 330 min.
+    → publish again. Job limit 330 min. Seasonal is checked in every light / full job but only asks Copernicus when
+    a new month is due: ECMWF from the 5th, BOM from the 10th, CFS from the 13th (12 UTC = 11 pm Sydney) → on the
+    trading PC by ~7:15 am the next morning.
   - Off round minutes: GitHub starts :00 / :30 schedules late or skips them (the 7:30 am job on 21 Oct never ran).
 - Publishes release `data`: `<feed>__<run>.zip`, `obs.zip`, `static.zip`, `manifest.json` (the list, uploaded last).
   Keeps 30 days (seasonal 400).

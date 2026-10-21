@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 import json
 import os
 import threading
+import time
 
 from . import config as C
 
@@ -23,8 +24,14 @@ def _write():
     _state["updated"] = _now()
     f = C.DATA / "progress.json"
     tmp = f.with_suffix(".ptmp")
-    tmp.write_text(json.dumps(_state))
-    os.replace(tmp, f)
+    # Windows refuses the swap while the screen is reading the file: retry, and never stop a download over it
+    for _ in range(10):
+        try:
+            tmp.write_text(json.dumps(_state))
+            os.replace(tmp, f)
+            return
+        except OSError:
+            time.sleep(0.05)
 
 
 def start(label, total, part="", run="", done=0):

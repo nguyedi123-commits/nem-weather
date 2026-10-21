@@ -101,7 +101,7 @@ def get_issue(year, month, feed="seasonal"):
             except Exception as e:   # a model may not offer every field – leave it blank
                 log.warning("%s %s: %s not available (%s)", feed, issue, var, str(e)[:150])
                 continue
-            os.replace(target.with_suffix(".part"), target)
+            C.replace(target.with_suffix(".part"), target)
         progress.step(target.stat().st_size)
         arr, lat, lon, months, members = _read(target, scale)
 
@@ -138,7 +138,7 @@ def get_issue(year, month, feed="seasonal"):
             "finished": datetime.now(timezone.utc).isoformat(timespec="seconds"), "members": len(members)}
         tmp = _catalog_file().with_suffix(".tmp")
         tmp.write_text(json.dumps(cat, indent=1))
-        os.replace(tmp, _catalog_file())
+        C.replace(tmp, _catalog_file())
     for var, (name, _) in VARS.items():
         (raw / f"{feed}_{issue}_{name}.grib").unlink(missing_ok=True)
     log.info("%s %s done: %d members, months %s to %s", feed, issue, len(members), months[0], months[-1])

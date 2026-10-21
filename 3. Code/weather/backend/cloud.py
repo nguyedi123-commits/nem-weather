@@ -41,7 +41,7 @@ def _save_state(**kw):
         s = {**load_state(), **kw}
         tmp = _state_file().with_suffix(".tmp")
         tmp.write_text(json.dumps(s, indent=1))
-        os.replace(tmp, _state_file())
+        C.replace(tmp, _state_file())
 
 
 def status():
@@ -73,7 +73,7 @@ def _unpack(blob):
             dest.parent.mkdir(parents=True, exist_ok=True)
             tmp = dest.with_suffix(dest.suffix + ".part")
             tmp.write_bytes(data)
-            os.replace(tmp, dest)
+            C.replace(tmp, dest)
     return obs_parts
 
 
@@ -83,7 +83,7 @@ def _catalog_add(feed, rid, info):
         cat.setdefault(feed, {})[rid] = {"finished": info.get("finished"), "from": "cloud"}
         tmp = ecmwf._catalog_file().with_suffix(".tmp")
         tmp.write_text(json.dumps(cat, indent=1))
-        os.replace(tmp, ecmwf._catalog_file())
+        C.replace(tmp, ecmwf._catalog_file())
 
 
 def check():

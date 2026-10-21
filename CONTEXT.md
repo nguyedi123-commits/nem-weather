@@ -1,5 +1,5 @@
 # CONTEXT – Weather (ECMWF)
-*Last updated: 22 Oct 2026 (~1 am Sydney)*
+*Last updated: 22 Oct 2026 (9 am Sydney)*
 
 ## In one line
 Weather.exe (one window) shows ECMWF + BOM forecasts for the NEM east coast. A **GitHub cloud job** downloads twice a
@@ -11,7 +11,7 @@ day and keeps only the NEM region; Weather.exe picks the small files up **by its
 | Downloader – IFS, AIFS, ensemble (+ `ensx` full-day max/min), BOM forecasts + observations, seasonal (ECMWF + BOM + **CFS US**, W-011a) | Built, tested (CFS 21 Oct) |
 | Screen – pages Short / Medium / AI vs IFS / Seasonal / Map, Edit mode, region + field + run / vs pickers, ⓘ, I1 Insights, map Play | Built, tested |
 | Cloud – GitHub job + pick-up (W-019, W-012, W-024) | Built 20 Oct. **GitHub's timer has never fired** → this PC starts the jobs (Task Scheduler, see Next) |
-| Weather.exe | Latest zip **21 Oct 09:48** (`2. Output\Weather.zip`, 70 MB) – trusts Windows certificates. **Not yet in an exe: CFS, 15-min pick-up** (needs "release") |
+| Weather.exe | **Released 22 Oct ~9 am** (`2. Output\Weather.zip` + `Weather (update).zip`) – CFS, 15-min pick-up, Windows certificates, file-swap retry. **Trading PC: install the update** |
 | Trading PC | **21 Oct: installed and working** (on a non-office Wi-Fi – see below) |
 | BOM correction (W-008b) | Recording observations since 18 Oct (history from 1 Sep). Correction from ~mid Nov |
 
@@ -34,14 +34,19 @@ day and keeps only the NEM region; Weather.exe picks the small files up **by its
   6:34 am Sydney every day; BOM morning issues QLD ~4:50, SA ~5:45, NSW ~7:20, TAS ~8:15, VIC ~8:40 am; ensemble 7 pm.
   Done: cloud light jobs 19:52 + 20:22 UTC (6:52 / 7:22 am Sydney), full 10:07 UTC (9:07 pm); seasonal only in the
   evening job and published after the forecasts; job limit 330 min; Weather.exe checks every 15 min (in code, **exe
-  not built** – ask for "release").
+  built 22 Oct**). 22 Oct morning: this PC started 6:52 + 7:22 jobs → IFS + AIFS overnight run in the cloud by ~6:55 am.
 - [ ] **GitHub's timer never fired** (21 Oct morning + evening, 0 scheduled runs; workflow active, Actions on). Back-up
   on THIS PC: Task Scheduler "Weather cloud morning 1 / morning 2 / evening" → `tools\cloud_trigger.ps1`
   (log `data\cloud_trigger.log`). Only works while this PC is on (wakes it from sleep). Check 22 Oct ~7:30 am:
-  `gh run list` – which jobs ran (schedule vs workflow_dispatch)? If GitHub's timer stays dead: an always-on trigger.
+  22 Oct: GitHub's timer did fire the 21 Oct evening job – **5 h late** (14:59 UTC) → can't be relied on; keep this PC's
+  trigger. Idea if this PC can't stay on: an always-on trigger elsewhere.
 - [x] 21 Oct evening job missed → run by hand 13:48 UTC (BOM test + full).
 - [ ] CFS (W-011a) built + tested on the dev copy (L1 third bar + table, I1 "CFS agrees", map "Seasonal CFS (US)").
-  User to look at it. CFS solar leans much sunnier than ECMWF / BOM (noted in L1 Limits).
+  User: keep as is (22 Oct). CFS solar leans much sunnier than ECMWF / BOM (noted in L1 Limits).
+- [x] Seasonal months: every cloud job checks; asks Copernicus only when due (ECMWF 5th, BOM 10th, CFS 13th, 11 pm
+  Sydney) → trading PC by ~7:15 am the next morning (user wants the latest seasonal, 22 Oct).
+- [x] Fixed 22 Oct: "Access is denied" on progress.json during a pick-up (screen reading it at the same moment) →
+  every file swap retries (`config.replace`); map files closed after reading.
 - [ ] User review of the screen → changes. Offered: daily high / low range markers on the Medium chart (days 8–15).
 - Later: W-020 keep the GitHub schedule alive (monthly upload, due before ~19 Dec), W-008b BOM correction (~mid Nov),
   W-014 forecast-check panel, backlog W-009 AIFS ENS / W-010 NOAA GFS (user: not wanted – poor) / W-011 other seasonal centres.

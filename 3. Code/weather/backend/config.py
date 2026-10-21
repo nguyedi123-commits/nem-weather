@@ -87,3 +87,15 @@ FEEDS = {
     "ensx": dict(label="IFS ensemble max/min (extra steps)", model="ifs", stream="enfo", type="ef",
                  params=list(MAXMIN), runs={0: ENS_MAXMIN}),
 }
+
+
+def replace(tmp, dest):
+    """os.replace with retries: Windows refuses the swap while another part of Weather is reading dest (22 Oct)."""
+    import time
+    for i in range(40):   # up to ~2 s
+        try:
+            return os.replace(tmp, dest)
+        except PermissionError:
+            if i == 39:
+                raise
+            time.sleep(0.05)

@@ -59,7 +59,7 @@ def _merge(path, new, keys):
     new = new.sort_values(keys).reset_index(drop=True)
     tmp = path.with_suffix(".tmp")
     new.to_parquet(tmp, index=False)
-    os.replace(tmp, path)
+    C.replace(tmp, path)
     return new
 
 
@@ -98,7 +98,7 @@ def update():
                       "halfhourly_rows": int(len(hh)) if hh is not None else 0, "problems": problems}
         tmp = _catalog_file().with_suffix(".tmp")
         tmp.write_text(json.dumps(cat, indent=1))
-        os.replace(tmp, _catalog_file())
+        C.replace(tmp, _catalog_file())
     for p in problems:
         log.warning("BOM observations: %s", p)
     log.info("BOM observations: %s days of daily records, %s half-hourly readings",

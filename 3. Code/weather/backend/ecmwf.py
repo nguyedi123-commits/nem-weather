@@ -131,7 +131,7 @@ def _mark_done(feed, run, n_steps):
             "steps": n_steps}
         tmp = _catalog_file().with_suffix(".tmp")
         tmp.write_text(json.dumps(cat, indent=1))
-        os.replace(tmp, _catalog_file())
+        C.replace(tmp, _catalog_file())
 
 
 # ---------- Grid geometry and city points ----------
@@ -273,7 +273,7 @@ def _do_step(feed, run, step, work, geo):
     tmp = out.with_suffix(".tmp")
     with open(tmp, "wb") as f:
         np.savez(f, **arrays)
-    os.replace(tmp, out)
+    C.replace(tmp, out)
     log.info("%s %s step %3dh  %4.0f MB  %4.1fs", feed, run_id(run), step, nbytes / 1e6, time.time() - t0)
     progress.step(nbytes)
     return nbytes
@@ -420,7 +420,7 @@ def _finish(feed, run, steps, work, geo, tag=""):
     tmp = gdir / f"{run_id(run)}{tag}.tmp"
     with open(tmp, "wb") as f:
         np.savez_compressed(f, **grid)
-    os.replace(tmp, gdir / f"{run_id(run)}{tag}.npz")
+    C.replace(tmp, gdir / f"{run_id(run)}{tag}.npz")
     for f in files:
         f.close()
     shutil.rmtree(work, ignore_errors=True)

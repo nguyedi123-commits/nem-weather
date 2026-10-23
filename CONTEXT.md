@@ -50,8 +50,7 @@ day and keeps only the NEM region; Weather.exe picks the small files up **by its
 - [x] Fixed 22 Oct: "Access is denied" on progress.json during a pick-up (screen reading it at the same moment) →
   every file swap retries (`config.replace`); map files closed after reading.
 - [ ] **W-025 built 23 Oct (dev copy, not in an exe yet)**: pages Short / Medium / Seasonal / Map (AI vs IFS retired –
-  a saved copy moves to `settings
-etired\` on start); one **Show** picker in the top bar for all region charts on a
+  a saved copy moves to `settingsetired\` on start); one **Show** picker in the top bar for all region charts on a
   page; I1 **price tags** (▲ / ▼ + reason, rules in card I1). 59 test checks OK. Exe of 23 Oct 5:25 pm has the midday fix
   only. User to look, then "release".
 - [ ] User review of the screen → changes. Offered: daily high / low range markers on the Medium chart (days 8–15).

@@ -585,8 +585,11 @@ function aboutPanel(body) {
 function farmLine(feeds) {
   const f = (feeds || []).filter((x) => x.run && "farms" in x);
   if (!f.length) return "";
-  const city = f.filter((x) => !x.farms).map((x) => ({ ifs: "IFS", aifs: "AIFS", ens: "ensemble" }[x.feed]));
-  return `<p class="note">Wind and solar: <b>farm areas</b> (state average)${city.length ? ` – ${esc(city.join(", "))} still on the city (older run)` : ""}.</p>`;
+  const name = { ifs: "IFS", aifs: "AIFS", ens: "ensemble" };
+  const city = f.filter((x) => !x.farms).map((x) => name[x.feed]);
+  if (!city.length) return '<p class="note">Wind and solar: <b>farm areas</b> (state average, see MODELS).</p>';
+  if (city.length === f.length) return '<p class="note">Wind and solar: <b>city squares</b> – these runs came before the farm-area switch; the next runs use the farm areas.</p>';
+  return `<p class="note">Wind and solar: <b>farm areas</b>, except ${esc(city.join(", "))} (older run: city square).</p>`;
 }
 
 // ---------- the panel list ("+ Add panel") ----------

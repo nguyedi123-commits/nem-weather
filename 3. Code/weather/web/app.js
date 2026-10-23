@@ -446,6 +446,7 @@ async function pollStatus() {
     S.status = st;
     S.version = st.version;
     showStatus(st);
+    showAlertDot(st.alerts_unseen);
     const rb = document.getElementById("refresh");
     rb.textContent = st.refreshing ? "Refreshing…" : "Refresh";
     rb.classList.toggle("busy", !!st.refreshing);
@@ -461,6 +462,27 @@ async function pollStatus() {
     document.getElementById("status").innerHTML = '<span class="old">Server not reachable</span>';
   }
 }
+// ---------- W-028 alerts (card AL): red dot = unseen alerts; click = the list ----------
+function showAlertDot(n) {
+  const b = document.querySelector("#alerts .badge");
+  b.hidden = !n;
+  b.textContent = n > 99 ? "99+" : String(n || "");
+}
+async function alertsDialog() {
+  const d = await fetch("/api/alerts").then((r) => r.json()).catch((e) => ({ error: e.message }));
+  if (d.error) return ask(`Alerts not available: ${d.error}`);
+  const arrow = (a) => a.price ? ` <span class="ptag ${a.price}" title="${esc(a.why || "")}">· price ${a.price === "up" ? "▲" : "▼"}</span>` : "";
+  const runs = d.runs.map((r) => `<div class="al-run ${r.new ? "new" : ""}"><h4>${esc(r.title)} <small>${r.items.length} alert${r.items.length === 1 ? "" : "s"}${r.new ? " · new" : ""}</small></h4>
+    ${r.items.length ? `<ul>${r.items.map((a) => `<li class="al-${a.kind}">${esc(a.text)}${arrow(a)}</li>`).join("")}</ul>` : '<p class="note">Nothing big changed.</p>'}</div>`).join("");
+  await dialog(`<h3>Alerts – what the newest runs changed (days 1–7)</h3>
+    <div class="al-list">${runs || '<p class="note">No alerts yet – they start when a second run of a model arrives.</p>'}</div>
+    <div class="btns"><button class="cancel">Close</button><button class="ok primary">Mark all seen</button></div>`,
+  (box, close) => {
+    box.classList.add("wide");
+    box.querySelector(".ok").onclick = async () => { await fetch("/api/alerts/seen", { method: "POST" }); showAlertDot(0); close(true); };
+  });
+}
+
 function showStatus(st) {
   const short = { ifs: "IFS", aifs: "AIFS", ens: "Ens", bom: "BOM" };
   const runs = st.feeds.filter((f) => short[f.feed]).map((f) => f.run
@@ -515,6 +537,7 @@ async function start() {
   $("edit").onclick = () => setEditing(!S.editing);
   $("page-field").onchange = (e) => setPageField(e.target.value);
   $("refresh").onclick = refreshDialog;
+  $("alerts").onclick = alertsDialog;
   $("add-panel").onchange = (e) => { if (e.target.value) addNewPanel(e.target.value); e.target.value = ""; };
   $("rename-page").onclick = renamePage;
   $("copy-page").onclick = copyPage;

@@ -58,8 +58,10 @@ day and keeps only the NEM region; Weather.exe picks the small files up **by its
   click → Short / Medium) + I1 + A1. Also fixed: ensemble day 7 was missing everywhere (18 h rule). 66 checks OK.
   User: good (23 Oct). Step 2 **W-027 farm areas** built: 16 farm squares (config `FARMS`, MODELS.md) taken with the
   cities, saved in `data/farms/<feed>/<run>.parquet`, published by the cloud; wind / solar on screen = state farm average
-  (TAS + older runs: city; About says which). First real farm data: cloud job 23 Oct 7:17 pm. Then W-028 alerts,
-  W-029 linked charts, W-030 map click + keys, W-014.
+  (TAS + older runs: city; About says which). First real farm data: cloud job 23 Oct 7:17 pm. User: good.
+  Step 3 **W-028 alerts** built (card AL): Alerts button + red dot; new / gone warnings + big changes, days 1–7, IFS
+  days 1–3 vs previous IFS run, ensemble days 4–7 vs previous ensemble; `data/alerts.json`; wind / sun skipped across
+  the farm switch. 69 checks OK. Then W-029 linked charts, W-030 map click + keys, W-014.
 - [ ] User review of the screen → changes. Offered: daily high / low range markers on the Medium chart (days 8–15).
 - Later: W-020 keep the GitHub schedule alive (monthly upload, due before ~19 Dec), W-008b BOM correction (~mid Nov),
   W-014 forecast-check panel, backlog W-009 AIFS ENS / W-010 NOAA GFS (user: not wanted – poor) / W-011 other seasonal centres.

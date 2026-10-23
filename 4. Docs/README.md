@@ -7,6 +7,7 @@ model it uses and how to read it. No new or changed panel without its card being
 | Code | Panel | Tab | Card |
 |---|---|---|---|
 | W1 | Week ahead: states × 15 days, colour + tags + price arrow, click through | Overview | [W1](panels/W1_week_ahead.md) |
+| AL | Alerts (top-bar button): new warnings + big changes in days 1–7 after each new run | all pages | [AL](panels/AL_alerts.md) |
 | S1 | Next 3 days – one region (picker); field from the top-bar picker | Short | [S1](panels/S1_short_region.md) |
 | M1 | Next 15 days with range – region picker; field from the top bar | Medium | [M1](panels/M1_medium_region.md) |
 | C1 | AI model vs main model – region picker; field from the top bar | – (Edit mode) | [C1](panels/C1_compare_region.md) |

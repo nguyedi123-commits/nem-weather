@@ -80,6 +80,17 @@ with sync_playwright() as p:
     check(page.locator(".help-pop h3").inner_text().startswith("S1"), "ⓘ help shows the S1 card")
     page.screenshot(path=str(out / f"help_S1_{theme}.png"))
     page.keyboard.press("Escape")
+
+    # W-028 alerts: button in the top bar, list opens, "Mark all seen" clears the dot
+    page.wait_for_timeout(5500)   # one status poll
+    check(page.locator("#alerts").is_visible(), "Alerts button shown")
+    page.click("#alerts")
+    page.wait_for_timeout(1200)
+    check("Alerts" in page.locator(".modal h3").inner_text(), "alert list opens")
+    page.screenshot(path=str(out / f"alerts_{theme}.png"))
+    page.click(".modal .ok")
+    page.wait_for_timeout(800)
+    check(page.locator("#alerts .badge").is_hidden(), "Mark all seen clears the red dot")
     b.close()
 
 print(f"{checks} checks, screenshots in {out}")

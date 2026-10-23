@@ -14,7 +14,7 @@ import sys
 import threading
 from urllib.parse import parse_qs, unquote, urlparse
 
-from . import cloud, config as C, insights, progress, refresh, views
+from . import alerts, cloud, config as C, insights, progress, refresh, views
 
 log = logging.getLogger("weather.server")
 WEB = (Path(sys._MEIPASS) if getattr(sys, "frozen", False) else Path(__file__).resolve().parents[1]) / "web"
@@ -73,6 +73,14 @@ def _save_json(path, data):
     C.replace(tmp, path)
 
 
+def _alerts_unseen():
+    try:
+        return alerts.unseen()
+    except Exception as e:   # alerts must never break the status line
+        log.warning("alerts: %s", e)
+        return 0
+
+
 def load_settings():
     try:
         return json.loads((C.SETTINGS / "settings.json").read_text())
@@ -113,7 +121,9 @@ class Handler(BaseHTTPRequestHandler):
             name = parts[1] if len(parts) > 1 else ""
             if name == "status":   # small and changes with the clock: never cached
                 return self._json({**views.status(), "progress": progress.read(), "refreshing": refresh.running(),
-                                   "cloud": cloud.status()})
+                                   "cloud": cloud.status(), "alerts_unseen": _alerts_unseen()})
+            if name == "alerts":   # W-028
+                return self._json(alerts.view())
             if name == "layouts":
                 return self._json(page_names())
             if name == "layout" and len(parts) == 3:
@@ -163,6 +173,8 @@ class Handler(BaseHTTPRequestHandler):
             if parts[:2] == ["api", "refresh"]:   # the Refresh button (W-018): downloads in the background
                 why = refresh.start(self._body().get("mode", "light"))
                 return self._json({"ok": why is None, "error": why})
+            if parts[:3] == ["api", "alerts", "seen"]:   # W-028: "Mark all seen"
+                return self._json(alerts.mark_seen())
             if parts[:2] == ["api", "settings"]:
                 s = {**load_settings(), **self._body()}
                 _save_json(C.SETTINGS / "settings.json", s)

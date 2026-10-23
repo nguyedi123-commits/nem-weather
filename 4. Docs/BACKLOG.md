@@ -16,9 +16,9 @@
 | W-010 | **NOAA GFS / GEFS** – US model + ensemble as independent second opinion, +2–10 GB | Idea – later |
 | W-024 | **Overnight data on the trading PC by 8 am Sydney**: cloud jobs 6:52 + 7:22 am, 11:47 am (midday IFS), 7:17 pm (full) Sydney; seasonal checked every job (only when due) and published after the forecasts; Weather.exe checks every 15 min; this PC starts the jobs (Task Scheduler) while GitHub's timer is late | Built 21–23 Oct, released 23 Oct |
 | W-025 | Pages Short / Medium / Seasonal / Map only (AI vs IFS page removed); **one field picker in the top bar** for all region charts on a page; **I1 price tags** (▲ / ▼ + reason) | Built 23 Oct – not released |
-| W-026 | **Week-ahead grid**: states × days, coloured hot / cold / lull / dull / wet, ▲ / ▼ price arrows | Agreed 23 Oct – step 1 of 6 |
-| W-027 | **Wind and solar at the farm areas** (not the capital city square) | Agreed 23 Oct – step 2 |
-| W-028 | **Alerts** when a new run changes something big (red dot on the tab, optional sound / pop-up) | Agreed 23 Oct – step 3 |
+| W-026 | **Week-ahead grid**: states × days, coloured hot / cold / lull / dull / wet, ▲ / ▼ price arrows | Built 23 Oct – user OK |
+| W-027 | **Wind and solar at the farm areas** (not the capital city square) | Built 23 Oct – user OK, first data 23 Oct evening |
+| W-028 | **Alerts** when a new run changes something big (red dot on the tab, optional sound / pop-up) | Built 23 Oct – testing |
 | W-029 | **Linked charts**: hover one state = same time on all; click a day = highlight everywhere | Agreed 23 Oct – step 4 |
 | W-030 | **Click a city on the map** opens its chart; **keyboard shortcuts** (1–4 pages, T / R / S / W field) | Agreed 23 Oct – step 5 |
 | W-014 | **Forecast check**: yesterday's forecasts vs what BOM measured, per model (better from ~mid Nov) | Agreed 23 Oct – step 6 |

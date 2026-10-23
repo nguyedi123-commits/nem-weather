@@ -196,3 +196,15 @@ body.empty-page #grid::before { content: "Empty page – click Edit (Ctrl+E), th
 .week td.none { text-align: center; color: var(--muted); }
 .theme-dark .week td.warm { background: #6d4c1f; } .theme-dark .week td.cold { background: #1e3a5f; }
 .theme-dark .week .tags i { filter: brightness(0.9); }
+
+/* ---------- W-028 alerts ---------- */
+#alerts { position: relative; }
+#alerts .badge { position: absolute; top: -6px; right: -8px; min-width: 1.3em; padding: 0 0.3em; border-radius: 0.7em;
+  background: #d32f2f; color: #fff; font-size: 0.72rem; font-weight: 700; line-height: 1.3em; text-align: center; }
+.al-list { max-height: 65vh; overflow: auto; }
+.al-run { border-left: 3px solid var(--border); padding-left: 0.6em; margin: 0.6em 0; }
+.al-run.new { border-left-color: #d32f2f; }
+.al-run h4 { margin: 0.2em 0; font-size: 0.95rem; } .al-run h4 small { color: var(--muted); font-weight: 400; }
+.al-run ul { margin: 0.2em 0; padding-left: 1.2em; }
+.al-new { color: #c62828; font-weight: 600; } .al-gone { color: #2e7d32; } .al-change { color: var(--text); }
+.theme-dark .al-new { color: #ff8a80; } .theme-dark .al-gone { color: #81c784; }

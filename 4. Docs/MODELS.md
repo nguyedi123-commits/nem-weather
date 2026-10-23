@@ -51,6 +51,23 @@ ECMWF is widely rated the most accurate global forecaster for the medium range.
 - Why monthly: ready-made "vs normal" numbers, same code and key, fair against the other two. NOAA's daily runs
   would need NOAA's own long-term averages and more work (not built).
 
+## Farm areas for wind and solar (W-027, since 23 Oct)
+Wind and solar on Short, Medium, the week grid (W1) and Insights are the **average of the state's farm areas**, not the
+capital city. Temperature and rain stay at the city (that is where demand is). One 25 km square per area (nearest square
+that is ≥ 90 % land), taken from the same downloaded fields as the cities – nothing extra to download.
+
+| State | Wind areas (100 m wind) | Solar areas (sunshine at the ground) |
+|---|---|---|
+| NSW | New England (−29.75, 151.35) · Central West (−32.47, 148.98) · Southern Tablelands (−34.75, 149.45) | Riverina, Darlington Pt (−34.60, 146.05) · North West, Moree (−29.45, 149.85) |
+| QLD | Darling Downs, Coopers Gap (−26.75, 151.45) · Far North, Mt Emerald (−17.18, 145.38) | Western Downs (−26.85, 150.65) · North, Townsville (−19.45, 146.75) |
+| VIC | Western Vic, Ararat / Stockyard Hill (−37.55, 143.25) · South Gippsland (−38.75, 145.95) | North West, Mildura / Kiamal (−34.95, 142.25) |
+| SA | Mid North, Hallett / Snowtown (−33.60, 138.60) · South East, Lake Bonney (−37.75, 140.40) | Port Augusta, Bungala (−32.45, 137.85) · Riverland (−34.20, 140.70) |
+
+- Runs downloaded before the change (before the 23 Oct evening run) have no farm squares: they keep the city wind / solar
+  (the About panel says which).
+- The list is in `3. Code/weather/backend/config.py` (`FARMS`) – easy to change. Still weather, not farm output:
+  no turbine curves, curtailment or outages.
+
 ## What BOM uses
 - BOM's own model family is **ACCESS** (now version APS4):
   - **ACCESS-G** – global, ~13 km, 4 times a day, to 10 days.

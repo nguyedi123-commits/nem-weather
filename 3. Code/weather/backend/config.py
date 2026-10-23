@@ -44,6 +44,29 @@ CITIES = [  # (region, city, lat, lon)
 CITY_SQUARE = {"Adelaide": (-34.75, 138.75)}   # nearest land square is in the cooler Adelaide Hills
 LAND_MIN = 0.9
 
+# W-027: wind and solar farm areas (MODELS.md). Taken from the same fields as the cities (no extra download), saved in
+# data/farms/<feed>/<run>.parquet; the screen uses each state's average for wind (kind "wind") and solar ("solar").
+FARMS = [  # (region, kind, area, lat, lon)
+    ("NSW", "wind", "New England", -29.75, 151.35),
+    ("NSW", "wind", "Central West", -32.47, 148.98),
+    ("NSW", "wind", "Southern Tablelands", -34.75, 149.45),
+    ("NSW", "solar", "Riverina (Darlington Pt)", -34.60, 146.05),
+    ("NSW", "solar", "North West (Moree)", -29.45, 149.85),
+    ("QLD", "wind", "Darling Downs (Coopers Gap)", -26.75, 151.45),
+    ("QLD", "wind", "Far North (Mt Emerald)", -17.18, 145.38),
+    ("QLD", "solar", "Western Downs", -26.85, 150.65),
+    ("QLD", "solar", "North (Townsville)", -19.45, 146.75),
+    ("VIC", "wind", "Western Vic (Ararat / Stockyard Hill)", -37.55, 143.25),
+    ("VIC", "wind", "South Gippsland", -38.75, 145.95),
+    ("VIC", "solar", "North West (Mildura / Kiamal)", -34.95, 142.25),
+    ("SA", "wind", "Mid North (Hallett / Snowtown)", -33.60, 138.60),
+    ("SA", "wind", "South East (Lake Bonney)", -37.75, 140.40),
+    ("SA", "solar", "Port Augusta (Bungala)", -32.45, 137.85),
+    ("SA", "solar", "Riverland", -34.20, 140.70),
+]
+# every point taken from each field: the cities first, then the farm areas
+POINTS = [(r, c, la, lo) for r, c, la, lo in CITIES] + [(r, a, la, lo) for r, _, a, la, lo in FARMS]
+
 # East-coast map box (degrees), 0.25 deg grid
 GRID = dict(north=-9.0, south=-44.0, west=129.0, east=155.0)
 

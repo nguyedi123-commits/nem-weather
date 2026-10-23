@@ -507,6 +507,8 @@ function weekPanel(body, panel) {
   const tip = (c, day, city) => [`${city} · ${day.label} (${c.src === "IFS" ? "IFS main model" : "ensemble middle"})`,
     `High ${fmt(c.high, 1)} °C · low ${fmt(c.low, 1)} °C`, `Wind ${fmt(c.wind)} km/h at 100 m · sun ${fmt(c.solar, 1)} kWh/m²`,
     `Rain ${fmt(c.rain, 1)} mm${c.chance !== null && c.chance !== undefined ? ` · chance ${fmt(c.chance)} %` : ""}`,
+    ...(c.areas?.wind ? [`Wind areas: ${Object.entries(c.areas.wind).map(([a, v]) => `${a} ${fmt(v)}`).join(" · ")}`] : []),
+    ...(c.areas?.solar ? [`Sun areas: ${Object.entries(c.areas.solar).map(([a, v]) => `${a} ${fmt(v, 1)}`).join(" · ")}`] : []),
     ...c.up.map((w) => `▲ price: ${w}`), ...c.down.map((w) => `▼ price: ${w}`), "Click: open the chart"].join("\n");
   return {
     update(d) {
@@ -571,11 +573,20 @@ function aboutPanel(body) {
         <li>Seasonal: solid bars ECMWF, light bars BOM, outline bars CFS (US). Times are NEM time (AEST).</li>
         <li>Each panel's <b>ⓘ</b> explains it in full.</li></ul>
         <h4>Forecast runs on screen</h4><table>${rows.join("")}</table>
+        ${farmLine(st.feeds)}
         ${cloudLines(st.cloud)}
         <p class="note">New data arrives from the cloud by itself (Refresh = check now). Data: ECMWF (CC BY 4.0), BOM, Copernicus (NOAA CFS).</p>`;
     },
     resize() {},
   };
+}
+
+// W-027: where wind / solar on screen come from (farm areas from the 23 Oct evening run; older runs: the city)
+function farmLine(feeds) {
+  const f = (feeds || []).filter((x) => x.run && "farms" in x);
+  if (!f.length) return "";
+  const city = f.filter((x) => !x.farms).map((x) => ({ ifs: "IFS", aifs: "AIFS", ens: "ensemble" }[x.feed]));
+  return `<p class="note">Wind and solar: <b>farm areas</b> (state average)${city.length ? ` – ${esc(city.join(", "))} still on the city (older run)` : ""}.</p>`;
 }
 
 // ---------- the panel list ("+ Add panel") ----------

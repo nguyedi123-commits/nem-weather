@@ -21,7 +21,7 @@ log = logging.getLogger("weather.cloud")
 REPO = "nguyedi123-commits/nem-weather"
 URL = f"https://github.com/{REPO}/releases/download/data"
 EVERY_S = 900   # 15 min: the morning cloud job (~6:56 am Sydney) reaches the screen by ~7:15 (W-024)
-SAFE = re.compile(r"^(cities|grid)/[a-z_]+/[0-9a-z_]+\.(parquet|npz)$|^obs/(daily|halfhourly)\.parquet$|^static/lsm\.npz$")
+SAFE = re.compile(r"^(cities|grid|farms)/[a-z_]+/[0-9a-z_]+\.(parquet|npz)$|^obs/(daily|halfhourly)\.parquet$|^static/lsm\.npz$")
 _state_lock = threading.Lock()
 
 

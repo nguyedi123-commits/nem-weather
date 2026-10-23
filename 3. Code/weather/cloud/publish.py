@@ -55,7 +55,8 @@ def run_time(feed, rid):
 
 
 def files_for(feed, rid):
-    fs = [C.DATA / "cities" / feed / f"{rid}.parquet", C.DATA / "grid" / feed / f"{rid}.npz"]
+    fs = [C.DATA / "cities" / feed / f"{rid}.parquet", C.DATA / "grid" / feed / f"{rid}.npz",
+          C.DATA / "farms" / feed / f"{rid}.parquet"]   # farms: W-027
     return [f for f in fs if f.exists()]
 
 

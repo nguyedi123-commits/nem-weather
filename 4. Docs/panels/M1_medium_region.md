@@ -32,6 +32,8 @@ heat event, a wind lull, a dull or wet spell?
 - Temperature chart: BOM's daily high ▲ and low ▼ for its 7 days.
 
 ## Model and data
+- **Wind and solar = the state's farm areas** (average of 1–3 squares, W-027, list in MODELS.md); temperature, rain
+  and cloud = the city square. Runs from before 23 Oct evening: city (About says which).
 - **IFS ensemble** (ECMWF, 50 runs, 00z run) – 6-hourly to day 7, then 4 am and 4 pm NEM time to day 15.
   Fields: temperature + true max/min, 100 m wind, rain, solar.
 - **IFS** single run (latest 00z/12z) – 3-hourly to day 6, 6-hourly after.
@@ -63,3 +65,4 @@ heat event, a wind lull, a dull or wet spell?
 - 23 Oct 2026 – field picker moved to the top bar: one choice for every region chart on the page (W-025).
 - 23 Oct 2026 – fixed: day 7 was missing (at the switch to 12-hourly steps one step straddles midnight; a day now
   needs 18 h, not 20 h, of ensemble data). The 2 night hours count to the next day.
+- 23 Oct 2026 – W-027: wind and solar = average of the state's farm areas (MODELS.md), not the city square.

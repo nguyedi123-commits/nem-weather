@@ -101,9 +101,60 @@ def runs_view():
     return out
 
 
+# ---------- W-027: wind and solar from the state's farm areas (MODELS.md) ----------
+FARM_COLS = {"wind": "wind100_kmh", "solar": "solar_wm2"}
+AREA_REGION = {a: r for r, _, a, *_ in C.FARMS}
+
+
+def _farm_file(feed, rid):
+    return C.DATA / "farms" / feed / f"{rid}.parquet"
+
+
+def has_farms(feed, rid):
+    return bool(rid) and _farm_file(feed, rid).exists()
+
+
+def _farm_avg(feed, rid):
+    """Per state and time (and member): average wind of its wind areas, average solar of its solar areas."""
+    fm = pd.read_parquet(_farm_file(feed, rid))
+    keys = ["region", "step_h"] + (["member"] if "member" in fm else [])
+    parts = [fm[fm["kind"] == kind].groupby(keys)[col].mean() for kind, col in FARM_COLS.items()]
+    return pd.concat(parts, axis=1).reset_index()
+
+
+@lru_cache(maxsize=8)
+def farm_daily(feed, rid):
+    """Each area's day values: {region: {date: {"wind": {area: km/h}, "solar": {area: kWh/m²}}}} (ensemble: middle)."""
+    if not has_farms(feed, rid):
+        return {}
+    fm = pd.read_parquet(_farm_file(feed, rid))
+    fm["t"] = fm["valid_utc"] + AEST
+    keys = ["area"] + (["member"] if "member" in fm else [])
+    fm = fm.sort_values(keys + ["step_h"])
+    fm["kwh"] = fm["solar_wm2"] * fm.groupby(keys)["step_h"].diff() / 1000
+    fm["pday"] = (fm["t"] - pd.Timedelta(minutes=1)).dt.normalize()
+    fm["iday"] = fm["t"].dt.normalize()
+    w = fm[fm["kind"] == "wind"].groupby(keys + ["iday"])["wind100_kmh"].mean()
+    s = fm[fm["kind"] == "solar"].groupby(keys + ["pday"])["kwh"].sum(min_count=1)
+    if "member" in fm:
+        w, s = w.groupby(["area", "iday"]).median(), s.groupby(["area", "pday"]).median()
+    out = {}
+    for name, ser, dp in (("wind", w, 0), ("solar", s, 1)):
+        for (area, day), v in ser.items():
+            if pd.notna(v):
+                d = out.setdefault(AREA_REGION[area], {}).setdefault(pd.Timestamp(day).strftime("%Y-%m-%d"), {})
+                d.setdefault(name, {})[area] = round(float(v), dp)
+    return out
+
+
 @lru_cache(maxsize=32)
 def _cities(feed, rid):
     df = pd.read_parquet(C.DATA / "cities" / feed / f"{rid}.parquet")
+    if has_farms(feed, rid):   # W-027: wind / solar = the state's farm areas (TAS and missing values: the city)
+        avg = _farm_avg(feed, rid)
+        df = df.merge(avg, on=[k for k in avg.columns if k not in FARM_COLS.values()], how="left", suffixes=("_city", ""))
+        for col in FARM_COLS.values():
+            df[col] = df[col].fillna(df[f"{col}_city"])
     df["t"] = df["valid_utc"] + AEST
     for col in ("tmax_c", "tmin_c"):   # files saved before 18 Oct fix had zeros (-273) at 0 h
         if col in df:
@@ -209,7 +260,8 @@ def status():
             t = parse_run(rid)
         feeds.append({"feed": feed, "label": FEED_LABEL[feed], "run": rid,
                       "run_text": run_text(feed, rid) + (" forecast" if feed.startswith("seasonal") else ""),
-                      "age_h": round((now - t).total_seconds() / 3600)})
+                      "age_h": round((now - t).total_seconds() / 3600),
+                      **({"farms": has_farms(feed, rid)} if feed in ("ifs", "aifs", "ens") else {})})
     mtime = (C.DATA / "catalog.json").stat().st_mtime if (C.DATA / "catalog.json").exists() else 0
     return {"feeds": feeds, "version": mtime,
             "now": (now + timedelta(hours=10)).strftime("%a %d %b %H:%M"),

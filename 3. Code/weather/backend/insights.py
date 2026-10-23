@@ -268,6 +268,7 @@ def week():
     s, m = views.short(), views.medium()
     if s.get("error") and m.get("error"):
         return {"error": s["error"]}
+    areas = {"IFS": views.farm_daily("ifs", s.get("run")), "Ens": views.farm_daily("ens", m.get("run"))}   # W-027 hover
     days, regions = {}, {}
     for r in REGIONS:
         cells = {}
@@ -284,6 +285,8 @@ def week():
                     lo, mid, hi = x["high"]
                     cells[x["date"]] = _cell(mreg["city"], x["date"], "Ens", mid, x["low"][1], x["wind"][1], x["solar"][1],
                                              x["rain"][1], x["rain_chance"], risk=hi >= HEAT[mreg["city"]] > mid)
+        for d, c in cells.items():
+            c["areas"] = areas[c["src"]].get(r, {}).get(d)
         regions[r] = {"city": (reg or mreg or {}).get("city"), "cells": cells}
         for d, c in cells.items():
             days.setdefault(d, c["src"])

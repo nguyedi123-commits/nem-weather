@@ -31,13 +31,14 @@ that usually pushes power prices? One look, before opening any chart.
 - **Days 1–3: IFS main model** (newest run, sharpest detail) – the same daily numbers as the S1 table.
 - **Days 4–14: IFS ensemble middle** (50 runs) – the same daily numbers as the M1 table; the heat-risk tag uses the
   top of its range.
-- City square as everywhere else (nearest ≥ 90 % land square). Wind = day-average at 100 m. Sun = kWh/m² for the day.
+- Temperature and rain: the city square (nearest ≥ 90 % land square). **Wind and sun: average of the state's farm areas**
+  (W-027, list in MODELS.md); hover shows each area. Wind = day-average at 100 m. Sun = kWh/m² for the day.
 - Rules and limits: exactly the I1 rules (heat / cold / lull / strong wind / dull / wet / likely rain), card I1.
 
 ## How to read it
 - Scan for red and ▲: those are the days and states to look at first; click through for the detail.
 - A pale day 10 that turns red on later runs = a signal firming up (W-028 alerts will flag that later).
-- City wind and sun only hint at wind-farm and solar-farm weather (W-027 will move them to the farm areas).
+- Wind and sun are at the farm areas, but still weather – not farm output (no curtailment, outages, turbine limits).
 
 ## Limits
 - Days 4–14 are the ensemble **middle**: a real heatwave on day 10 can look milder here than it will turn out
@@ -47,3 +48,4 @@ that usually pushes power prices? One look, before opening any chart.
 
 ## Change log
 - 23 Oct 2026 – W-026 agreed: new Overview page, up to 14 days (IFS days 1–3, ensemble after), high + low + colour + tags + arrow.
+- 23 Oct 2026 – W-027: wind and sun = farm-area average; hover lists each area.

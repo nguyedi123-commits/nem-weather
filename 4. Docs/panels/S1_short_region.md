@@ -35,6 +35,8 @@ matter most for demand, wind and solar bids.
   - Grey italic rows = part days (the run starts or ends during that day).
 
 ## Model and data
+- **Wind and solar = the state's farm areas** (average of 1–3 squares, W-027, list in MODELS.md); temperature, rain
+  and cloud = the city square. Runs from before 23 Oct evening: city (About says which).
 - ECMWF **IFS** single run (latest on disk), 3-hourly. One 25 km grid square per city: nearest square that is
   ≥ 90 % land (Adelaide set by hand). High / Low use ECMWF's true max/min temperature in each 3 h.
 - ECMWF **IFS ensemble** (50 runs, latest 00z run), 6-hourly – range band and rain chance.
@@ -65,3 +67,4 @@ matter most for demand, wind and solar bids.
 - 20 Oct 2026 – W-017 built: run + vs pickers, dashed older run, Change column.
 - 20 Oct 2026 – W-015 built: free panel (add / move / resize / remove), own region + field picker, ⓘ help.
 - 23 Oct 2026 – field picker moved to the top bar: one choice for every region chart on the page (W-025).
+- 23 Oct 2026 – W-027: wind and solar = average of the state's farm areas (MODELS.md), not the city square; temperature / rain stay at the city.

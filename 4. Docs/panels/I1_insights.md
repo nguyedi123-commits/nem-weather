@@ -62,7 +62,7 @@ Each page reads its own data and the same run as the page's default (latest, vs 
 - "Changed since" in the next 1–3 days is the forecast firming up and matters most. Changes at day 8–15 are early signs.
 - A price tag is a **direction, not a forecast**: gas, coal outages, interconnectors, bidding and the rest of the
   market can outweigh the weather. Several ▲ on the same day and region = worth a closer look.
-- The wind rules use the **city** grid square. They hint at wind-farm weather but are not wind-farm output.
+- The wind and sun rules use the **state's farm areas** (W-027, MODELS.md) – weather at the farms, not farm output.
 
 ## Limits
 - Rules, not a forecaster: the wording is fixed and simple.
@@ -73,3 +73,4 @@ Each page reads its own data and the same run as the page's default (latest, vs 
 - 20 Oct 2026 – agreed and built (W-021). Built-in pages now: NSW, QLD, About · SA, VIC, I1 (no TAS).
 - 21 Oct 2026 – W-011a: seasonal lines also say whether CFS (US) agrees (after BOM).
 - 23 Oct 2026 – W-025: price tags (▲ / ▼ with the reason); AI vs IFS page removed from the page picker.
+- 23 Oct 2026 – W-027: Lull / Strong wind / Dull day now use the state's farm areas (MODELS.md), not the city.

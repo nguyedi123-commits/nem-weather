@@ -152,8 +152,8 @@ class Geo:
         self.r0, self.r1, self.c0, self.c1 = rows[0], rows[-1] + 1, cols[0], cols[-1] + 1
         self.lat, self.lon = lats[self.r0:self.r1], lons[self.c0:self.c1]
         self.city_rc = [self._city_point(*C.CITY_SQUARE.get(city, (lat, lon)), lats, lons, lsm)
-                        for _, city, lat, lon in C.CITIES]
-        for (_, city, *_), (i, j) in zip(C.CITIES, self.city_rc):
+                        for _, city, lat, lon in C.POINTS]   # cities, then the W-027 farm areas
+        for (_, city, *_), (i, j) in zip(C.POINTS, self.city_rc):
             log.info("%s uses grid point %.2f, %.2f", city, lats[i], lons[j])
 
     @staticmethod
@@ -380,15 +380,23 @@ def _finish(feed, run, steps, work, geo, tag=""):
     s = df.pop("s").to_numpy()
     df.insert(1, "valid_utc", valid[s])
     df.insert(2, "step_h", np.array(steps)[s])
-    df.insert(3, "region", [C.CITIES[i][0] for i in df["c"]])
-    df.insert(4, "city", [C.CITIES[i][1] for i in df.pop("c")])
+    c = df.pop("c").to_numpy()
+    df.insert(3, "region", [C.POINTS[i][0] for i in c])
+    df.insert(4, "city", [C.POINTS[i][1] for i in c])
     member = members[df.pop("m").to_numpy()]
     if ens:
         df.insert(5, "member", member)
     df = df.round({k: 2 for k in cf})
+    n_city = len(C.CITIES)
     cdir = C.DATA / "cities" / feed
     cdir.mkdir(parents=True, exist_ok=True)
-    df.to_parquet(cdir / f"{run_id(run)}{tag}.parquet", index=False)
+    df[c < n_city].to_parquet(cdir / f"{run_id(run)}{tag}.parquet", index=False)
+    if n_c > n_city:   # W-027 farm areas: own file, the city tables stay as they were
+        fm = df[c >= n_city].rename(columns={"city": "area"})
+        fm.insert(4, "kind", [C.FARMS[i - n_city][1] for i in c[c >= n_city]])
+        fdir = C.DATA / "farms" / feed
+        fdir.mkdir(parents=True, exist_ok=True)
+        fm.to_parquet(fdir / f"{run_id(run)}{tag}.parquet", index=False)
 
     # Map grid: one field at a time to keep memory low
     gdir = C.DATA / "grid" / feed
@@ -482,7 +490,8 @@ def get_run(feed, run, max_steps=None, part=""):
     """Download one run (resumes if partly done). Returns True when finished."""
     steps = steps_for(feed, run)[:max_steps] if max_steps else steps_for(feed, run)
     rid = run_id(run)
-    work = C.DATA / "work" / feed / (rid + (f"_test{max_steps}" if max_steps else ""))
+    # the number of points is in the name: a run half-done before W-027 (cities only) starts again cleanly
+    work = C.DATA / "work" / feed / (rid + (f"_test{max_steps}" if max_steps else "") + f"_p{len(C.POINTS)}")
     work.mkdir(parents=True, exist_ok=True)
     geo = _load_geo()
     t0 = time.time()

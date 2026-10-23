@@ -3,7 +3,8 @@
 # Times are UTC (GitHub has no daylight saving; ECMWF works in UTC too, so these suit summer and winter):
 #   19:52 light – ECMWF's overnight (12z) IFS + AIFS are complete at 19:34 UTC. = 6:52 am Sydney summer / 5:52 am winter
 #   20:22 light – back-up if 19:52 is skipped or late; also picks up BOM's later morning issues. = 7:22 am / 6:22 am
-#   10:07 full  – + ensemble (complete 08:01 UTC). = 9:07 pm / 8:07 pm
+#   00:47 light – midday IFS (18z, to 90 h) is complete at 00:27 UTC.               = 11:47 am / 10:47 am
+#   08:17 full  – day IFS + AIFS (00z, 07:34 UTC) + ensemble (08:01 UTC).           = 7:17 pm / 6:17 pm
 #   Every job: forecasts are published first, then a new seasonal month if one is due (Copernicus queue can be slow).
 # Off the round :00 / :30 minutes – GitHub starts round-time schedules late or skips them when busy (seen 21 Oct).
 name: Weather refresh
@@ -12,7 +13,8 @@ on:
   schedule:
     - cron: "52 19 * * *"
     - cron: "22 20 * * *"
-    - cron: "7 10 * * *"
+    - cron: "47 0 * * *"
+    - cron: "17 8 * * *"
   workflow_dispatch:
     inputs:
       mode:
@@ -55,5 +57,5 @@ jobs:
       - name: Download, keep the NEM east coast, publish
         env:
           GH_TOKEN: ${{ github.token }}
-          MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || (github.event.schedule == '7 10 * * *' && 'full' || 'light') }}
+          MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || (github.event.schedule == '17 8 * * *' && 'full' || 'light') }}
         run: python "3. Code/weather/cloud/publish.py" --mode "$MODE"

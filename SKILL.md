@@ -23,10 +23,12 @@ py -3.14 -m venv .venv                     (from the project root)
 - Job `.github/workflows/refresh.yml` → `cloud/publish.py --mode light|full|bom`:
   - 19:52 UTC light = BOM + IFS + AIFS (ECMWF's 12z run is complete at 19:34 UTC) – 6:52 am Sydney summer / 5:52 winter;
   - 20:22 UTC light again = back-up if the first is skipped + later BOM issues – 7:22 am / 6:22 am;
-  - 10:07 UTC full = + ensemble + `ensx` + seasonal (ensemble complete 08:01 UTC) – 9:07 pm / 8:07 pm.
+  - 00:47 UTC light = midday IFS 18z run (to 90 h, complete 00:27 UTC) – 11:47 am / 10:47 am;
+  - 08:17 UTC full = + ensemble + `ensx` (IFS / AIFS 00z complete 07:34, ensemble 08:01 UTC) – 7:17 pm / 6:17 pm.
+  - ECMWF 06z (complete 12:27 UTC = 11:27 pm Sydney) is not fetched on purpose.
   - Goal (W-024): overnight data on the trading PC by 8 am Sydney. GitHub cron is UTC only – no daylight-saving change needed.
   - **GitHub's timer had not fired once by 22 Oct** → back-up on this PC: Windows Task Scheduler tasks
-    "Weather cloud morning 1" (6:52 am), "morning 2" (7:22 am), "evening" (9:07 pm, full) run
+    "Weather cloud morning 1" (6:52 am), "morning 2" (7:22 am), "midday" (11:47 am), "evening" (7:17 pm, full) run
     `3. Code\weather\tools\cloud_trigger.ps1 <mode>` (= `gh workflow run`), log `data\cloud_trigger.log`. They wake
     the PC from sleep, not when it is off. Remove: `Unregister-ScheduledTask -TaskName "Weather cloud*"`.
   - Order inside a job: BOM → ECMWF → **publish** → seasonal (Copernicus queue, can take hours – took 4.5 h on 21 Oct)

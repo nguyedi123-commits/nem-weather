@@ -32,11 +32,12 @@ day and keeps only the NEM region; Weather.exe picks the small files up **by its
   Check tool: `2. Output\Weather net check\RUN ME.bat`.
 - [ ] **W-024 data by 8 am Sydney** (user, 21 Oct). Measured: ECMWF IFS + AIFS overnight (12z) run complete 19:34 UTC =
   6:34 am Sydney every day; BOM morning issues QLD ~4:50, SA ~5:45, NSW ~7:20, TAS ~8:15, VIC ~8:40 am; ensemble 7 pm.
-  Done: cloud light jobs 19:52 + 20:22 UTC (6:52 / 7:22 am Sydney), full 10:07 UTC (9:07 pm); seasonal only in the
-  evening job and published after the forecasts; job limit 330 min; Weather.exe checks every 15 min (in code, **exe
+  Done: cloud light jobs 19:52 + 20:22 UTC (6:52 / 7:22 am Sydney); 23 Oct (user): + midday 00:47 UTC (11:47 am,
+  IFS 18z, complete 11:27 am) and full moved to 08:17 UTC (7:17 pm, was 9:07 pm; ensemble complete 7:01 pm); seasonal
+  published after the forecasts; job limit 330 min; Weather.exe checks every 15 min (in code, **exe
   built 22 Oct**). 22 Oct morning: this PC started 6:52 + 7:22 jobs → IFS + AIFS overnight run in the cloud by ~6:55 am.
 - [ ] **GitHub's timer never fired** (21 Oct morning + evening, 0 scheduled runs; workflow active, Actions on). Back-up
-  on THIS PC: Task Scheduler "Weather cloud morning 1 / morning 2 / evening" → `tools\cloud_trigger.ps1`
+  on THIS PC: Task Scheduler "Weather cloud morning 1 / morning 2 / midday / evening" → `tools\cloud_trigger.ps1`
   (log `data\cloud_trigger.log`). Only works while this PC is on (wakes it from sleep). Check 22 Oct ~7:30 am:
   22 Oct: GitHub's timer did fire the 21 Oct evening job – **5 h late** (14:59 UTC) → can't be relied on; keep this PC's
   trigger. Idea if this PC can't stay on: an always-on trigger elsewhere.

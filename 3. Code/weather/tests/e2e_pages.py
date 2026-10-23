@@ -53,6 +53,7 @@ with sync_playwright() as p:
             check(page.locator("#tabs .tab.on").inner_text() == "Medium", "Overview: late-day click opens Medium")
         elif name == "Check":   # W-014: forecast check – 4 models, every measure draws
             f1 = page.locator(".grid-stack-item .panel").first
+            page.wait_for_selector(".grid-stack-item .panel .table table", timeout=20000)   # first calculation takes a few s
             check(f1.locator(".table tr").count() == 5, "Check: 4 model rows + head")
             for mv in ("low", "rain", "sun", "high"):
                 f1.locator("select[data-key=measure]").select_option(mv)

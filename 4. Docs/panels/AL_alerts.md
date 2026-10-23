@@ -3,7 +3,7 @@
 |---|---|
 | **Code** | **AL** (top bar, not a panel) |
 | Kind | **Alerts** button in the top bar, on every page |
-| Status | W-028 agreed 23 Oct 2026 – building |
+| Status | W-028 built 23 Oct 2026 – released 23 Oct |
 
 ## Question it answers
 Did the newest forecast change anything that matters for the next 7 days – without me checking every page after every
@@ -38,6 +38,8 @@ cloud job?
 ## Limits
 - Only what the rules see: a change just under a limit (e.g. +1.9 °C) is not alerted.
 - The first time the program sees a run there is nothing to compare with – alerts start from the next run.
+- While a download is bringing runs in (e.g. a PC catching up after being off), nothing is compared; afterwards only
+  the newest run against the one before. Runs more than 30 h old raise no alerts.
 - When one run has farm-area wind / sun and the other still the city (the 23 Oct evening switch), wind and sun are
   not compared for that pair (the heading says so).
 - Rules, not a forecaster; price arrows are a direction, not a forecast.

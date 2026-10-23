@@ -7,12 +7,14 @@ from datetime import datetime, timedelta, timezone
 import json
 import threading
 
-from . import config as C, insights as I, views
+from . import config as C, insights as I, progress, views
+from .ecmwf import parse_run
 
 WARN = {"Hot", "Very hot", "Cold", "Lull", "Windy", "Dull", "Heavy"}   # Wet / Rain likely / Heat risk: too jumpy
 NAMES = {"Cold": "Cold night", "Lull": "Wind lull", "Windy": "Strong wind", "Dull": "Dull day", "Heavy": "Heavy rain"}
 DAYS = {"ifs": (1, 3), "ens": (4, 7)}
 KEEP_DAYS = 7
+FRESH_H = 30   # runs older than this are history (a PC catching up after being off), not news
 _lock = threading.Lock()
 
 
@@ -110,12 +112,19 @@ def update():
     """Compare each model's newest run with the one before, once per run. Returns the saved state."""
     with _lock:
         s = _load()
+        p = progress.read()
+        if p.get("active") and not p.get("stalled"):   # a download is bringing runs in: compare once it has finished
+            return s
         changed = False
         for feed in DAYS:
             lst = views.runs(feed)
             if len(lst) < 2 or f"{feed}:{lst[0]}" in s["done"]:
                 continue
             rid, prev = lst[0], lst[1]
+            if datetime.now(timezone.utc) - parse_run(rid) > timedelta(hours=FRESH_H):
+                s["done"] = (s["done"] + [f"{feed}:{rid}"])[-200:]   # old news: no alert
+                changed = True
+                continue
             try:
                 items = _compare(feed, rid, prev)
             except Exception as e:   # never break the screen over alerts

@@ -29,10 +29,12 @@ LESS_SUN = (UP, "less solar by day")
 SUMMER, WINTER = {11, 12, 1, 2, 3}, {6, 7, 8}
 
 
-def _b(text, kind, score, price=None):
+def _b(text, kind, score, price=None, tag=None):
     b = {"text": text, "kind": kind, "score": round(score, 2)}
     if price:
         b["price"], b["why"] = price
+    if tag:   # short word for the W1 week-ahead cells
+        b["tag"] = tag
     return b
 
 
@@ -71,18 +73,18 @@ def _flags(city, day, high=None, low=None, wind=None, solar=None, rain=None, cha
         very = high >= HEAT[city] + 4
         out.append(_b(f"{'Very hot' if very else 'Hot'} {day}: {_f(high)} °C", "heat", 9 if very else 7, AIRCON))
     if low is not None and low <= COLD[city]:
-        out.append(_b(f"Cold night {day}: {_f(low)} °C", "cold", 6, HEATING))
+        out.append(_b(f"Cold night {day}: {_f(low)} °C", "cold", 6, HEATING, "Cold"))
     if wind is not None and wind <= LULL:
-        out.append(_b(f"Wind lull {day}: {_f(wind)} km/h at 100 m", "wind", 6, LESS_WIND))
+        out.append(_b(f"Wind lull {day}: {_f(wind)} km/h at 100 m", "wind", 6, LESS_WIND, "Lull"))
     if wind is not None and wind >= STRONG:
-        out.append(_b(f"Strong wind {day}: {_f(wind)} km/h at 100 m", "wind", 6, MORE_WIND))
+        out.append(_b(f"Strong wind {day}: {_f(wind)} km/h at 100 m", "wind", 6, MORE_WIND, "Windy"))
     if solar is not None and solar <= DULL:
-        out.append(_b(f"Dull day {day}: {_f(solar, 1)} kWh/m² of sun", "solar", 4, LESS_SUN))
+        out.append(_b(f"Dull day {day}: {_f(solar, 1)} kWh/m² of sun", "solar", 4, LESS_SUN, "Dull"))
     if rain is not None and rain >= WET:
         heavy = rain >= HEAVY
-        out.append(_b(f"{'Heavy rain' if heavy else 'Wet'} {day}: {_f(rain)} mm", "rain", 8 if heavy else 5))
+        out.append(_b(f"{'Heavy rain' if heavy else 'Wet'} {day}: {_f(rain)} mm", "rain", 8 if heavy else 5, None, "Heavy" if heavy else "Wet"))
     elif chance is not None and chance >= LIKELY:
-        out.append(_b(f"Rain likely {day}: {chance:.0f} % chance", "rain", 4))
+        out.append(_b(f"Rain likely {day}: {chance:.0f} % chance", "rain", 4, None, "Rain"))
     return out
 
 
@@ -243,6 +245,52 @@ def _seasonal(run, vs):
                             changes.append(_b(f"{r} {m[:3]} chance {up} {o:.0f} → {n:.0f} %", "change", 5 + abs(n - o) / LEAN_MOVE))
         regions[r] = items or [_b("No clear lean – close to normal", "info", 1)]
     return {"run_text": f"{d['issue_text']} forecast", "vs_text": d.get("vs_text"), "regions": regions, "changes": changes}
+
+
+# ---------- W1 Week ahead (W-026, card W1): the same rules, one cell per state and day ----------
+
+def _cell(city, date, src, high, low, wind, solar, rain, chance, risk=False):
+    day = _day(views._day_label(date))
+    flags = _flags(city, day, high, low, wind, solar, rain, chance)
+    if risk:
+        flags.append(_b(f"Heat risk {day}", "heat", 5, AIRCON, "Risk"))
+    h = HEAT[city]
+    level = ("vhot" if high is not None and high >= h + 4 else "hot" if high is not None and high >= h
+             else "warm" if high is not None and high >= h - 4 else "cold" if low is not None and low <= COLD[city] else "mild")
+    ups = sorted({b["why"] for b in flags if b.get("price") == UP})
+    downs = sorted({b["why"] for b in flags if b.get("price") == DOWN})
+    price = "both" if ups and downs else UP if ups else DOWN if downs else None
+    return {"src": src, "high": high, "low": low, "wind": wind, "solar": solar, "rain": rain, "chance": chance,
+            "level": level, "tags": [b["tag"] for b in flags if b.get("tag")], "price": price, "up": ups, "down": downs}
+
+
+def week():
+    s, m = views.short(), views.medium()
+    if s.get("error") and m.get("error"):
+        return {"error": s["error"]}
+    days, regions = {}, {}
+    for r in REGIONS:
+        cells = {}
+        reg = (s.get("regions") or {}).get(r)
+        if reg:
+            for x in [x for x in reg["daily"] if not x["part"]][:3]:   # days 1–3: IFS
+                cells[x["date"]] = _cell(reg["city"], x["date"], "IFS", x["high"], x["low"], x["wind"], x["solar"],
+                                         x["rain"], x.get("rain_chance"))
+        mreg = (m.get("regions") or {}).get(r)
+        if mreg:
+            last = max(cells) if cells else ""
+            for x in mreg["daily"]:   # after that: ensemble middle (+ heat risk from the top of the range)
+                if x["date"] > last and len(cells) < 15:
+                    lo, mid, hi = x["high"]
+                    cells[x["date"]] = _cell(mreg["city"], x["date"], "Ens", mid, x["low"][1], x["wind"][1], x["solar"][1],
+                                             x["rain"][1], x["rain_chance"], risk=hi >= HEAT[mreg["city"]] > mid)
+        regions[r] = {"city": (reg or mreg or {}).get("city"), "cells": cells}
+        for d, c in cells.items():
+            days.setdefault(d, c["src"])
+    run = " · ".join(t for t in (f"IFS {s['run_text']}" if s.get("run_text") else "",
+                                 f"Ensemble {m['run_text']}" if m.get("run_text") else "") if t)
+    return {"run_text": run, "regions": regions,
+            "days": [{"date": d, "label": _day(views._day_label(d)), "src": src} for d, src in sorted(days.items())][:15]}
 
 
 PAGES = {"short": _short, "medium": _medium, "compare": _compare, "seasonal": _seasonal}

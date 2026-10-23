@@ -19,15 +19,15 @@ from . import cloud, config as C, insights, progress, refresh, views
 log = logging.getLogger("weather.server")
 WEB = (Path(sys._MEIPASS) if getattr(sys, "frozen", False) else Path(__file__).resolve().parents[1]) / "web"
 LAYOUTS = C.SETTINGS / "layouts"
-BUILT_IN = ["Short", "Medium", "Seasonal", "Map"]   # page order; first = start page
+BUILT_IN = ["Overview", "Short", "Medium", "Seasonal", "Map"]   # page order; first = start page (Overview: W-026)
 RETIRED = ["AI vs IFS"]   # built-in pages taken away (user, 23 Oct – W-025): a saved copy is moved to settings/retired/
 TYPES = {".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8",
          ".json": "application/json", ".txt": "text/plain; charset=utf-8", ".svg": "image/svg+xml"}
 
 ROUTES = {"short": views.short, "medium": views.medium, "compare": views.compare, "seasonal": views.seasonal,
-          "changes": views.changes, "insights": insights.insights}
+          "changes": views.changes, "insights": insights.insights, "week": insights.week}
 ARGS = {"short": ("run", "vs"), "medium": ("run", "vs"), "seasonal": ("run", "vs"), "changes": ("model", "run", "vs"),
-        "compare": (), "insights": ("page", "run", "vs")}
+        "compare": (), "insights": ("page", "run", "vs"), "week": ()}
 
 
 class Cache:
@@ -201,6 +201,9 @@ def retire_pages():
         if s.get("page") == name:
             s["page"] = BUILT_IN[0]
         s["retired"] = done
+        _save_json(C.SETTINGS / "settings.json", s)
+    if not s.get("overview_shown"):   # W-026: open on the new Overview page once; after that the last page as usual
+        s["page"], s["overview_shown"] = "Overview", True
         _save_json(C.SETTINGS / "settings.json", s)
 
 

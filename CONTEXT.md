@@ -53,6 +53,10 @@ day and keeps only the NEM region; Weather.exe picks the small files up **by its
   a saved copy moves to `settings/retired/` on start); one **Show** picker in the top bar for all region charts on a
   page; I1 **price tags** (▲ / ▼ + reason, rules in card I1). 59 test checks OK. Exe of 23 Oct 5:25 pm has the midday fix
   only. User to look, then "release".
+- [ ] **More interactive (agreed 23 Oct, one at a time – PLAN.md):** step 1 **W-026 Week-ahead grid** built (dev copy):
+  new first page **Overview** = W1 grid (4 states × up to 14 days; IFS days 1–3, ensemble after; colour, tags, ▲▼, hover,
+  click → Short / Medium) + I1 + A1. Also fixed: ensemble day 7 was missing everywhere (18 h rule). 66 checks OK.
+  **Waiting: user tests it.** Then W-027 farm areas, W-028 alerts, W-029 linked charts, W-030 map click + keys, W-014.
 - [ ] User review of the screen → changes. Offered: daily high / low range markers on the Medium chart (days 8–15).
 - Later: W-020 keep the GitHub schedule alive (monthly upload, due before ~19 Dec), W-008b BOM correction (~mid Nov),
   W-014 forecast-check panel, backlog W-009 AIFS ENS / W-010 NOAA GFS (user: not wanted – poor) / W-011 other seasonal centres.

@@ -1,0 +1,39 @@
+{
+ "name": "Overview",
+ "columns": 24,
+ "rows": 36,
+ "panels": [
+  {
+   "id": "week",
+   "kind": "week",
+   "x": 0,
+   "y": 0,
+   "w": 24,
+   "h": 15,
+   "font": 1,
+   "opts": {}
+  },
+  {
+   "id": "insights",
+   "kind": "insights",
+   "x": 0,
+   "y": 15,
+   "w": 16,
+   "h": 21,
+   "font": 1,
+   "opts": {
+    "ipage": "medium"
+   }
+  },
+  {
+   "id": "about",
+   "kind": "about",
+   "x": 16,
+   "y": 15,
+   "w": 8,
+   "h": 21,
+   "font": 1,
+   "opts": {}
+  }
+ ]
+}

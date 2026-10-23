@@ -142,7 +142,7 @@ def _ens_daily(x):
     dm = _daily(x, ("member",))
     out = {}
     for day, v in dm.groupby("day"):
-        if v["hours"].median() < 20:
+        if v["hours"].median() < 18:   # 18 not 20: at day 7 a 12-h step straddles midnight (only 18 h land on that day)
             continue
         row = {k: [round(float(a), 1) for a in np.nanpercentile(v[k], [10, 50, 90])] for k in DAILY_KEYS}
         row["rain_chance"] = round(float((v["rain"] >= 1).mean() * 100))

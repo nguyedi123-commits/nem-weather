@@ -11,7 +11,7 @@ url = sys.argv[1] if len(sys.argv) > 1 else "http://127.0.0.1:8892"
 out = Path(sys.argv[2] if len(sys.argv) > 2 else "screenshots")
 theme = sys.argv[3] if len(sys.argv) > 3 else "light"
 out.mkdir(parents=True, exist_ok=True)
-PAGES = {"Short": 6, "Medium": 6, "Seasonal": 6, "Map": 2}   # AI vs IFS page removed 23 Oct (W-025)
+PAGES = {"Overview": 3, "Short": 6, "Medium": 6, "Seasonal": 6, "Map": 2}   # AI vs IFS removed 23 Oct (W-025); Overview W-026
 problems, checks = [], 0
 
 
@@ -37,7 +37,21 @@ with sync_playwright() as p:
         check(panels == n, f"{name}: {panels} panels, expected {n}")
         check(not page.locator(".err").count(), f"{name}: error box {page.locator('.err').all_inner_texts()}")
         page.screenshot(path=str(out / f"page_{name.replace(' ', '_')}_{theme}.png"))
-        if name != "Map":   # W-025: one picker in the top bar drives every region chart on the page
+        if name == "Overview":   # W-026: week-ahead grid – 4 states × up to 14 days, click opens a chart page
+            cells = page.locator(".week td.cell")
+            n_cells = cells.count()
+            check(n_cells >= 4 * 12, f"Overview: {n_cells} week cells")
+            check(page.locator(".week tr").count() == 5, "Overview: 4 state rows + head")
+            check(not page.locator("#page-field-box").is_visible(), "Overview: no top-bar field picker")
+            cells.first.click()
+            page.wait_for_timeout(1500)
+            check(page.locator("#tabs .tab.on").inner_text() == "Short", "Overview: day-1 click opens Short")
+            page.click("#tabs .tab:text-is('Overview')")
+            page.wait_for_timeout(1500)
+            page.locator(".week tr").nth(1).locator("td.cell").last.click()
+            page.wait_for_timeout(1500)
+            check(page.locator("#tabs .tab.on").inner_text() == "Medium", "Overview: late-day click opens Medium")
+        elif name != "Map":   # W-025: one picker in the top bar drives every region chart on the page
             check(page.locator("#page-field-box").is_visible(), f"{name}: top-bar field picker shown")
             check(page.locator(".grid-stack-item .panel select[data-key=field]").count() == 0, f"{name}: no per-chart field pickers")
             for f in ("wind", "solar", "rain", "temp"):

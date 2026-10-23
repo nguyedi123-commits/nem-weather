@@ -74,6 +74,15 @@ Kept on disk (`data\`):
    - Zips: `2. Output\Weather.zip` (first install) and `Weather (update).zip`.
    - Built only when you say "release".
 
+## More interactive screen (agreed 23 Oct) – one at a time: build → test together → confirm → next
+1. W-026 Week-ahead grid
+2. W-027 Wind / solar at the farm areas
+3. W-028 Alerts on big changes
+4. W-029 Linked charts (hover / click a day)
+5. W-030 Map city click + keyboard shortcuts
+6. W-014 Forecast check vs BOM measurements
+No exe until "release".
+
 ## Cloud refresh (W-019, agreed 20 Oct)
 - GitHub public project `nem-weather` (code + docs only; never data, settings or the key).
 - GitHub job (Actions) at 7 am NEM (21:00 UTC, without ensemble) and 7 pm NEM (09:00 UTC, full) + a "run now" button:

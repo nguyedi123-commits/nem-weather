@@ -112,7 +112,9 @@ with sync_playwright() as p:
     page.click(".modal .ok")
     page.wait_for_timeout(1200)
     names = page.request.get(f"{url}/api/layouts").json()
-    check(T2 not in names and page.locator("#tabs .tab.on:text-is('Short')").count() == 1, "page deleted, back on Short")
+    check(T2 not in names and page.locator("#tabs .tab.on:text-is('Overview')").count() == 1, "page deleted, back on the first page (Overview)")
+    page.click("#tabs .tab:text-is('Short')")
+    page.wait_for_timeout(1500)
 
     # built-in page: change it, then Reset brings the built-in layout back
     page.locator(".grid-stack-item").first.locator("button.remove").click()

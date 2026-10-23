@@ -167,3 +167,32 @@ body.empty-page #grid::before { content: "Empty page – click Edit (Ctrl+E), th
 .map-strip .m-play { font-weight: 600; min-width: 5.2em; }
 .map-strip .m-play.on { background: var(--accent); color: #fff; }
 .map-strip select.m-speed { font: inherit; font-size: 0.9em; }
+
+/* ---------- W1 Week ahead ---------- */
+.week { height: 100%; overflow: auto; }
+.week table { width: 100%; height: 100%; border-collapse: separate; border-spacing: 3px; table-layout: fixed; }
+.week th { font-weight: 600; color: var(--muted); font-size: 0.85em; text-align: center; }
+.week th small { display: block; font-weight: 400; font-size: 0.8em; }
+.week th.reg { width: 7em; text-align: left; color: var(--text); font-size: 0.95em; }
+.week th.reg .dot { display: inline-block; width: 0.7em; height: 0.7em; border-radius: 50%; margin-right: 0.3em; }
+.week td.cell { position: relative; text-align: center; vertical-align: middle; border: 1px solid var(--border); border-radius: 4px;
+  cursor: pointer; padding: 0.15em; background: var(--panel); }
+.week td.cell:hover { outline: 2px solid var(--accent); }
+.week td.cell b { font-size: 1.35em; display: block; line-height: 1.1; }
+.week td.cell .lo { font-size: 0.8em; color: var(--muted); }
+.week td.cell.ens { opacity: 0.82; }
+.week td.warm { background: #ffe0b2; } .week td.hot { background: #ef5350; color: #fff; } .week td.vhot { background: #b71c1c; color: #fff; }
+.week td.cold { background: #bbdefb; }
+.week td.hot .lo, .week td.vhot .lo { color: #ffebee; }
+.week .tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px; margin-top: 2px; }
+.week .tags i { font-style: normal; font-size: 0.72em; font-weight: 600; padding: 0 0.3em; border-radius: 3px; background: #eceff1; color: #37474f; }
+.week .tags .t-lull { background: #fff3cd; color: #8a6d00; } .week .tags .t-windy { background: #e1f5fe; color: #01579b; }
+.week .tags .t-dull { background: #e0e0e0; color: #424242; } .week .tags .t-wet, .week .tags .t-rain { background: #e3f2fd; color: #1565c0; }
+.week .tags .t-heavy { background: #1565c0; color: #fff; } .week .tags .t-risk { background: #ffcdd2; color: #b71c1c; }
+.week .tags .t-cold { background: #1565c0; color: #fff; }
+.week .arr { position: absolute; top: 1px; right: 3px; font-size: 0.8em; font-weight: 700; }
+.week .arr.up { color: #c62828; } .week .arr.down { color: #2e7d32; } .week .arr.both { color: #6a1b9a; }
+.week td.hot .arr, .week td.vhot .arr { color: #fff; }
+.week td.none { text-align: center; color: var(--muted); }
+.theme-dark .week td.warm { background: #6d4c1f; } .theme-dark .week td.cold { background: #1e3a5f; }
+.theme-dark .week .tags i { filter: brightness(0.9); }

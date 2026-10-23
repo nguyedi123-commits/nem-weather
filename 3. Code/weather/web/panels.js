@@ -499,6 +499,37 @@ function insightsPanel(body, panel) {
   };
 }
 
+// ---------- W1 Week ahead (W-026, card W1): states × days, colour + tags + price arrow; click = that page ----------
+const ARROW = { up: "▲", down: "▼", both: "▲▼" };
+function weekPanel(body, panel) {
+  body.innerHTML = '<div class="week"></div>';
+  const box = body.firstChild;
+  const tip = (c, day, city) => [`${city} · ${day.label} (${c.src === "IFS" ? "IFS main model" : "ensemble middle"})`,
+    `High ${fmt(c.high, 1)} °C · low ${fmt(c.low, 1)} °C`, `Wind ${fmt(c.wind)} km/h at 100 m · sun ${fmt(c.solar, 1)} kWh/m²`,
+    `Rain ${fmt(c.rain, 1)} mm${c.chance !== null && c.chance !== undefined ? ` · chance ${fmt(c.chance)} %` : ""}`,
+    ...c.up.map((w) => `▲ price: ${w}`), ...c.down.map((w) => `▼ price: ${w}`), "Click: open the chart"].join("\n");
+  return {
+    update(d) {
+      if (!d) { box.innerHTML = '<div class="empty">Loading…</div>'; return; }
+      if (d.error) { box.innerHTML = `<div class="err">${esc(d.error)}</div>`; return; }
+      panel.setSub(d.run_text);
+      const head = d.days.map((x) => `<th class="${x.src === "Ens" ? "ens" : ""}">${esc(x.label)}${x.src === "Ens" ? '<small>Ens</small>' : ""}</th>`).join("");
+      const rows = Object.entries(d.regions).map(([r, reg]) => `<tr><th class="reg"><span class="dot" style="background:${REGION_COLOURS[r]}"></span>${esc(r)}<small>${esc(reg.city || "")}</small></th>
+        ${d.days.map((x) => { const c = reg.cells[x.date];
+          if (!c) return '<td class="none">–</td>';
+          return `<td class="cell ${c.level} ${c.src === "Ens" ? "ens" : ""}" data-r="${r}" data-src="${c.src}" title="${esc(tip(c, x, reg.city))}">
+            ${c.price ? `<span class="arr ${c.price}">${ARROW[c.price]}</span>` : ""}
+            <b>${fmt(c.high)}°</b><span class="lo">${fmt(c.low)}°</span>
+            <span class="tags">${c.tags.map((t) => `<i class="t-${t.toLowerCase()}">${esc(t)}</i>`).join("")}</span></td>`; }).join("")}</tr>`).join("");
+      box.innerHTML = `<table><tr><th></th>${head}</tr>${rows}</table>`;
+      box.querySelectorAll("td.cell").forEach((td) => {
+        td.onclick = () => window.__showPage?.(td.dataset.src === "IFS" ? "Short" : "Medium");
+      });
+    },
+    resize() {},
+  };
+}
+
 // ---------- A1 About: runs on screen + download progress ----------
 export function progressText(p) {
   if (!p) return "";
@@ -565,6 +596,7 @@ export const PANELS = {
     query: (o) => ({ page: o.ipage || "short" }), create: insightsPanel },
   changes: { code: "D1", title: "What changed", source: "changes", pickers: ["model"], runFeed: (o) => o.model,
     query: (o) => ({ model: o.model || "ens", ...runQ(o) }), create: changesPanel },
+  week: { code: "W1", title: "Week ahead", source: "week", pickers: [], create: weekPanel },
   about: { code: "A1", title: "About · runs · download", source: null, pickers: [], create: aboutPanel, status: true },
 };
 export const MAP_SOURCES = MAP_SRC;

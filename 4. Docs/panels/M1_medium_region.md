@@ -61,3 +61,5 @@ heat event, a wind lull, a dull or wet spell?
 - 20 Oct 2026 – W-015 built: free panel, own region + field picker, ⓘ help.
 - 23 Oct 2026 – IFS line always from the newest 15-day run (00z / 12z), not the midday 18z run (to 90 h only).
 - 23 Oct 2026 – field picker moved to the top bar: one choice for every region chart on the page (W-025).
+- 23 Oct 2026 – fixed: day 7 was missing (at the switch to 12-hourly steps one step straddles midnight; a day now
+  needs 18 h, not 20 h, of ensemble data). The 2 night hours count to the next day.

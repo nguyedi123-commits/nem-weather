@@ -27,6 +27,8 @@ const PICKER = {
   field: { opts: Object.entries(FIELDS), def: "temp", title: "What to show" },
   src: { opts: Object.entries(MAP_SOURCES), def: "ifs", title: "Model" },
   model: { opts: [["ens", "Ensemble middle"], ["ifs", "IFS"], ["aifs", "AIFS (AI)"]], def: "ens", title: "Model" },
+  measure: { opts: [["high", "Highs"], ["low", "Lows"], ["rain", "Rain yes / no"], ["sun", "Sunshine"]], def: "high", title: "What to check" },
+  period: { opts: [["14", "Last 14 days"], ["30", "Last 30 days"], ["90", "Last 90 days"]], def: "30", title: "Period checked" },
   ipage: { opts: [["short", "Short"], ["medium", "Medium"], ["seasonal", "Seasonal"]], def: "short",
     title: "Which page's data the insights read" },
 };
@@ -95,7 +97,7 @@ function makePanel(item) {
       saveSoon();
       if (key === "src" || key === "model") fillRuns(panel);   // other model, other runs
       if (panel.onPick) panel.onPick(key);
-      else if (key === "model" || key === "ipage") loadData().then(() => feed(panel));
+      else if (key === "model" || key === "ipage" || key === "period") loadData().then(() => feed(panel));
       else panel.impl.redraw?.();
     };
     sel.onmousedown = (e) => e.stopPropagation();   // don't start a drag in edit mode
@@ -291,7 +293,7 @@ window.__openRegion = async (page, date, region) => {
 // ---------- W-030 keyboard shortcuts (card README "Keyboard") ----------
 const FIELD_KEYS = { t: "temp", r: "rain", s: "solar", w: "wind" };
 function keysDialog() {
-  const rows = [["1 – 5", "Overview · Short · Medium · Seasonal · Map"], ["T · R · S · W", "Temperature · Rain · Solar · Wind"],
+  const rows = [["1 – 6", "Overview · Short · Medium · Seasonal · Map · Check"], ["T · R · S · W", "Temperature · Rain · Solar · Wind"],
     ["← · →", "Move the highlighted day back / on"], ["A", "Alerts"], ["Esc", "Clear the highlighted day"], ["?", "This list"],
     ["Ctrl+E", "Edit mode"]];
   return dialog(`<h3>Keyboard</h3><table class="grid">${rows.map(([k, v]) => `<tr><td class="l"><b>${esc(k)}</b></td><td class="l">${esc(v)}</td></tr>`).join("")}</table>

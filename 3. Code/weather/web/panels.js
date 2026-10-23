@@ -584,6 +584,76 @@ function weekPanel(body, panel) {
   };
 }
 
+// ---------- F1 Forecast check (W-014, card F1): forecasts vs what BOM measured ----------
+const CHECK_COL = { IFS: C_IFS, AIFS: C_AI, Ensemble: C_ENS, BOM: "#d32f2f" };
+function checkPanel(body, panel) {
+  body.innerHTML = '<div class="chart"></div><div class="table"></div>';
+  const chEl = body.querySelector(".chart"), tb = body.querySelector(".table");
+  const chart = echarts.init(chEl, dark() ? "dark" : null, { renderer: "canvas" });
+  new ResizeObserver(() => chart.resize()).observe(chEl);
+  let last = null;
+  const cell = (v, m) => {
+    if (m === "high" || m === "low") {
+      const x = v[m];
+      if (!x.n) return { html: "–", score: null, n: 0 };
+      const lean = Math.abs(x.lean) < 0.25 ? "even" : `${fmt(Math.abs(x.lean), 1)} ${x.lean > 0 ? "warm" : "cool"}`;
+      return { html: `${fmt(x.miss, 1)}° <span class="rng">${lean}</span>`, score: -x.miss, n: x.n };
+    }
+    const x = m === "rain" ? v.rain : v.sun, val = m === "rain" ? x.right : x.match;
+    return val === null || val === undefined ? { html: "–", score: null, n: x.n } : { html: `${fmt(val)} %`, score: val, n: x.n };
+  };
+  const draw = () => {
+    const d = last;
+    if (!d) { chart.clear(); tb.innerHTML = '<div class="empty">Loading…</div>'; return; }
+    if (d.error) { chart.clear(); tb.innerHTML = `<div class="err">${esc(d.error)}</div>`; return; }
+    const r = d.regions?.[panel.opts.region], m = panel.opts.measure || "high";
+    if (!r) return;
+    panel.setSub(`${r.days} day${r.days === 1 ? "" : "s"} checked · last ${d.period} days`);
+    const a = style(panel), c = r.chart;
+    if (m === "sun" && !r.sun_measured) {
+      chart.clear();
+      tb.innerHTML = `<div class="empty">Sunshine is not measured at the ${esc(r.city)} station – only Sydney and Brisbane record it.</div>`;
+      return;
+    }
+    const what = { high: "Average miss of the high (°C) and its lean (warm / cool)", low: "Average miss of the low (°C) and its lean (warm / cool)",
+      rain: "Rain or dry called right (1 mm or more)", sun: "How well sunny and dull days matched (70 %+ = good)" }[m];
+    const head = { high: "High: miss · lean", low: "Low: miss · lean", rain: "Rain: % right", sun: "Sun: % match" }[m];
+    const cells = Object.fromEntries(d.models.map((mod) => [mod, Object.fromEntries(d.leads.map((l) => [l, cell(r.table[mod][String(l)], m)]))]));
+    const best = Object.fromEntries(d.leads.map((l) => {
+      const s = d.models.map((mod) => cells[mod][l].score).filter((x) => x !== null);
+      return [l, s.length > 1 ? Math.max(...s) : null];
+    }));
+    tb.innerHTML = `<table class="grid check"><tr><th class="l" title="${esc(what)}">${esc(head)}</th>${d.leads.map((l) => `<th>Day ${l}</th>`).join("")}</tr>
+      ${d.models.map((mod) => `<tr><td class="l"><span class="dot" style="background:${CHECK_COL[mod]}"></span>${esc(mod)}</td>
+        ${d.leads.map((l) => { const x = cells[mod][l];
+          return `<td class="${x.score !== null && x.score === best[l] ? "best" : ""}" title="${x.n} day${x.n === 1 ? "" : "s"} checked">${x.html}</td>`; }).join("")}</tr>`).join("")}</table>`;
+    const unit = { high: "°C", low: "°C", rain: "mm", sun: "sun hours" }[m];
+    const series = [];
+    let shown = d.models;
+    if (m === "rain") {
+      series.push({ name: "Measured", type: "bar", color: "#78909c", data: c.obs.rain });
+      d.models.forEach((mod, k) => series.push({ name: mod, type: "scatter", yAxisIndex: 1, color: CHECK_COL[mod], symbolSize: a.f * 0.7,
+        symbolOffset: [(k - 1.5) * a.f * 0.75, 0],   // side by side when several models said the same
+        data: c.models[mod].rain.map((v) => (v === null ? null : v ? "said rain" : "said dry")) }));
+    } else if (m === "sun") {
+      shown = d.models.filter((x) => x !== "BOM");
+      series.push({ name: "Measured", type: "bar", color: "#78909c", data: c.obs.sun });
+      for (const mod of shown) series.push({ name: mod, type: "line", yAxisIndex: 1, color: CHECK_COL[mod], symbolSize: 5, data: c.models[mod].sun });
+    } else {
+      series.push({ name: "Measured", type: "line", color: dark() ? "#eceff1" : "#000", lineStyle: { width: 2.5 }, symbolSize: 6, data: c.obs[m] });
+      for (const mod of d.models) series.push({ name: mod, type: "line", color: CHECK_COL[mod], symbolSize: 5, data: c.models[mod][m] });
+    }
+    const yR = m === "rain" ? { type: "category", data: ["said dry", "said rain"], axisLabel: a.label }
+      : m === "sun" ? valueAxis(a, "kWh/m²", { min: 0, scale: false }) : null;
+    chart.setOption({ ...base(a), legend: { ...a.legend, data: ["Measured", ...shown] },
+      xAxis: { type: "category", data: c.labels, axisLabel: { ...a.label, hideOverlap: true } },
+      yAxis: [valueAxis(a, unit, m === "rain" || m === "sun" ? { min: 0, scale: false } : {}), ...(yR ? [yR] : [])],
+      tooltip: { trigger: "axis" }, series }, true);
+    chart.resize();
+  };
+  return { update(d) { last = d; draw(); }, redraw: draw, resize() { chart.resize(); }, dispose() { chart.dispose(); } };
+}
+
 // ---------- A1 About: runs on screen + download progress ----------
 export function progressText(p) {
   if (!p) return "";
@@ -662,6 +732,8 @@ export const PANELS = {
     query: (o) => ({ page: o.ipage || "short" }), create: insightsPanel },
   changes: { code: "D1", title: "What changed", source: "changes", pickers: ["model"], runFeed: (o) => o.model,
     query: (o) => ({ model: o.model || "ens", ...runQ(o) }), create: changesPanel },
+  check: { code: "F1", title: "Forecast check", source: "check", pickers: ["region", "measure", "period"],
+    query: (o) => ({ period: o.period || "30" }), create: checkPanel },
   week: { code: "W1", title: "Week ahead", source: "week", pickers: [], create: weekPanel },
   about: { code: "A1", title: "About · runs · download", source: null, pickers: [], create: aboutPanel, status: true },
 };

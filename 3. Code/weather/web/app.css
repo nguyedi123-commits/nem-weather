@@ -220,3 +220,8 @@ table.grid tr[data-date] { cursor: pointer; }
 /* ---------- W-030: chart flash after a map city click ---------- */
 .panel.flash { animation: flash 0.6s ease-in-out 3; }
 @keyframes flash { 50% { box-shadow: inset 0 0 0 3px #ffb300; border-color: #ffb300; } }
+
+/* ---------- F1 forecast check ---------- */
+table.grid td.best { background: rgba(46, 125, 50, 0.16); font-weight: 600; }
+table.grid .dot { display: inline-block; width: 0.65em; height: 0.65em; border-radius: 50%; margin-right: 0.35em; }
+table.grid.check th.l { width: 9em; }

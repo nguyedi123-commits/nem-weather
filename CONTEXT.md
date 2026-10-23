@@ -65,7 +65,10 @@ day and keeps only the NEM region; Weather.exe picks the small files up **by its
   charts of that kind; click a day (chart, table row, week cell) = yellow band + row highlight on every page, "Day" chip
   in the top bar (✕ / Esc clears). 75 checks OK. User: OK. Step 5 **W-030** built: map city click opens Short /
   Medium / Seasonal at the map's day, state chart flashes; keys 1–5, T/R/S/W, ←/→, A, Esc, ? (4. Docs/README.md).
-  81 checks OK. Then W-014 forecast check (last step).
+  81 checks OK. User: OK. Step 6 **W-014 forecast check** built: new **Check** page (F1 × 4 states) – IFS / AIFS /
+  ensemble / BOM vs BOM measurements, days 1/2/3/5/7: highs, lows (miss + lean), rain % right, sun % match (Sydney +
+  Brisbane only measure sun); chart of the last 14 days. Only ~5 days checkable yet (forecasts kept since ~18 Oct).
+  86 checks OK. **All 6 steps built – waiting for the user's OK, then "release".**
 - [ ] User review of the screen → changes. Offered: daily high / low range markers on the Medium chart (days 8–15).
 - Later: W-020 keep the GitHub schedule alive (monthly upload, due before ~19 Dec), W-008b BOM correction (~mid Nov),
   W-014 forecast-check panel, backlog W-009 AIFS ENS / W-010 NOAA GFS (user: not wanted – poor) / W-011 other seasonal centres.

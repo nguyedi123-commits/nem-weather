@@ -20,8 +20,8 @@
 | W-027 | **Wind and solar at the farm areas** (not the capital city square) | Built 23 Oct – user OK, first data 23 Oct evening |
 | W-028 | **Alerts** when a new run changes something big (red dot on the tab, optional sound / pop-up) | Built 23 Oct – user OK |
 | W-029 | **Linked charts**: hover one state = same time on all; click a day = highlight everywhere | Built 23 Oct – user OK |
-| W-030 | **Click a city on the map** opens its chart; **keyboard shortcuts** (1–4 pages, T / R / S / W field) | Built 23 Oct – testing |
-| W-014 | **Forecast check**: yesterday's forecasts vs what BOM measured, per model (better from ~mid Nov) | Agreed 23 Oct – step 6 |
+| W-030 | **Click a city on the map** opens its chart; **keyboard shortcuts** (1–4 pages, T / R / S / W field) | Built 23 Oct – user OK |
+| W-014 | **Forecast check**: yesterday's forecasts vs what BOM measured, per model (better from ~mid Nov) | Built 23 Oct – testing |
 | W-011a | **CFS (US, NOAA CFSv2)** seasonal as a third model on L1 + map (Copernicus monthly, same key) | Built 21 Oct – not released |
 | W-011 | Other seasonal centres on Copernicus (UK Met Office, Météo-France, DWD, Japan, Canada) | Idea – later |
 | W-012 | Automatic refresh: Weather.exe checks the cloud (hourly; every 15 min since W-024), fetches only new NEM-only runs (~60 MB each) | Built 20 Oct (with W-019) |

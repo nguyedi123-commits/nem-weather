@@ -14,20 +14,21 @@ import sys
 import threading
 from urllib.parse import parse_qs, unquote, urlparse
 
-from . import alerts, cloud, config as C, insights, progress, refresh, views
+from . import alerts, check, cloud, config as C, insights, progress, refresh, views
 
 log = logging.getLogger("weather.server")
 WEB = (Path(sys._MEIPASS) if getattr(sys, "frozen", False) else Path(__file__).resolve().parents[1]) / "web"
 LAYOUTS = C.SETTINGS / "layouts"
-BUILT_IN = ["Overview", "Short", "Medium", "Seasonal", "Map"]   # page order; first = start page (Overview: W-026)
+BUILT_IN = ["Overview", "Short", "Medium", "Seasonal", "Map", "Check"]   # page order; first = start page (Overview: W-026)
 RETIRED = ["AI vs IFS"]   # built-in pages taken away (user, 23 Oct – W-025): a saved copy is moved to settings/retired/
 TYPES = {".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8",
          ".json": "application/json", ".txt": "text/plain; charset=utf-8", ".svg": "image/svg+xml"}
 
 ROUTES = {"short": views.short, "medium": views.medium, "compare": views.compare, "seasonal": views.seasonal,
-          "changes": views.changes, "insights": insights.insights, "week": insights.week}
+          "changes": views.changes, "insights": insights.insights, "week": insights.week,
+          "check": check.check}
 ARGS = {"short": ("run", "vs"), "medium": ("run", "vs"), "seasonal": ("run", "vs"), "changes": ("model", "run", "vs"),
-        "compare": (), "insights": ("page", "run", "vs"), "week": ()}
+        "compare": (), "insights": ("page", "run", "vs"), "week": (), "check": ("period",)}
 
 
 class Cache:

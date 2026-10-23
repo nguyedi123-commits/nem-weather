@@ -11,7 +11,7 @@ url = sys.argv[1] if len(sys.argv) > 1 else "http://127.0.0.1:8892"
 out = Path(sys.argv[2] if len(sys.argv) > 2 else "screenshots")
 theme = sys.argv[3] if len(sys.argv) > 3 else "light"
 out.mkdir(parents=True, exist_ok=True)
-PAGES = {"Overview": 3, "Short": 6, "Medium": 6, "Seasonal": 6, "Map": 2}   # AI vs IFS removed 23 Oct (W-025); Overview W-026
+PAGES = {"Overview": 3, "Short": 6, "Medium": 6, "Seasonal": 6, "Map": 2, "Check": 4}   # AI vs IFS removed 23 Oct (W-025); Overview W-026
 problems, checks = [], 0
 
 
@@ -51,6 +51,16 @@ with sync_playwright() as p:
             page.locator(".week tr").nth(1).locator("td.cell").last.click()
             page.wait_for_timeout(1500)
             check(page.locator("#tabs .tab.on").inner_text() == "Medium", "Overview: late-day click opens Medium")
+        elif name == "Check":   # W-014: forecast check – 4 models, every measure draws
+            f1 = page.locator(".grid-stack-item .panel").first
+            check(f1.locator(".table tr").count() == 5, "Check: 4 model rows + head")
+            for mv in ("low", "rain", "sun", "high"):
+                f1.locator("select[data-key=measure]").select_option(mv)
+                page.wait_for_timeout(500)
+                if mv == "rain":
+                    page.screenshot(path=str(out / f"page_Check_rain_{theme}.png"))
+            check(not page.locator(".err").count(), "Check: no error after measure changes")
+            check(not page.locator("#page-field-box").is_visible(), "Check: no top-bar field picker")
         elif name != "Map":   # W-025: one picker in the top bar drives every region chart on the page
             check(page.locator("#page-field-box").is_visible(), f"{name}: top-bar field picker shown")
             check(page.locator(".grid-stack-item .panel select[data-key=field]").count() == 0, f"{name}: no per-chart field pickers")

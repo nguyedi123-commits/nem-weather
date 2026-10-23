@@ -1,0 +1,63 @@
+{
+ "name": "Check",
+ "columns": 24,
+ "rows": 36,
+ "panels": [
+  {
+   "id": "check-nsw",
+   "kind": "check",
+   "x": 0,
+   "y": 0,
+   "w": 12,
+   "h": 18,
+   "font": 1,
+   "opts": {
+    "region": "NSW",
+    "measure": "high",
+    "period": "30"
+   }
+  },
+  {
+   "id": "check-qld",
+   "kind": "check",
+   "x": 12,
+   "y": 0,
+   "w": 12,
+   "h": 18,
+   "font": 1,
+   "opts": {
+    "region": "QLD",
+    "measure": "high",
+    "period": "30"
+   }
+  },
+  {
+   "id": "check-sa",
+   "kind": "check",
+   "x": 0,
+   "y": 18,
+   "w": 12,
+   "h": 18,
+   "font": 1,
+   "opts": {
+    "region": "SA",
+    "measure": "high",
+    "period": "30"
+   }
+  },
+  {
+   "id": "check-vic",
+   "kind": "check",
+   "x": 12,
+   "y": 18,
+   "w": 12,
+   "h": 18,
+   "font": 1,
+   "opts": {
+    "region": "VIC",
+    "measure": "high",
+    "period": "30"
+   }
+  }
+ ]
+}

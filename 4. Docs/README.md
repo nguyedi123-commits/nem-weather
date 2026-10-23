@@ -8,6 +8,7 @@ model it uses and how to read it. No new or changed panel without its card being
 |---|---|---|---|
 | W1 | Week ahead: states × 15 days, colour + tags + price arrow, click through | Overview | [W1](panels/W1_week_ahead.md) |
 | AL | Alerts (top-bar button): new warnings + big changes in days 1–7 after each new run | all pages | [AL](panels/AL_alerts.md) |
+| F1 | Forecast check: forecasts vs what BOM measured – highs, lows, rain, sun; IFS / AIFS / ensemble / BOM by days ahead | Check | [F1](panels/F1_forecast_check.md) |
 | S1 | Next 3 days – one region (picker); field from the top-bar picker | Short | [S1](panels/S1_short_region.md) |
 | M1 | Next 15 days with range – region picker; field from the top bar | Medium | [M1](panels/M1_medium_region.md) |
 | C1 | AI model vs main model – region picker; field from the top bar | – (Edit mode) | [C1](panels/C1_compare_region.md) |
@@ -38,7 +39,7 @@ Group letters: S Short · M Medium · C Compare · L Long (seasonal) · G Map ·
 ## Keyboard (W-030, any page; not while typing in a box)
 | Key | Does |
 |---|---|
-| 1 – 5 | Overview · Short · Medium · Seasonal · Map |
+| 1 – 6 | Overview · Short · Medium · Seasonal · Map · Check |
 | T · R · S · W | Show Temperature · Rain · Solar · Wind (top-bar picker) |
 | ← · → | Move the highlighted day (W-029) one day back / on |
 | A | Alerts list |

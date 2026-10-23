@@ -48,6 +48,12 @@ def latest(feed):
     return r[0] if r else None
 
 
+def latest_long(feed):
+    """Newest 15-day run (00z / 12z). IFS 06z / 18z only go to 90 h – fine for Short, too short for Medium / AI vs IFS."""
+    r = [x for x in runs(feed) if x[-2:] in ("00", "12")]
+    return r[0] if r else None
+
+
 def _run_aest(rid):
     return (parse_run(rid) + timedelta(hours=10)).strftime("%a %d %b %H:%M")
 
@@ -177,10 +183,11 @@ def _bom_marks(days):
     return [{"date": d, "high": v["high"], "low": v["low"]} for d, v in sorted(days.items())]
 
 
-def _same_or_latest(feed, rid, main_feed):
-    """Partner run for an older main run: the same run id if on disk; for the newest main run: the newest partner."""
+def _same_or_latest(feed, rid, main_feed, long=False):
+    """Partner run for an older main run: the same run id if on disk; for the newest main run: the newest partner
+    (long=True: the newest 15-day partner)."""
     if rid == latest(main_feed):
-        return latest(feed)
+        return latest_long(feed) if long else latest(feed)
     return rid if rid in runs(feed) else None
 
 
@@ -288,7 +295,7 @@ def medium(run="latest", vs="auto"):
         return {"error": "No ensemble data yet – click Refresh (top right)."}
     ens = _cities("ens", rid)
     old = _cities("ens", vid) if vid else None
-    part = {f: _same_or_latest(f, rid, "ens") for f in ("ifs", "aifs")}
+    part = {f: _same_or_latest(f, rid, "ens", long=True) for f in ("ifs", "aifs")}
     det = {f: (_cities(f, p) if p else None) for f, p in part.items()}
     bom_issued, bom = bom_days()
     out = {"run": rid, "run_text": _run_aest(rid), "vs": vid, "vs_text": run_text("ens", vid), "bom_issued": bom_issued,
@@ -320,7 +327,7 @@ def medium(run="latest", vs="auto"):
 # ---------- C1 AI vs IFS ----------
 
 def compare():
-    ri, ra = latest("ifs"), latest("aifs")
+    ri, ra = latest_long("ifs"), latest_long("aifs")
     if not (ri and ra):
         return {"error": "Need both IFS and AIFS data – click Refresh (top right)."}
     i, a = _cities("ifs", ri), _cities("aifs", ra)

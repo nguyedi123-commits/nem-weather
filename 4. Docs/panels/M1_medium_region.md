@@ -59,3 +59,4 @@ heat event, a wind lull, a dull or wet spell?
 - 20 Oct 2026 – W-022 built: full-day max / min for the ensemble (extra max/min-only steps).
 - 20 Oct 2026 – W-017 built: run + vs pickers, dashed older run, Change column.
 - 20 Oct 2026 – W-015 built: free panel, own region + field picker, ⓘ help.
+- 23 Oct 2026 – IFS line always from the newest 15-day run (00z / 12z), not the midday 18z run (to 90 h only).

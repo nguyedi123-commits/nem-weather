@@ -34,3 +34,4 @@ weather is harder to call.
 ## Change log
 - 18 Oct 2026 – built.
 - 20 Oct 2026 – W-015 built: free panel, own region + field picker, ⓘ help.
+- 23 Oct 2026 – IFS always the newest 15-day run (00z / 12z), not the midday 18z run (to 90 h only).

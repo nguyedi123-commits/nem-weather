@@ -386,6 +386,13 @@ function mapPanel(body, panel) {
   const el = body.querySelector(".chart"), $ = (s) => body.querySelector(s);
   const chart = echarts.init(el, dark() ? "dark" : null, { renderer: "canvas" });
   let i = null, d = null, busy = false;
+  // W-030: click a city dot = open its chart page at the map's day
+  chart.on("click", (p) => {
+    if (p.seriesIndex !== 2 || !d || d.error) return;
+    const src = panel.opts.src, days = d.date ? (new Date(`${d.date}T00:00`) - new Date(new Date().toDateString())) / 864e5 : 0;
+    const page = src.startsWith("seasonal") ? "Seasonal" : src === "ens" || days > 3 ? "Medium" : "Short";
+    window.__openRegion?.(page, d.date, p.data.region);
+  });
   async function load() {
     if (busy) return;
     busy = true;
@@ -456,9 +463,10 @@ function mapPanel(body, panel) {
         { type: "scatter", symbol: "rect", symbolSize: cell, data: pts, itemStyle: { opacity: 1 }, z: 1, progressive: 0 },
         { type: "lines", coordinateSystem: "cartesian2d", silent: true, polyline: false, z: 5,
           lineStyle: { color: "#222", width: 1.2, opacity: 0.9 }, data: d.coast.map((s) => ({ coords: s })) },   // map is always colourful: dark line in both themes
-        { type: "scatter", symbolSize: 7, z: 6, itemStyle: { color: "#000", borderColor: "#fff", borderWidth: 1.5 },
+        { type: "scatter", symbolSize: 10, z: 6, cursor: "pointer", itemStyle: { color: "#000", borderColor: "#fff", borderWidth: 1.5 },
           label: { show: true, position: "right", color: "#1d2327", fontWeight: 600, fontSize: a.f, textBorderColor: "#fff",
-            textBorderWidth: 2, formatter: (p) => p.name }, data: d.cities.map((c) => ({ name: c.city, value: [c.lon, c.lat] })) },
+            textBorderWidth: 2, formatter: (p) => p.name },
+          data: d.cities.map((c) => ({ name: c.city, value: [c.lon, c.lat], region: c.region })) },
       ],
     }, true);
   }

@@ -23,6 +23,9 @@ heat reach – at a chosen time?
 - Colour map of the east coast (lat −9 to −44, lon 129 to 155): one square per 0.25° (~25 km); seasonal 1°.
 - Black line = coastline (from ECMWF's land/sea mask). Dots = the 5 cities.
 - Colour scale on the right with min / max and unit.
+- **Click a city dot (W-030):** opens that city's page for the map's model – IFS / AIFS: Short if the map time is within
+  3 days, else Medium; ensemble: Medium; seasonal: Seasonal – with the map's day highlighted (W-029) and the state's
+  chart flashing briefly.
 
 ## Model and data
 Chosen in the title bar: **IFS** single run · **AIFS** · **Ensemble middle** (median of 50 runs) · **Seasonal** (SEAS5 difference
@@ -45,3 +48,4 @@ from normal, average of 51 runs) · **Seasonal CFS (US)** (NOAA CFSv2 difference
 - 20 Oct 2026 – W-017 built: run + vs pickers, change map.
 - 20 Oct 2026 – W-015 built: map controls moved into the panel (G2 retired).
 - 21 Oct 2026 – W-011a: Seasonal CFS (US) added to the model picker.
+- 23 Oct 2026 – W-030: click a city dot = open its chart page at the map's day.

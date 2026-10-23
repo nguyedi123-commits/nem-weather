@@ -34,3 +34,14 @@ Group letters: S Short · M Medium · C Compare · L Long (seasonal) · G Map ·
 - [MODELS.md](MODELS.md) – the forecast models we use (IFS, ensemble, AIFS, SEAS5), what BOM uses, other options.
 - Card headings (copy for a new card): Code · Question it answers · What you see · Model and data · How to read it ·
   Limits · Change log.
+
+## Keyboard (W-030, any page; not while typing in a box)
+| Key | Does |
+|---|---|
+| 1 – 5 | Overview · Short · Medium · Seasonal · Map |
+| T · R · S · W | Show Temperature · Rain · Solar · Wind (top-bar picker) |
+| ← · → | Move the highlighted day (W-029) one day back / on |
+| A | Alerts list |
+| Esc | Clear the highlighted day (in Edit mode: leave Edit mode) |
+| ? | This list, on screen |
+| Ctrl+E | Edit mode |

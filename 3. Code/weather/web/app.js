@@ -280,6 +280,41 @@ async function showPage(name) {
   await openPage(name);
 }
 window.__showPage = showPage;
+// W-030: open a page at a day, flash that state's chart (map city click)
+window.__openRegion = async (page, date, region) => {
+  if (date) setDay(date, false);
+  await showPage(page);
+  const p = [...S.panels.values()].find((x) => x.opts.region === region && usesPageField(x.item));
+  if (p) { p.el.classList.add("flash"); setTimeout(() => p.el.classList.remove("flash"), 1800); }
+};
+
+// ---------- W-030 keyboard shortcuts (card README "Keyboard") ----------
+const FIELD_KEYS = { t: "temp", r: "rain", s: "solar", w: "wind" };
+function keysDialog() {
+  const rows = [["1 – 5", "Overview · Short · Medium · Seasonal · Map"], ["T · R · S · W", "Temperature · Rain · Solar · Wind"],
+    ["← · →", "Move the highlighted day back / on"], ["A", "Alerts"], ["Esc", "Clear the highlighted day"], ["?", "This list"],
+    ["Ctrl+E", "Edit mode"]];
+  return dialog(`<h3>Keyboard</h3><table class="grid">${rows.map(([k, v]) => `<tr><td class="l"><b>${esc(k)}</b></td><td class="l">${esc(v)}</td></tr>`).join("")}</table>
+    <div class="btns"><button class="cancel ok primary">Close</button></div>`, (box) => box.querySelector(".ok").focus());
+}
+function shiftDay(n) {
+  const t = DAY.date ? new Date(`${DAY.date}T00:00`) : new Date(new Date().toDateString());
+  t.setDate(t.getDate() + (DAY.date ? n : n > 0 ? 1 : 0));
+  setDay(`${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`, false);
+}
+function onKey(e) {
+  if (e.ctrlKey || e.altKey || e.metaKey || e.target.closest?.("input, select, textarea") || document.querySelector(".modal-back")) return;
+  const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+  if (k >= "1" && k <= "9" && S.builtIn[+k - 1]) showPage(S.builtIn[+k - 1]);
+  else if (FIELD_KEYS[k] && document.getElementById("page-field-box").style.display !== "none") {
+    document.getElementById("page-field").value = FIELD_KEYS[k];
+    setPageField(FIELD_KEYS[k]);
+  } else if (k === "ArrowLeft" || k === "ArrowRight") shiftDay(k === "ArrowLeft" ? -1 : 1);
+  else if (k === "a") alertsDialog();
+  else if (k === "?") keysDialog();
+  else return;
+  e.preventDefault();
+}
 const pageNames = () => fetch("/api/layouts").then((r) => r.json()).catch(() => S.builtIn);
 
 async function fillTabs() {
@@ -551,6 +586,7 @@ async function start() {
   $("copy-page").onclick = copyPage;
   $("delete-page").onclick = deletePage;
   $("reset-page").onclick = resetPage;
+  document.addEventListener("keydown", onKey);
   document.addEventListener("keydown", (e) => {
     if (e.ctrlKey && (e.key === "e" || e.key === "E")) { e.preventDefault(); setEditing(!S.editing); }
     if (e.key === "Escape" && S.editing && !document.querySelector(".modal-back")) setEditing(false);

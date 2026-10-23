@@ -590,5 +590,6 @@ def map_view(src="ifs", field="temp", i=0, run="latest", vs="none"):
             "vs": vid, "vs_text": run_text(src, vid), "diff": bool(vid), "note": note, "now_i": now_i,
             "lat": _num(g["lat"], 2), "lon": _num(g["lon"], 2),
             "values": _num(vals.ravel(), 1), "coast": coastline(),
-            "cities": [{"city": c, "lat": la, "lon": lo} for _, c, la, lo in C.CITIES],
+            "cities": [{"city": c, "region": r, "lat": la, "lon": lo} for r, c, la, lo in C.CITIES],
+            "date": None if seas else (pd.Timestamp(int(keys[i]), unit="s") + AEST).strftime("%Y-%m-%d"),   # W-030
             "anomaly": seas}

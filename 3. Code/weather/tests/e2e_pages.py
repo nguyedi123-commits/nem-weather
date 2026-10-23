@@ -110,6 +110,39 @@ with sync_playwright() as p:
     page.locator("#day-chip button").click()
     page.wait_for_timeout(500)
 
+    # W-030 keyboard: 1-5 pages, T/R/S/W field, arrows move the day, ? = key list
+    page.keyboard.press("2")
+    page.wait_for_timeout(1500)
+    check(page.locator("#tabs .tab.on").inner_text() == "Short", "key 2 opens Short")
+    page.keyboard.press("r")
+    page.wait_for_timeout(600)
+    check(page.locator("#page-field").input_value() == "rain", "key R shows rain")
+    page.keyboard.press("t")
+    page.keyboard.press("ArrowRight")
+    page.wait_for_timeout(800)
+    check(page.locator("#day-chip").is_visible() and page.locator(".table tr.dayon").count() == 4, "→ highlights a day")
+    page.keyboard.press("Escape")
+    page.keyboard.press("?")
+    page.wait_for_timeout(500)
+    check("Keyboard" in page.locator(".modal h3").inner_text(), "? shows the key list")
+    page.keyboard.press("Escape")
+
+    # W-030 map: click the Sydney dot -> Short or Medium with the map's day highlighted, NSW chart flashing
+    page.keyboard.press("5")
+    page.wait_for_timeout(2500)
+    m = page.locator(".grid-stack-item .chart").first
+    mb = m.bounding_box()
+    xy = page.evaluate("""() => { const el = document.querySelector('.grid-stack-item .chart');
+        const c = echarts.getInstanceByDom(el); const o = c.getOption(); const s = o.series[2].data.find(d => d.name === 'Sydney');
+        return c.convertToPixel({ seriesIndex: 2 }, s.value); }""")
+    page.mouse.click(mb["x"] + xy[0], mb["y"] + xy[1])
+    page.wait_for_timeout(1800)
+    on = page.locator("#tabs .tab.on").inner_text()
+    check(on in ("Short", "Medium") and page.locator("#day-chip").is_visible(), f"map city click opens {on} with the day highlighted")
+    check(page.locator(".panel.flash").count() == 1, "the NSW chart flashes")
+    page.screenshot(path=str(out / f"map_click_{theme}.png"))
+    page.keyboard.press("Escape")
+
     # W-028 alerts: button in the top bar, list opens, "Mark all seen" clears the dot
     page.wait_for_timeout(5500)   # one status poll
     check(page.locator("#alerts").is_visible(), "Alerts button shown")

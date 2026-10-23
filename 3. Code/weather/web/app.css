@@ -216,3 +216,7 @@ table.grid tr.dayon td { background: rgba(255, 193, 7, 0.28) !important; }
 table.grid tr[data-date] { cursor: pointer; }
 .week td.cell.dayon { outline: 3px solid #ffb300; outline-offset: -1px; }
 .week th.dayon { color: #e65100; }
+
+/* ---------- W-030: chart flash after a map city click ---------- */
+.panel.flash { animation: flash 0.6s ease-in-out 3; }
+@keyframes flash { 50% { box-shadow: inset 0 0 0 3px #ffb300; border-color: #ffb300; } }

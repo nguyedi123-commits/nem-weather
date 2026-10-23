@@ -1,5 +1,5 @@
 # CONTEXT – Weather (ECMWF)
-*Last updated: 22 Oct 2026 (9 am Sydney)*
+*Last updated: 23 Oct 2026 (5:30 pm Sydney)*
 
 ## In one line
 Weather.exe (one window) shows ECMWF + BOM forecasts for the NEM east coast. A **GitHub cloud job** downloads twice a
@@ -34,7 +34,8 @@ day and keeps only the NEM region; Weather.exe picks the small files up **by its
   6:34 am Sydney every day; BOM morning issues QLD ~4:50, SA ~5:45, NSW ~7:20, TAS ~8:15, VIC ~8:40 am; ensemble 7 pm.
   Done: cloud light jobs 19:52 + 20:22 UTC (6:52 / 7:22 am Sydney); 23 Oct (user): + midday 00:47 UTC (11:47 am,
   IFS 18z, complete 11:27 am) and full moved to 08:17 UTC (7:17 pm, was 9:07 pm; ensemble complete 7:01 pm); seasonal
-  published after the forecasts; job limit 330 min; Weather.exe checks every 15 min (in code, **exe
+  published after the forecasts; Medium + AI vs IFS now always use the newest 15-day IFS run (code 23 Oct, **not yet
+  in an exe** – the 22 Oct exe would show the midday run there, cut at day 4, from ~11:50 am to 7:30 pm); job limit 330 min; Weather.exe checks every 15 min (in code, **exe
   built 22 Oct**). 22 Oct morning: this PC started 6:52 + 7:22 jobs → IFS + AIFS overnight run in the cloud by ~6:55 am.
 - [ ] **GitHub's timer never fired** (21 Oct morning + evening, 0 scheduled runs; workflow active, Actions on). Back-up
   on THIS PC: Task Scheduler "Weather cloud morning 1 / morning 2 / midday / evening" → `tools\cloud_trigger.ps1`

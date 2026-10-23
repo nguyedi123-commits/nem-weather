@@ -11,9 +11,9 @@ Are the coming months likely to be warmer / cooler, wetter / drier, windier / ca
 and do **ECMWF, BOM and the US model (CFS)** agree? The backdrop for monthly and quarterly hedging.
 
 ## What you see
-- **Title bar:** code L1 · region picker (NSW / QLD / VIC / SA / TAS) · field picker (Temperature / Wind 10 m /
-  Solar / Rain) · ⓘ (this card's "How to read it") · ▁ minimise. Edit mode adds A− / A+ (text size) and ✕ (remove).
-  Region and field are remembered per panel, so a page can hold e.g. NSW temperature next to NSW wind.
+- **Title bar:** code L1 · region picker (NSW / QLD / VIC / SA / TAS) · ⓘ (this card's "How to read it") · ▁ minimise. Edit mode adds A− / A+ (text size) and ✕ (remove).
+  **What to show (Temperature / Rain / Solar / Wind) is one picker in the top bar** – all region charts on the page
+  follow it; each page remembers its own choice (user, 23 Oct). Region is remembered per panel.
 - **Run pickers (W-017):** **forecast month** (default: latest) and **vs** (– none – or any earlier month on disk;
   default: last month). Remembered per panel.
 - **With a vs month:** a ◆ marker on each bar = last month's forecast for the same month (each model);
@@ -52,3 +52,4 @@ and do **ECMWF, BOM and the US model (CFS)** agree? The backdrop for monthly and
 - 20 Oct 2026 – W-017 built: forecast month + vs pickers, ◆ last month, Change column.
 - 20 Oct 2026 – W-015 built: free panel, own region + field picker, ⓘ help.
 - 21 Oct 2026 – W-011a agreed: CFS (US, NOAA) as a third model – bar, whiskers, ◆, table columns; also on the map.
+- 23 Oct 2026 – field picker moved to the top bar: one choice for every region chart on the page (W-025).

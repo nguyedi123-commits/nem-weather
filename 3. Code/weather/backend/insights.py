@@ -1,8 +1,11 @@
 """I1 Insights (W-021): plain-words bullets from the numbers each page already shows, by fixed rules (card I1).
 
 insights(page, run, vs) -> {headlines, regions{NSW: [...]}, changes, run_text, vs_text, note}
-Each bullet: {"text", "kind" (heat | cold | wind | solar | rain | change | info), "score" (bigger = more important)}.
+Each bullet: {"text", "kind" (heat | cold | wind | solar | rain | change | info), "score" (bigger = more important),
+              "price" (up | down, W-025 – the direction this weather usually pushes power prices), "why"}.
 """
+from datetime import datetime
+
 from . import views
 
 REGIONS = ["NSW", "QLD", "VIC", "SA"]          # TAS left out on purpose (user, 20 Oct)
@@ -18,8 +21,34 @@ NAME = {"high": ("high", "°C", 1), "low": ("low", "°C", 1), "rain": ("rain", "
 WORD = {"temp": ("warmer", "cooler"), "rain": ("wetter", "drier"), "wind": ("windier", "calmer"), "solar": ("sunnier", "duller")}
 
 
-def _b(text, kind, score):
-    return {"text": text, "kind": kind, "score": round(score, 2)}
+# W-025 price tags (card I1): direction only, with the reason
+UP, DOWN = "up", "down"
+AIRCON, HEATING = (UP, "more aircon demand"), (UP, "more heating demand")
+LESS_WIND, MORE_WIND = (UP, "less wind generation"), (DOWN, "more wind generation")
+LESS_SUN = (UP, "less solar by day")
+SUMMER, WINTER = {11, 12, 1, 2, 3}, {6, 7, 8}
+
+
+def _b(text, kind, score, price=None):
+    b = {"text": text, "kind": kind, "score": round(score, 2)}
+    if price:
+        b["price"], b["why"] = price
+    return b
+
+
+def _seas_price(field, warmer_etc, months):
+    """Price direction for a seasonal lean over `months` ("Oct 2026", ...); None = no clear effect."""
+    if field == "wind":
+        return MORE_WIND if warmer_etc else LESS_WIND
+    if field == "solar":
+        return (DOWN, "more solar, mostly midday") if warmer_etc else (UP, "less solar")
+    if field == "temp":
+        nums = {datetime.strptime(m, "%b %Y").month for m in months}
+        if nums & SUMMER:
+            return AIRCON if warmer_etc else (DOWN, "less aircon demand")
+        if nums & WINTER:
+            return (DOWN, "less heating demand") if warmer_etc else HEATING
+    return None
 
 
 def _day(label):   # "Thu 22 Oct" -> "Thu 22"
@@ -40,15 +69,15 @@ def _flags(city, day, high=None, low=None, wind=None, solar=None, rain=None, cha
     out = []
     if high is not None and high >= HEAT[city]:
         very = high >= HEAT[city] + 4
-        out.append(_b(f"{'Very hot' if very else 'Hot'} {day}: {_f(high)} °C", "heat", 9 if very else 7))
+        out.append(_b(f"{'Very hot' if very else 'Hot'} {day}: {_f(high)} °C", "heat", 9 if very else 7, AIRCON))
     if low is not None and low <= COLD[city]:
-        out.append(_b(f"Cold night {day}: {_f(low)} °C", "cold", 6))
+        out.append(_b(f"Cold night {day}: {_f(low)} °C", "cold", 6, HEATING))
     if wind is not None and wind <= LULL:
-        out.append(_b(f"Wind lull {day}: {_f(wind)} km/h at 100 m", "wind", 6))
+        out.append(_b(f"Wind lull {day}: {_f(wind)} km/h at 100 m", "wind", 6, LESS_WIND))
     if wind is not None and wind >= STRONG:
-        out.append(_b(f"Strong wind {day}: {_f(wind)} km/h at 100 m", "wind", 6))
+        out.append(_b(f"Strong wind {day}: {_f(wind)} km/h at 100 m", "wind", 6, MORE_WIND))
     if solar is not None and solar <= DULL:
-        out.append(_b(f"Dull day {day}: {_f(solar, 1)} kWh/m² of sun", "solar", 4))
+        out.append(_b(f"Dull day {day}: {_f(solar, 1)} kWh/m² of sun", "solar", 4, LESS_SUN))
     if rain is not None and rain >= WET:
         heavy = rain >= HEAVY
         out.append(_b(f"{'Heavy rain' if heavy else 'Wet'} {day}: {_f(rain)} mm", "rain", 8 if heavy else 5))
@@ -115,7 +144,7 @@ def _medium(run, vs):
             items += _flags(city, day, x["high"][1], x["low"][1], x["wind"][1], x["solar"][1], x["rain"][1], x["rain_chance"])
             lo, mid, hi = x["high"]
             if hi >= HEAT[city] > mid:
-                items.append(_b(f"Heat risk {day}: 1 in 10 runs ≥ {_f(hi)} °C (middle {_f(mid)} °C)", "heat", 5))
+                items.append(_b(f"Heat risk {day}: 1 in 10 runs ≥ {_f(hi)} °C (middle {_f(mid)} °C)", "heat", 5, AIRCON))
             if hi - lo >= UNCERTAIN:
                 items.append(_b(f"Uncertain {day}: high anywhere {_f(lo)}–{_f(hi)} °C", "info", 3))
         regions[r] = items
@@ -203,7 +232,7 @@ def _seasonal(run, vs):
                     txt += (f", {name} agrees" if same else f", {name} disagrees ({_pct_range(bc)})" if other
                             else f", {name} less sure ({_pct_range(bc)})")
                 kind = {"temp": "heat" if lean == up else "cold", "rain": "rain", "wind": "wind", "solar": "solar"}[field]
-                items.append(_b(txt, kind, 4 + (i1 - i0) + agree))
+                items.append(_b(txt, kind, 4 + (i1 - i0) + agree, _seas_price(field, lean == up, reg["months"][i0:i1 + 1])))
             old = (reg.get("vs") or {}).get(field)
             if old:
                 for i, m in enumerate(reg["months"]):

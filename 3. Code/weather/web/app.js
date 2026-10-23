@@ -27,7 +27,7 @@ const PICKER = {
   field: { opts: Object.entries(FIELDS), def: "temp", title: "What to show" },
   src: { opts: Object.entries(MAP_SOURCES), def: "ifs", title: "Model" },
   model: { opts: [["ens", "Ensemble middle"], ["ifs", "IFS"], ["aifs", "AIFS (AI)"]], def: "ens", title: "Model" },
-  ipage: { opts: [["short", "Short"], ["medium", "Medium"], ["compare", "AI vs IFS"], ["seasonal", "Seasonal"]], def: "short",
+  ipage: { opts: [["short", "Short"], ["medium", "Medium"], ["seasonal", "Seasonal"]], def: "short",
     title: "Which page's data the insights read" },
 };
 
@@ -82,7 +82,7 @@ function makePanel(item) {
   // pickers in the title bar (region / field / model), remembered in the page
   for (const key of kind?.pickers || []) {
     const p = PICKER[key];
-    if (!opts[key]) opts[key] = p.def;
+    if (!opts[key] || !p.opts.some(([v]) => v === opts[key])) opts[key] = p.def;   // e.g. a retired choice
     const sel = document.createElement("select");
     sel.title = p.title;
     sel.dataset.key = key;
@@ -167,6 +167,30 @@ function removePanel(panel) {
   S.grid.removeWidget(panel.widget);
   S.panels.delete(panel.item.id);
   document.body.classList.toggle("empty-page", !S.panels.size);
+  showPageField();
+  saveSoon();
+}
+
+// ---------- W-025: one "what to show" picker in the top bar for every region chart on the page ----------
+const usesPageField = (item) => !!PANELS[item.kind]?.pageField;
+function pageField(layout) {   // the page's field: saved with the page, else the first chart's, else temperature
+  const items = layout.panels.filter(usesPageField);
+  const f = layout.field || items[0]?.opts?.field || "temp";
+  layout.field = f;
+  for (const it of items) (it.opts ||= {}).field = f;
+  return f;
+}
+function showPageField() {
+  const box = document.getElementById("page-field-box"), sel = document.getElementById("page-field");
+  const kinds = [...S.panels.values()].map((p) => p.item).filter(usesPageField).map((it) => it.kind);
+  box.style.display = kinds.length ? "" : "none";
+  const wind = kinds.every((k) => k === "seasonal") ? "Wind 10 m" : kinds.includes("seasonal") ? "Wind" : FIELDS.wind;
+  sel.replaceChildren(...Object.entries(FIELDS).map(([v, l]) => new Option(v === "wind" ? wind : l, v)));
+  sel.value = S.layout?.field || "temp";
+}
+function setPageField(f) {
+  S.layout.field = f;
+  for (const p of S.panels.values()) if (usesPageField(p.item)) { p.opts.field = f; p.impl.redraw?.(); }
   saveSoon();
 }
 
@@ -211,6 +235,7 @@ function loadLayout(layout) {
   S.loading = true;   // opening a page is not a change: don't save it
   for (const p of S.panels.values()) p.impl.dispose?.();
   S.layout = layout;
+  pageField(layout);
   S.grid.removeAll();
   S.panels.clear();
   S.grid.batchUpdate();
@@ -221,6 +246,7 @@ function loadLayout(layout) {
   clearTimeout(saveTimer);
   S.loading = false;
   document.body.classList.toggle("empty-page", !layout.panels.length);
+  showPageField();
   loadData();
 }
 
@@ -329,7 +355,9 @@ function addNewPanel(kind) {
   const size = sizes.find(([w, h]) => S.grid.willItFit({ w, h, autoPosition: true }));
   if (!size) return ask("No free space for a new panel. Make room first: shrink, minimise or remove a panel.");
   const item = { id: `${kind}-${Date.now().toString(36)}`, kind, w: size[0], h: size[1], font: 1, opts: {} };
+  if (usesPageField(item)) item.opts.field = S.layout.field || "temp";
   const p = addPanel(item);
+  showPageField();
   document.body.classList.remove("empty-page");
   loadData().then(() => feed(p));
   saveSoon();
@@ -467,7 +495,7 @@ function setTheme(name) {
 async function start() {
   const settings = await fetch("/api/settings").then((r) => r.json()).catch(() => ({}));
   HELP = await fetch("help.json").then((r) => r.json()).catch(() => ({}));
-  S.builtIn = (await pageNames()).slice(0, 5);
+  S.builtIn = settings.built_in || (await pageNames()).slice(0, 4);
   S.runs = await fetch("/api/runs").then((r) => r.json()).catch(() => ({}));
   document.body.classList.add(settings.theme === "dark" ? "theme-dark" : "theme-light");
   initGrid();
@@ -485,6 +513,7 @@ async function start() {
     fetch("/api/settings", { method: "POST", body: JSON.stringify({ theme: next }) });
   };
   $("edit").onclick = () => setEditing(!S.editing);
+  $("page-field").onchange = (e) => setPageField(e.target.value);
   $("refresh").onclick = refreshDialog;
   $("add-panel").onchange = (e) => { if (e.target.value) addNewPanel(e.target.value); e.target.value = ""; };
   $("rename-page").onclick = renamePage;

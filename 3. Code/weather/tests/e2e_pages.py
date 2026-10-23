@@ -11,7 +11,7 @@ url = sys.argv[1] if len(sys.argv) > 1 else "http://127.0.0.1:8892"
 out = Path(sys.argv[2] if len(sys.argv) > 2 else "screenshots")
 theme = sys.argv[3] if len(sys.argv) > 3 else "light"
 out.mkdir(parents=True, exist_ok=True)
-PAGES = {"Short": 6, "Medium": 6, "AI vs IFS": 6, "Seasonal": 6, "Map": 2}
+PAGES = {"Short": 6, "Medium": 6, "Seasonal": 6, "Map": 2}   # AI vs IFS page removed 23 Oct (W-025)
 problems, checks = [], 0
 
 
@@ -37,15 +37,19 @@ with sync_playwright() as p:
         check(panels == n, f"{name}: {panels} panels, expected {n}")
         check(not page.locator(".err").count(), f"{name}: error box {page.locator('.err').all_inner_texts()}")
         page.screenshot(path=str(out / f"page_{name.replace(' ', '_')}_{theme}.png"))
-        if name != "Map":   # try every field on the first panel (its own picker)
-            sel = page.locator(".grid-stack-item .panel").first.locator("select[data-key=field]")
+        if name != "Map":   # W-025: one picker in the top bar drives every region chart on the page
+            check(page.locator("#page-field-box").is_visible(), f"{name}: top-bar field picker shown")
+            check(page.locator(".grid-stack-item .panel select[data-key=field]").count() == 0, f"{name}: no per-chart field pickers")
             for f in ("wind", "solar", "rain", "temp"):
-                sel.select_option(f)
-                page.wait_for_timeout(400)
+                page.select_option("#page-field", f)
+                page.wait_for_timeout(500)
+                fields = page.evaluate("[...window.__weather.panels.values()].filter(p => p.item.opts.region && p.item.kind !== 'map').map(p => p.item.opts.field)")
+                check(fields and all(x == f for x in fields), f"{name}: all charts on {f} ({fields})")
                 if f == "rain":
                     page.screenshot(path=str(out / f"page_{name.replace(' ', '_')}_rain_{theme}.png"))
             check(not page.locator(".err").count(), f"{name}: error after field changes")
-        else:
+        if name == "Map":
+            check(not page.locator("#page-field-box").is_visible(), "Map: no top-bar field picker")
             src = page.locator(".grid-stack-item .panel").first.locator("select[data-key=src]")
             for s in ("ens", "seasonal", "aifs", "ifs"):
                 src.select_option(s)

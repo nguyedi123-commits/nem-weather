@@ -35,6 +35,8 @@ body.editing #edit { background: var(--accent); color: #fff; }
   border-radius: 5px 5px 0 0; background: var(--panel); color: var(--muted); cursor: pointer; white-space: nowrap; }
 #tabs .tab.on { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
 #tabs .tab.add { border-style: dashed; }
+#page-field-box { white-space: nowrap; color: var(--muted); font-size: 0.9rem; }
+#page-field-box select { font-weight: 600; }
 
 /* ---------- grid + panels ---------- */
 #grid { min-height: calc(100vh - 2.2rem); }   /* GridStack sets the height from the panels; the edit grid needs the whole screen */
@@ -157,6 +159,9 @@ body.empty-page #grid::before { content: "Empty page – click Edit (Ctrl+E), th
 .ins-rain::marker { color: #2a7ab0; }
 .ins-change::marker { color: #e65100; }
 .ins-info { color: var(--muted); }
+.ptag { font-size: 0.9em; font-weight: 600; }
+.ptag.up { color: #c62828; } .ptag.down { color: #2e7d32; }
+.theme-dark .ptag.up { color: #ff8a80; } .theme-dark .ptag.down { color: #81c784; }
 .theme-dark .ins-heat { color: #ff8a80; } .theme-dark .ins-cold { color: #82b1ff; }
 /* G1 map Play (W-023) */
 .map-strip .m-play { font-weight: 600; min-width: 5.2em; }

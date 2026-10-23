@@ -479,7 +479,9 @@ const IKIND = { heat: "ins-heat", cold: "ins-cold", wind: "ins-wind", solar: "in
 function insightsPanel(body, panel) {
   body.innerHTML = '<div class="insights"></div>';
   const box = body.firstChild;
-  const li = (b) => `<li class="${IKIND[b.kind] || ""}">${esc(b.text)}</li>`;
+  // W-025: price tag = the direction this weather usually pushes prices, with the reason (card I1)
+  const tag = (b) => b.price ? ` <span class="ptag ${b.price}" title="What this weather usually does to power prices – a direction, not a forecast">→ ${esc(b.why)} · price ${b.price === "up" ? "▲" : "▼"}</span>` : "";
+  const li = (b) => `<li class="${IKIND[b.kind] || ""}">${esc(b.text)}${tag(b)}</li>`;
   return {
     update(d) {
       if (!d) { box.innerHTML = '<div class="empty">Loading…</div>'; return; }
@@ -549,13 +551,13 @@ function aboutPanel(body) {
 const regionSub = (what) => (d) => d?.run_text ? `${what}` : "";
 const runQ = (o) => ({ run: o.run || "latest", vs: o.vs || "auto" });
 export const PANELS = {
-  short: { code: "S1", title: "Next 3 days", source: "short", pickers: ["region", "field"], runFeed: () => "ifs", query: runQ,
+  short: { code: "S1", title: "Next 3 days", source: "short", pickers: ["region"], pageField: true, runFeed: () => "ifs", query: runQ,
     create: regionPanel(shortChart, shortTable, regionSub("IFS run")) },
-  medium: { code: "M1", title: "Next 15 days – range", source: "medium", pickers: ["region", "field"], runFeed: () => "ens", query: runQ,
+  medium: { code: "M1", title: "Next 15 days – range", source: "medium", pickers: ["region"], pageField: true, runFeed: () => "ens", query: runQ,
     create: regionPanel(mediumChart, mediumTable, regionSub("Ensemble run")) },
-  compare: { code: "C1", title: "AI model vs main model", source: "compare", pickers: ["region", "field"],
+  compare: { code: "C1", title: "AI model vs main model", source: "compare", pickers: ["region"], pageField: true,
     create: regionPanel(compareChart, compareTable, (d) => d?.runs ? `IFS ${d.runs.ifs} · AIFS ${d.runs.aifs}` : "") },
-  seasonal: { code: "L1", title: "6 months vs normal", source: "seasonal", pickers: ["region", "field"], runFeed: () => "seasonal",
+  seasonal: { code: "L1", title: "6 months vs normal", source: "seasonal", pickers: ["region"], pageField: true, runFeed: () => "seasonal",
     query: runQ, create: regionPanel(seasonalChart, seasonalTable, () => "Forecast") },
   map: { code: "G1", title: "East-coast map", source: null, pickers: ["src", "field"], create: mapPanel, map: true,
     runFeed: (o) => o.src, vsDefault: "none" },

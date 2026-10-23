@@ -11,9 +11,9 @@ What will the weather do in each region over the next 3 days, hour by hour – a
 matter most for demand, wind and solar bids.
 
 ## What you see
-- **Title bar:** code S1 · region picker (NSW / QLD / VIC / SA / TAS) · field picker (Temperature / Wind 100 m /
-  Solar / Rain) · ⓘ (this card's "How to read it") · ▁ minimise. Edit mode adds A− / A+ (text size) and ✕ (remove).
-  Region and field are remembered per panel, so a page can hold e.g. NSW temperature next to NSW wind.
+- **Title bar:** code S1 · region picker (NSW / QLD / VIC / SA / TAS) · ⓘ (this card's "How to read it") · ▁ minimise. Edit mode adds A− / A+ (text size) and ✕ (remove).
+  **What to show (Temperature / Rain / Solar / Wind) is one picker in the top bar** – all region charts on the page
+  follow it; each page remembers its own choice (user, 23 Oct). Region is remembered per panel.
 - **Run pickers (W-017)**, after the title: **run** (default: latest) and **vs** (– none – or any earlier run on
   disk; default: the same time yesterday, else the run before). Remembered per panel.
 - **With a vs run:** the vs run's IFS line is drawn **dashed** in the same colour (temperature, wind, solar; rain as
@@ -64,3 +64,4 @@ matter most for demand, wind and solar bids.
 - 18 Oct 2026 – W-005 / W-006 agreed and built: ensemble band, AIFS line, rain chance, BOM forecast.
 - 20 Oct 2026 – W-017 built: run + vs pickers, dashed older run, Change column.
 - 20 Oct 2026 – W-015 built: free panel (add / move / resize / remove), own region + field picker, ⓘ help.
+- 23 Oct 2026 – field picker moved to the top bar: one choice for every region chart on the page (W-025).

@@ -53,7 +53,7 @@ with sync_playwright() as p:
     panel = page.locator(".grid-stack-item").first
     check(page.locator(".grid-stack-item").count() == 1, "panel added")
     panel.locator("select[data-key=region]").select_option("VIC")
-    panel.locator("select[data-key=field]").select_option("wind")
+    page.select_option("#page-field", "wind")   # W-025: top-bar picker
     page.wait_for_timeout(1200)
     saved = api(T1)
     it = saved["panels"][0]

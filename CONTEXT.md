@@ -1,5 +1,5 @@
 # CONTEXT – Weather (ECMWF)
-*Last updated: 23 Oct 2026 (5:30 pm Sydney)*
+*Last updated: 23 Oct 2026 (5:45 pm Sydney)*
 
 ## In one line
 Weather.exe (one window) shows ECMWF + BOM forecasts for the NEM east coast. A **GitHub cloud job** downloads twice a
@@ -49,6 +49,10 @@ day and keeps only the NEM region; Weather.exe picks the small files up **by its
   Sydney) → trading PC by ~7:15 am the next morning (user wants the latest seasonal, 22 Oct).
 - [x] Fixed 22 Oct: "Access is denied" on progress.json during a pick-up (screen reading it at the same moment) →
   every file swap retries (`config.replace`); map files closed after reading.
+- [ ] **W-025 built 23 Oct (dev copy, not in an exe yet)**: pages Short / Medium / Seasonal / Map (AI vs IFS retired –
+  a saved copy moves to `settingsetired\` on start); one **Show** picker in the top bar for all region charts on a
+  page; I1 **price tags** (▲ / ▼ + reason, rules in card I1). 59 test checks OK. Exe of 23 Oct 5:25 pm has the midday fix
+  only. User to look, then "release".
 - [ ] User review of the screen → changes. Offered: daily high / low range markers on the Medium chart (days 8–15).
 - Later: W-020 keep the GitHub schedule alive (monthly upload, due before ~19 Dec), W-008b BOM correction (~mid Nov),
   W-014 forecast-check panel, backlog W-009 AIFS ENS / W-010 NOAA GFS (user: not wanted – poor) / W-011 other seasonal centres.
@@ -64,7 +68,8 @@ day and keeps only the NEM region; Weather.exe picks the small files up **by its
   failed on a missing `BACKFILL_HOURS` entry for `ensx` (fixed).
 
 ## User decisions (keep)
-- Pages: TAS removed everywhere – NSW, QLD, About (top) · SA, VIC, I1 Insights (bottom). Built-in pages match.
+- Pages: Short, Medium, Seasonal, Map (AI vs IFS removed 23 Oct). TAS removed everywhere – NSW, QLD, About (top) ·
+  SA, VIC, I1 Insights (bottom). One field choice per page (top bar). Built-in pages match.
   Insights cover NSW, QLD, VIC, SA (rules in card I1). Times: NEM time (AEST). Charts + daily table.
 - Keep **city data forever**, **maps 30 days**. Newest run only on direct downloads (`BACKFILL_HOURS` 0).
 - Ensemble max/min over all 24 hours via extra max/min-only steps (option B, W-022).

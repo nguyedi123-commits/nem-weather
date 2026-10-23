@@ -3,7 +3,7 @@
 |---|---|
 | **Code** | **C1** |
 | Kind | `compare` – add as many as you like, each with its own region and field |
-| Built-in page | AI vs IFS |
+| Built-in page | – (AI vs IFS page removed 23 Oct; add C1 in Edit mode if wanted) |
 | Status | Built 18 Oct 2026 – not released |
 
 ## Question it answers
@@ -35,3 +35,5 @@ weather is harder to call.
 - 18 Oct 2026 – built.
 - 20 Oct 2026 – W-015 built: free panel, own region + field picker, ⓘ help.
 - 23 Oct 2026 – IFS always the newest 15-day run (00z / 12z), not the midday 18z run (to 90 h only).
+- 23 Oct 2026 – AI vs IFS page removed (user: Short, Medium, Seasonal, Map are enough). Panel kept for Edit mode;
+  it follows the page's field picker like S1 / M1 / L1. AIFS stays as the purple line on Short / Medium (W-025).

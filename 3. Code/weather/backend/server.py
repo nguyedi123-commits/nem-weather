@@ -19,7 +19,8 @@ from . import cloud, config as C, insights, progress, refresh, views
 log = logging.getLogger("weather.server")
 WEB = (Path(sys._MEIPASS) if getattr(sys, "frozen", False) else Path(__file__).resolve().parents[1]) / "web"
 LAYOUTS = C.SETTINGS / "layouts"
-BUILT_IN = ["Short", "Medium", "AI vs IFS", "Seasonal", "Map"]   # page order; first = start page
+BUILT_IN = ["Short", "Medium", "Seasonal", "Map"]   # page order; first = start page
+RETIRED = ["AI vs IFS"]   # built-in pages taken away (user, 23 Oct – W-025): a saved copy is moved to settings/retired/
 TYPES = {".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8",
          ".json": "application/json", ".txt": "text/plain; charset=utf-8", ".svg": "image/svg+xml"}
 
@@ -119,7 +120,7 @@ class Handler(BaseHTTPRequestHandler):
                 f = LAYOUTS / f"{safe_name(parts[2])}.json"
                 return self._json(json.loads(f.read_text()) if f.exists() else {})
             if name == "settings":
-                return self._json(load_settings())
+                return self._json({**load_settings(), "built_in": BUILT_IN})
             if name == "runs":
                 return self._send(200, CACHE.get(("runs",), views.runs_view))
             if name == "map":
@@ -186,8 +187,26 @@ class _Server(ThreadingHTTPServer):
     daemon_threads = True
 
 
+def retire_pages():
+    """Once per retired built-in page: move the saved copy out of the page list (kept in settings/retired/)."""
+    s = load_settings()
+    done = s.get("retired", [])
+    for name in [n for n in RETIRED if n not in done]:
+        f = LAYOUTS / f"{name}.json"
+        if f.exists():
+            (C.SETTINGS / "retired").mkdir(parents=True, exist_ok=True)
+            C.replace(f, C.SETTINGS / "retired" / f.name)
+            log.info("page %r retired (moved to settings/retired)", name)
+        done.append(name)
+        if s.get("page") == name:
+            s["page"] = BUILT_IN[0]
+        s["retired"] = done
+        _save_json(C.SETTINGS / "settings.json", s)
+
+
 def start(port):
     """Start on `port`, or the next free one (e.g. a dev copy already on 8892)."""
+    retire_pages()
     for p in range(port, port + 20):
         try:
             server = _Server(("127.0.0.1", p), Handler)

@@ -208,3 +208,11 @@ body.empty-page #grid::before { content: "Empty page – click Edit (Ctrl+E), th
 .al-run ul { margin: 0.2em 0; padding-left: 1.2em; }
 .al-new { color: #c62828; font-weight: 600; } .al-gone { color: #2e7d32; } .al-change { color: var(--text); }
 .theme-dark .al-new { color: #ff8a80; } .theme-dark .al-gone { color: #81c784; }
+
+/* ---------- W-029 linked charts: highlighted day ---------- */
+#day-chip { white-space: nowrap; background: #ffe082; color: #3e2723; border-radius: 4px; padding: 0.05rem 0.2rem 0.05rem 0.5rem; font-size: 0.85rem; }
+#day-chip button { border: none; background: transparent; cursor: pointer; font-weight: 700; color: inherit; padding: 0 0.3rem; }
+table.grid tr.dayon td { background: rgba(255, 193, 7, 0.28) !important; }
+table.grid tr[data-date] { cursor: pointer; }
+.week td.cell.dayon { outline: 3px solid #ffb300; outline-offset: -1px; }
+.week th.dayon { color: #e65100; }

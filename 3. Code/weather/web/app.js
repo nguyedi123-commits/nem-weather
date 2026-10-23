@@ -3,7 +3,7 @@
 // edges, A− / A+ text size, ✕ remove, "+ Add panel", pages: + Page / Rename / Copy / Delete / Reset.
 // Every change is saved straight away (settings/layouts/<page>.json). Built-in pages: web/layouts/<page>.json.
 // Data: /api/<source> per panel kind (fetched once for all panels, again after a refresh); /api/status every 5 s.
-import { PANELS, REGIONS, REGION_COLOURS, FIELDS, MAP_SOURCES, progressText, esc } from "./panels.js";
+import { PANELS, REGIONS, REGION_COLOURS, FIELDS, MAP_SOURCES, progressText, esc, DAY, setDay } from "./panels.js";
 
 const FONT_MIN = 0.5, FONT_MAX = 3, FONT_STEP = 0.1;
 const S = {
@@ -536,6 +536,14 @@ async function start() {
   };
   $("edit").onclick = () => setEditing(!S.editing);
   $("page-field").onchange = (e) => setPageField(e.target.value);
+  // W-029: the highlighted day – redraw every panel, show it as a chip in the top bar (✕ clears)
+  DAY.onChange = () => {
+    for (const p of S.panels.values()) p.impl.redraw?.();
+    const chip = $("day-chip");
+    chip.hidden = !DAY.date;
+    if (DAY.date) chip.querySelector("b").textContent = new Date(`${DAY.date}T00:00`).toLocaleDateString("en-AU", { weekday: "short", day: "numeric", month: "short" });
+  };
+  $("day-chip").querySelector("button").onclick = () => setDay(null, false);
   $("refresh").onclick = refreshDialog;
   $("alerts").onclick = alertsDialog;
   $("add-panel").onchange = (e) => { if (e.target.value) addNewPanel(e.target.value); e.target.value = ""; };
@@ -546,6 +554,7 @@ async function start() {
   document.addEventListener("keydown", (e) => {
     if (e.ctrlKey && (e.key === "e" || e.key === "E")) { e.preventDefault(); setEditing(!S.editing); }
     if (e.key === "Escape" && S.editing && !document.querySelector(".modal-back")) setEditing(false);
+    else if (e.key === "Escape" && DAY.date && !document.querySelector(".modal-back")) setDay(null, false);   // W-029
   });
 }
 

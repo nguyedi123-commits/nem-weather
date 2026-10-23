@@ -23,7 +23,8 @@ that usually pushes power prices? One look, before opening any chart.
   - **Price arrow** in the corner: red ▲ / green ▼ = the direction the tagged weather usually pushes prices (same rules as
     I1); ▲▼ = both kinds on the same day.
 - **Hover** a cell: high, low, wind, sun, rain + chance, and the reasons for the arrow.
-- **Click** a cell: opens that day's page – Short for days 1–3, Medium after – with that state's chart.
+- **Click** a cell: opens that day's page – Short for days 1–3, Medium after – with **that day highlighted** on
+  every chart (W-029). The highlighted day's column is outlined here too.
 - **Column heads:** the day; days from the ensemble are marked "Ens" and drawn a little paler (less certain).
 - Subtitle: the runs used, e.g. "IFS Fri 23 Oct 04:00 · Ensemble Thu 22 Oct 10:00".
 
@@ -49,3 +50,4 @@ that usually pushes power prices? One look, before opening any chart.
 ## Change log
 - 23 Oct 2026 – W-026 agreed: new Overview page, up to 14 days (IFS days 1–3, ensemble after), high + low + colour + tags + arrow.
 - 23 Oct 2026 – W-027: wind and sun = farm-area average; hover lists each area.
+- 23 Oct 2026 – W-029: click = open the page with that day highlighted; highlighted day outlined in the grid.

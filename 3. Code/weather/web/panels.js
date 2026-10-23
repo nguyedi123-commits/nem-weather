@@ -156,7 +156,7 @@ function shortTable(r, field, d) {
     <th title="IFS day total; % = share of the 50 ensemble runs with at least 1 mm">Rain mm · chance</th>
     <th>Wind km/h</th><th>Sun kWh/m²</th><th title="BOM's city forecast: high / low, rain range, chance of rain">BOM</th>
     ${v ? `<th title="Change since the ${esc(d.vs_text)} run: high / low °C · rain mm">Change vs ${esc(d.vs_text.slice(4))}</th>` : ""}</tr>
-    ${r.daily.map((d) => `<tr class="${d.part ? "part" : ""}"
+    ${r.daily.map((d) => `<tr data-date="${d.date}" class="${d.part ? "part" : ""} ${d.date === DAY.date ? "dayon" : ""}"
     title="${d.part ? "Part day – the forecast starts or ends during this day" : ""}"><td class="l">${esc(d.day)}${d.part ? " (part)" : ""}</td>
     <td>${fmt(d.high, 1)}</td><td>${fmt(d.low, 1)}</td>
     <td>${fmt(d.rain, 1)}${d.rain_chance !== null && d.rain_chance !== undefined ? ` <span class="rng">${d.rain_chance}%</span>` : ""}</td>
@@ -219,7 +219,7 @@ function mediumTable(r, field, d) {
   return `<table class="grid"><tr><th class="l">Day</th><th>High °C</th><th>Low °C</th><th>Rain mm</th>
     <th>Wind km/h</th><th>Sun kWh/m²</th><th title="BOM's city forecast (7 days): high / low, rain range, chance">BOM</th>
     ${v ? `<th title="Change of the middle run since the ${esc(d.vs_text)} run: high / low °C · rain chance">Change vs ${esc(d.vs_text.slice(4))}</th>` : ""}</tr>
-    ${r.daily.map((x) => `<tr><td class="l">${esc(x.day)}</td>
+    ${r.daily.map((x) => `<tr data-date="${x.date}" class="${x.date === DAY.date ? "dayon" : ""}"><td class="l">${esc(x.day)}</td>
     <td>${rng(x.high)}</td><td>${rng(x.low)}</td><td>${fmt(x.rain[1], 1)} <span class="rng">${x.rain_chance}%</span></td>
     <td>${fmt(x.wind[1])}</td><td>${fmt(x.solar[1], 1)}</td>${bomCell(x.bom)}${v ? change(x) : ""}</tr>`).join("")}</table>`;
 }
@@ -297,6 +297,37 @@ function seasonalTable(r, field, d) {
 }
 
 // ---------- one region, one field: chart above, daily table below ----------
+// ---------- W-029 linked charts: one highlighted day for every page; hover linked per chart kind ----------
+export const DAY = { date: null, onChange: null };
+export function setDay(date, toggle = true) {
+  DAY.date = toggle && DAY.date === date ? null : date;
+  DAY.onChange?.();
+}
+const ymd = (t) => `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`;
+function dayBand(chart, r) {   // yellow band over the highlighted day (times on the charts are NEM time)
+  const opt = chart.getOption();
+  if (!opt?.series?.length) return;
+  const ax = opt.xAxis?.[0];
+  let data = [];
+  if (DAY.date && ax?.type === "category" && r.daily) {
+    const i = r.daily.findIndex((x) => x.date === DAY.date);
+    if (i >= 0) data = [[{ xAxis: ax.data[i] }, { xAxis: ax.data[i] }]];
+  } else if (DAY.date && ax?.type === "time") {
+    const n = new Date(`${DAY.date}T00:00`);
+    n.setDate(n.getDate() + 1);
+    data = [[{ xAxis: `${DAY.date}T00:00` }, { xAxis: `${ymd(n)}T00:00` }]];
+  }
+  chart.setOption({ series: [{ markArea: { silent: true, itemStyle: { color: "rgba(255, 193, 7, 0.25)" }, data } }] });
+}
+function clickedDay(chart, r, e) {   // the day under a click on the chart, or null
+  const p = [e.offsetX, e.offsetY];
+  if (!chart.containPixel("grid", p)) return null;
+  const ax = chart.getOption().xAxis?.[0];
+  const v = chart.convertFromPixel({ xAxisIndex: 0 }, p)[0];
+  if (ax?.type === "category") return r.daily?.[Math.round(v)]?.date || null;
+  return ax?.type === "time" ? ymd(new Date(v)) : null;
+}
+
 function regionPanel(draw, table, subtitle) {
   return (body, panel) => {
     body.innerHTML = '<div class="chart"></div><div class="table"></div>';
@@ -304,6 +335,12 @@ function regionPanel(draw, table, subtitle) {
     const chart = echarts.init(chEl, dark() ? "dark" : null, { renderer: "canvas" });
     new ResizeObserver(() => chart.resize()).observe(chEl);   // the table below fills in after the chart: re-fit
     let last = null;
+    chart.getZr().on("click", (e) => {   // W-029: click a day on the chart = highlight it everywhere
+      const r = last?.regions?.[panel.opts.region];
+      const day = r && clickedDay(chart, r, e);
+      if (day) setDay(day);
+    });
+    tb.onclick = (e) => { const tr = e.target.closest("tr[data-date]"); if (tr) setDay(tr.dataset.date); };
     const draw_ = () => {
       const d = last;
       if (!d) { chart.clear(); tb.innerHTML = '<div class="empty">Loading…</div>'; return; }
@@ -312,6 +349,9 @@ function regionPanel(draw, table, subtitle) {
       if (!r) return;
       try {
         draw(chart, r, panel.opts.field, style(panel), d);
+        dayBand(chart, r);
+        const g = `${panel.item.kind}-${panel.opts.field}`;   // W-029: linked hover with the same kind of chart
+        if (chart.group !== g) { chart.group = g; echarts.connect(g); }
         tb.innerHTML = table(r, panel.opts.field, d);
         chart.resize();
       } catch (e) { tb.innerHTML = `<div class="err">Could not draw: ${esc(e.message)}</div>`; console.error(e); }
@@ -504,6 +544,7 @@ const ARROW = { up: "▲", down: "▼", both: "▲▼" };
 function weekPanel(body, panel) {
   body.innerHTML = '<div class="week"></div>';
   const box = body.firstChild;
+  let last = null;
   const tip = (c, day, city) => [`${city} · ${day.label} (${c.src === "IFS" ? "IFS main model" : "ensemble middle"})`,
     `High ${fmt(c.high, 1)} °C · low ${fmt(c.low, 1)} °C`, `Wind ${fmt(c.wind)} km/h at 100 m · sun ${fmt(c.solar, 1)} kWh/m²`,
     `Rain ${fmt(c.rain, 1)} mm${c.chance !== null && c.chance !== undefined ? ` · chance ${fmt(c.chance)} %` : ""}`,
@@ -511,21 +552,24 @@ function weekPanel(body, panel) {
     ...(c.areas?.solar ? [`Sun areas: ${Object.entries(c.areas.solar).map(([a, v]) => `${a} ${fmt(v, 1)}`).join(" · ")}`] : []),
     ...c.up.map((w) => `▲ price: ${w}`), ...c.down.map((w) => `▼ price: ${w}`), "Click: open the chart"].join("\n");
   return {
+    redraw() { this.update(last); },
     update(d) {
+      last = d;
       if (!d) { box.innerHTML = '<div class="empty">Loading…</div>'; return; }
       if (d.error) { box.innerHTML = `<div class="err">${esc(d.error)}</div>`; return; }
       panel.setSub(d.run_text);
-      const head = d.days.map((x) => `<th class="${x.src === "Ens" ? "ens" : ""}">${esc(x.label)}${x.src === "Ens" ? '<small>Ens</small>' : ""}</th>`).join("");
+      const on = (x) => (x.date === DAY.date ? " dayon" : "");
+      const head = d.days.map((x) => `<th class="${x.src === "Ens" ? "ens" : ""}${on(x)}">${esc(x.label)}${x.src === "Ens" ? '<small>Ens</small>' : ""}</th>`).join("");
       const rows = Object.entries(d.regions).map(([r, reg]) => `<tr><th class="reg"><span class="dot" style="background:${REGION_COLOURS[r]}"></span>${esc(r)}<small>${esc(reg.city || "")}</small></th>
         ${d.days.map((x) => { const c = reg.cells[x.date];
           if (!c) return '<td class="none">–</td>';
-          return `<td class="cell ${c.level} ${c.src === "Ens" ? "ens" : ""}" data-r="${r}" data-src="${c.src}" title="${esc(tip(c, x, reg.city))}">
+          return `<td class="cell ${c.level} ${c.src === "Ens" ? "ens" : ""}${on(x)}" data-r="${r}" data-src="${c.src}" data-date="${x.date}" title="${esc(tip(c, x, reg.city))}">
             ${c.price ? `<span class="arr ${c.price}">${ARROW[c.price]}</span>` : ""}
             <b>${fmt(c.high)}°</b><span class="lo">${fmt(c.low)}°</span>
             <span class="tags">${c.tags.map((t) => `<i class="t-${t.toLowerCase()}">${esc(t)}</i>`).join("")}</span></td>`; }).join("")}</tr>`).join("");
       box.innerHTML = `<table><tr><th></th>${head}</tr>${rows}</table>`;
       box.querySelectorAll("td.cell").forEach((td) => {
-        td.onclick = () => window.__showPage?.(td.dataset.src === "IFS" ? "Short" : "Medium");
+        td.onclick = () => { setDay(td.dataset.date, false); window.__showPage?.(td.dataset.src === "IFS" ? "Short" : "Medium"); };
       });
     },
     resize() {},

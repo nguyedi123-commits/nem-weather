@@ -23,6 +23,7 @@ and do **ECMWF, BOM and the US model (CFS)** agree? The backdrop for monthly and
 - **Whiskers:** range 10–90 % of each model's runs.
 - **Table:** Month · ECMWF average + **chance above normal** · BOM average + chance · CFS average + chance.
   Yellow = clear lean (≥ 70 % or ≤ 30 %).
+- **Linked charts (W-029):** hover a month on one state's chart → all four show that month's values.
 
 ## Model and data
 - **ECMWF SEAS5**, 51 runs; **BOM ACCESS-S2**, ~110 runs; **NCEP CFSv2** (US, NOAA), 120 runs. All from Copernicus (C3S, dataset
@@ -53,3 +54,4 @@ and do **ECMWF, BOM and the US model (CFS)** agree? The backdrop for monthly and
 - 20 Oct 2026 – W-015 built: free panel, own region + field picker, ⓘ help.
 - 21 Oct 2026 – W-011a agreed: CFS (US, NOAA) as a third model – bar, whiskers, ◆, table columns; also on the map.
 - 23 Oct 2026 – field picker moved to the top bar: one choice for every region chart on the page (W-025).
+- 23 Oct 2026 – W-029: linked hover across the page's charts.

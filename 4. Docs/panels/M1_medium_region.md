@@ -30,6 +30,10 @@ heat event, a wind lull, a dull or wet spell?
 - **Daily table:** High and Low as "middle (low–high range)"; Rain = middle run mm + % chance of at least 1 mm;
   Wind = day average; Sun = day total kWh/m²; **BOM** = BOM's high / low, rain range and chance (BOM forecasts 7 days).
 - Temperature chart: BOM's daily high ▲ and low ▼ for its 7 days.
+- **Linked charts (W-029):** hover a time on one state's chart → all charts of the same kind on the page show a line
+  and their own value box at that time. **Click a day** (on a chart or a table row) → that day gets a yellow band on
+  every chart and its table row is highlighted, on every page (Short, Medium, the week grid) until you click it again,
+  press Esc or click ✕ on the "Day" chip in the top bar.
 
 ## Model and data
 - **Wind and solar = the state's farm areas** (average of 1–3 squares, W-027, list in MODELS.md); temperature, rain
@@ -66,3 +70,4 @@ heat event, a wind lull, a dull or wet spell?
 - 23 Oct 2026 – fixed: day 7 was missing (at the switch to 12-hourly steps one step straddles midnight; a day now
   needs 18 h, not 20 h, of ensemble data). The 2 night hours count to the next day.
 - 23 Oct 2026 – W-027: wind and solar = average of the state's farm areas (MODELS.md), not the city square.
+- 23 Oct 2026 – W-029: linked hover across the page's charts; click a day = highlighted everywhere.

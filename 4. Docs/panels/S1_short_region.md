@@ -33,6 +33,10 @@ matter most for demand, wind and solar bids.
     Sun (day total kWh/m²);
   - **BOM** column: BOM's high / low, rain range and chance of rain (BOM's latest city forecast).
   - Grey italic rows = part days (the run starts or ends during that day).
+- **Linked charts (W-029):** hover a time on one state's chart → all charts of the same kind on the page show a line
+  and their own value box at that time. **Click a day** (on a chart or a table row) → that day gets a yellow band on
+  every chart and its table row is highlighted, on every page (Short, Medium, the week grid) until you click it again,
+  press Esc or click ✕ on the "Day" chip in the top bar.
 
 ## Model and data
 - **Wind and solar = the state's farm areas** (average of 1–3 squares, W-027, list in MODELS.md); temperature, rain
@@ -68,3 +72,4 @@ matter most for demand, wind and solar bids.
 - 20 Oct 2026 – W-015 built: free panel (add / move / resize / remove), own region + field picker, ⓘ help.
 - 23 Oct 2026 – field picker moved to the top bar: one choice for every region chart on the page (W-025).
 - 23 Oct 2026 – W-027: wind and solar = average of the state's farm areas (MODELS.md), not the city square; temperature / rain stay at the city.
+- 23 Oct 2026 – W-029: linked hover across the page's charts; click a day = highlighted everywhere.

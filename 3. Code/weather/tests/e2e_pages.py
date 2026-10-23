@@ -81,6 +81,35 @@ with sync_playwright() as p:
     page.screenshot(path=str(out / f"help_S1_{theme}.png"))
     page.keyboard.press("Escape")
 
+    # W-029 linked charts: hover one chart -> value boxes on all four; click a day -> highlighted on every page
+    page.click("#tabs .tab:text-is('Short')")
+    page.wait_for_timeout(1500)
+    box = page.locator(".grid-stack-item .chart").first.bounding_box()
+    page.mouse.move(box["x"] + box["width"] * 0.5, box["y"] + box["height"] * 0.5)
+    page.wait_for_timeout(800)
+    tips = page.evaluate("""[...document.querySelectorAll('.grid-stack-item .chart > div')].filter(d => d.style.zIndex === '9999999' && d.style.display !== 'none' && d.style.opacity !== '0').length""")
+    check(tips >= 4, f"hover: value boxes on all 4 charts ({tips})")
+    row = page.locator(".grid-stack-item .table tr[data-date]").nth(1)
+    date = row.get_attribute("data-date")
+    row.click()
+    page.wait_for_timeout(1200)
+    check(page.locator("#day-chip").is_visible(), "click a day: Day chip shown")
+    check(page.locator(f".table tr.dayon[data-date='{date}']").count() == 4, "click a day: row highlighted on all 4 panels")
+    page.screenshot(path=str(out / f"linked_day_short_{theme}.png"))
+    page.click("#tabs .tab:text-is('Overview')")
+    page.wait_for_timeout(1500)
+    check(page.locator(f".week td.cell.dayon[data-date='{date}']").count() == 4, "highlighted day outlined in the week grid")
+    page.keyboard.press("Escape")
+    page.wait_for_timeout(600)
+    check(not page.locator("#day-chip").is_visible() and page.locator(".week td.cell.dayon").count() == 0, "Esc clears the day")
+    page.locator(".week tr").nth(1).locator("td.cell").last.click()
+    page.wait_for_timeout(1800)
+    check(page.locator("#tabs .tab.on").inner_text() == "Medium" and page.locator(".table tr.dayon").count() == 4,
+          "week-grid click opens Medium with that day highlighted")
+    page.screenshot(path=str(out / f"linked_day_medium_{theme}.png"))
+    page.locator("#day-chip button").click()
+    page.wait_for_timeout(500)
+
     # W-028 alerts: button in the top bar, list opens, "Mark all seen" clears the dot
     page.wait_for_timeout(5500)   # one status poll
     check(page.locator("#alerts").is_visible(), "Alerts button shown")

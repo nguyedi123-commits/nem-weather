@@ -15,13 +15,13 @@
 | W-009 | **AIFS ENS** – ECMWF AI ensemble (range from the AI model), ~+12 GB per refresh | Idea – later |
 | W-010 | **NOAA GFS / GEFS** – US model + ensemble as independent second opinion, +2–10 GB | Idea – later |
 | W-024 | **Overnight data on the trading PC by 8 am Sydney**: cloud jobs 6:52 + 7:22 am, 11:47 am (midday IFS), 7:17 pm (full) Sydney; seasonal checked every job (only when due) and published after the forecasts; Weather.exe checks every 15 min; this PC starts the jobs (Task Scheduler) while GitHub's timer is late | Built 21–23 Oct, released 23 Oct |
-| W-025 | Pages Short / Medium / Seasonal / Map only (AI vs IFS page removed); **one field picker in the top bar** for all region charts on a page; **I1 price tags** (▲ / ▼ + reason) | Built 23 Oct – not released |
-| W-026 | **Week-ahead grid**: states × days, coloured hot / cold / lull / dull / wet, ▲ / ▼ price arrows | Built 23 Oct – user OK |
-| W-027 | **Wind and solar at the farm areas** (not the capital city square) | Built 23 Oct – user OK, first data 23 Oct evening |
-| W-028 | **Alerts** when a new run changes something big (red dot on the tab, optional sound / pop-up) | Built 23 Oct – user OK |
-| W-029 | **Linked charts**: hover one state = same time on all; click a day = highlight everywhere | Built 23 Oct – user OK |
-| W-030 | **Click a city on the map** opens its chart; **keyboard shortcuts** (1–4 pages, T / R / S / W field) | Built 23 Oct – user OK |
-| W-014 | **Forecast check**: yesterday's forecasts vs what BOM measured, per model (better from ~mid Nov) | Built 23 Oct – testing |
+| W-025 | Pages Short / Medium / Seasonal / Map only (AI vs IFS page removed); **one field picker in the top bar** for all region charts on a page; **I1 price tags** (▲ / ▼ + reason) | Released 23 Oct |
+| W-026 | **Week-ahead grid**: states × days, coloured hot / cold / lull / dull / wet, ▲ / ▼ price arrows | Released 23 Oct |
+| W-027 | **Wind and solar at the farm areas** (not the capital city square) | Released 23 Oct |
+| W-028 | **Alerts** when a new run changes something big (red dot on the tab, optional sound / pop-up) | Released 23 Oct |
+| W-029 | **Linked charts**: hover one state = same time on all; click a day = highlight everywhere | Released 23 Oct |
+| W-030 | **Click a city on the map** opens its chart; **keyboard shortcuts** (1–4 pages, T / R / S / W field) | Released 23 Oct |
+| W-014 | **Forecast check**: yesterday's forecasts vs what BOM measured, per model (better from ~mid Nov) | Released 23 Oct |
 | W-011a | **CFS (US, NOAA CFSv2)** seasonal as a third model on L1 + map (Copernicus monthly, same key) | Built 21 Oct – not released |
 | W-011 | Other seasonal centres on Copernicus (UK Met Office, Météo-France, DWD, Japan, Canada) | Idea – later |
 | W-012 | Automatic refresh: Weather.exe checks the cloud (hourly; every 15 min since W-024), fetches only new NEM-only runs (~60 MB each) | Built 20 Oct (with W-019) |

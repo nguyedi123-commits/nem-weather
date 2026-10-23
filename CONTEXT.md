@@ -1,5 +1,5 @@
 # CONTEXT – Weather (ECMWF)
-*Last updated: 23 Oct 2026 (5:45 pm Sydney)*
+*Last updated: 23 Oct 2026 (7:10 pm Sydney)*
 
 ## In one line
 Weather.exe (one window) shows ECMWF + BOM forecasts for the NEM east coast. A **GitHub cloud job** downloads twice a
@@ -11,7 +11,7 @@ day and keeps only the NEM region; Weather.exe picks the small files up **by its
 | Downloader – IFS, AIFS, ensemble (+ `ensx` full-day max/min), BOM forecasts + observations, seasonal (ECMWF + BOM + **CFS US**, W-011a) | Built, tested (CFS 21 Oct) |
 | Screen – pages Short / Medium / AI vs IFS / Seasonal / Map, Edit mode, region + field + run / vs pickers, ⓘ, I1 Insights, map Play | Built, tested |
 | Cloud – GitHub job + pick-up (W-019, W-012, W-024) | Built 20 Oct. **GitHub's timer has never fired** → this PC starts the jobs (Task Scheduler, see Next) |
-| Weather.exe | **Released 22 Oct ~9 am** (`2. Output\Weather.zip` + `Weather (update).zip`) – CFS, 15-min pick-up, Windows certificates, file-swap retry. **Trading PC: install the update** |
+| Weather.exe | **Released 23 Oct ~7:05 pm Sydney** (`2. Output/Weather.zip` + `Weather (update).zip`) – Overview, farm areas, alerts, linked charts, keys, Check, Show picker, price tags. **Trading PC: install the update** |
 | Trading PC | **21 Oct: installed and working** (on a non-office Wi-Fi – see below) |
 | BOM correction (W-008b) | Recording observations since 18 Oct (history from 1 Sep). Correction from ~mid Nov |
 
@@ -68,7 +68,9 @@ day and keeps only the NEM region; Weather.exe picks the small files up **by its
   81 checks OK. User: OK. Step 6 **W-014 forecast check** built: new **Check** page (F1 × 4 states) – IFS / AIFS /
   ensemble / BOM vs BOM measurements, days 1/2/3/5/7: highs, lows (miss + lean), rain % right, sun % match (Sydney +
   Brisbane only measure sun); chart of the last 14 days. Only ~5 days checkable yet (forecasts kept since ~18 Oct).
-  86 checks OK. **All 6 steps built – waiting for the user's OK, then "release".**
+  86 checks OK. **All 6 steps released 23 Oct evening** (58 checks also run on the built exe). Fix found in release
+  testing: a fresh install / a PC catching up flooded alerts with old runs → alerts wait for downloads to finish and
+  skip runs > 30 h old.
 - [ ] User review of the screen → changes. Offered: daily high / low range markers on the Medium chart (days 8–15).
 - Later: W-020 keep the GitHub schedule alive (monthly upload, due before ~19 Dec), W-008b BOM correction (~mid Nov),
   W-014 forecast-check panel, backlog W-009 AIFS ENS / W-010 NOAA GFS (user: not wanted – poor) / W-011 other seasonal centres.

@@ -1,5 +1,5 @@
 # Forecast models
-*Last updated: 18 Oct 2026*
+*Last updated: 29 Oct 2026*
 
 All from ECMWF (European Centre for Medium-Range Weather Forecasts), free open data, licence CC BY 4.0.
 ECMWF is widely rated the most accurate global forecaster for the medium range.
@@ -7,18 +7,34 @@ ECMWF is widely rated the most accurate global forecaster for the medium range.
 ## What we use, by tab
 | Tab | Model(s) | Runs we take | Detail |
 |---|---|---|---|
-| Short · 3 days | **IFS** main model (line) + **IFS ensemble** range band + **AIFS** line + **BOM** city forecast | IFS 00z/12z (+ 06z/18z to 90 h), ensemble 00z | IFS 3-hourly, band and AIFS 6-hourly |
-| Medium · 15 days | **IFS ensemble** (50 runs) + IFS line + AIFS line + **BOM** city forecast (7 days) | 00z | 6-hourly to day 7, then 4 am / 4 pm |
+| Short · 3 days | **IFS** main model (line) + **IFS ensemble** range band + **AIFS** line + **BOM** city forecast | IFS 4 runs a day (06z/18z to 90 h), AIFS 4 a day, ensemble 00z + 12z | IFS 3-hourly, band and AIFS 6-hourly |
+| Medium · 15 days | **IFS ensemble** (50 runs) + IFS line + AIFS line + **BOM** city forecast (7 days) | ensemble 00z + 12z, IFS 00z/12z, AIFS all 4 | 6-hourly to day 7, then 4 am / 4 pm |
 | AI vs IFS | **IFS** vs **AIFS Single** | 00z, 12z | IFS 3-hourly, AIFS 6-hourly |
 | Seasonal · 6 months | **ECMWF SEAS5** (51 runs) + **BOM ACCESS-S2** (110 runs) + **NCEP CFSv2** (US, 120 runs) | monthly (ECMWF 5th, BOM by 10th, CFS by 13th) | monthly averages vs normal |
 | Map | any of the above | | 0.25° (seasonal 1°) |
 
-(00z = 10:00 NEM time, 12z = 22:00 NEM time.)
+(00z = 10:00 NEM time, 06z = 16:00, 12z = 22:00, 18z = 04:00. AI vs IFS page removed 23 Oct – the C1 panel remains.)
+
+## When each run arrives (W-031, from 29 Oct)
+Times ECMWF finishes publishing (measured 28 Oct), Sydney summer time. The cloud job fetches it within ~30 min and the
+trading PC picks it up within 15 min after that (~45 min in all).
+
+| Run | IFS | AIFS | Ensemble |
+|---|---|---|---|
+| 12z (overnight) | 6:34 am – 15 days | 4:30 am – 15 days | **6:45 am – 15 days** (new 29 Oct) |
+| 18z | 11:27 am – 90 h | **10:25 am – 15 days** (new) | – (only 6 days on offer, not taken) |
+| 00z (day) | 6:34 pm – 15 days | 4:25 pm – 15 days | 7:01 pm – 15 days |
+| 06z | 11:27 pm – 90 h | **10:24 pm – 15 days** (new) | – |
+
+- Before 29 Oct: ensemble once a day (00z) and AIFS twice (00z / 12z) – the ensemble was up to ~31 h old in the afternoon.
+- The cloud job is started every 30 min by an online timer (cron-job.org); GitHub's own timer stays as a back-up.
+  A job with nothing new stops in about a minute. Seasonal is only checked in the late-night jobs (11 pm – 3 am Sydney)
+  because the Copernicus queue can take hours.
 
 ## The models
 ### IFS – Integrated Forecasting System ("the main model")
 - ECMWF's physics model: solves the equations of the atmosphere, oceans and land on a ~9 km global grid.
-- **Single run** (stream "oper", also called HRES): one best guess, to 15 days (00z/12z) or 6 days (06z/18z).
+- **Single run** (stream "oper", also called HRES): one best guess, to 15 days (00z/12z) or 6 days (06z/18z – we take 90 h).
 - Open data is the same forecast, shared on a 0.25° (~25 km) grid.
 
 ### IFS ensemble (ENS)
@@ -37,7 +53,7 @@ ECMWF is widely rated the most accurate global forecaster for the medium range.
   ECMWF's own analyses; starts each run from the same starting weather as IFS.
 - Runs in about a minute instead of hours; scores as well as or better than IFS on many measures (e.g. storm tracks,
   large-scale temperature), but tends to be **smoother** (less extreme peaks) and has no true hourly max/min.
-- Output every 6 hours, to 15 days, on ~0.25°.
+- Output every 6 hours, to 15 days, on ~0.25°. Four runs a day (00z, 06z, 12z, 18z) – all to 15 days.
 - ECMWF also runs **AIFS ENS** (50-run AI ensemble) – in the free data, not used yet (see options).
 
 ### SEAS5 – seasonal forecast system

@@ -104,11 +104,11 @@ FEEDS = {
     "ifs": dict(label="IFS main model", model="ifs", stream="oper", type="fc",
                 params=ALL_PARAMS + list(MAXMIN), runs={0: LONG, 6: SHORT, 12: LONG, 18: SHORT}),
     "aifs": dict(label="AIFS AI model", model="aifs-single", stream="oper", type="fc",
-                 params=ALL_PARAMS, runs={0: AI, 12: AI}),
+                 params=ALL_PARAMS, runs={0: AI, 6: AI, 12: AI, 18: AI}),   # W-031: all 4 runs go to 15 days
     "ens": dict(label="IFS ensemble", model="ifs", stream="enfo", type="ef",
-                params=ENS_PARAMS + list(MAXMIN), runs={0: ENS}),
+                params=ENS_PARAMS + list(MAXMIN), runs={0: ENS, 12: ENS}),   # W-031: + 12z (done 6:45 am Sydney)
     "ensx": dict(label="IFS ensemble max/min (extra steps)", model="ifs", stream="enfo", type="ef",
-                 params=list(MAXMIN), runs={0: ENS_MAXMIN}),
+                 params=list(MAXMIN), runs={0: ENS_MAXMIN, 12: ENS_MAXMIN}),
 }
 
 

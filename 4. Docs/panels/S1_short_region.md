@@ -43,7 +43,7 @@ matter most for demand, wind and solar bids.
   and cloud = the city square. Runs from before 23 Oct evening: city (About says which).
 - ECMWF **IFS** single run (latest on disk), 3-hourly. One 25 km grid square per city: nearest square that is
   ≥ 90 % land (Adelaide set by hand). High / Low use ECMWF's true max/min temperature in each 3 h.
-- ECMWF **IFS ensemble** (50 runs, latest 00z run), 6-hourly – range band and rain chance.
+- ECMWF **IFS ensemble** (50 runs, latest 00z or 12z run), 6-hourly – range band and rain chance.
 - ECMWF **AIFS Single** (latest), 6-hourly.
 - **BOM city forecast** (precis XML from BOM's FTP, the forecast BOM publishes for the city) – fetched on refresh.
 - Times NEM time (AEST). See [MODELS.md](../MODELS.md).
@@ -61,7 +61,7 @@ matter most for demand, wind and solar bids.
 
 ## Limits
 - Ensemble band is 6-hourly (the 3-hourly ensemble was not downloaded to save ~4 GB per refresh).
-- Ensemble may be one run older than IFS (we take the ensemble once a day, 00z).
+- Ensemble may be one run older than IFS (ensemble twice a day, 00z + 12z; IFS four times).
 - Raw model, no BOM correction yet (W-008).
 - BOM forecast uses local time days (daylight saving) – matched to the same calendar date.
 
@@ -73,3 +73,4 @@ matter most for demand, wind and solar bids.
 - 23 Oct 2026 – field picker moved to the top bar: one choice for every region chart on the page (W-025).
 - 23 Oct 2026 – W-027: wind and solar = average of the state's farm areas (MODELS.md), not the city square; temperature / rain stay at the city.
 - 23 Oct 2026 – W-029: linked hover across the page's charts; click a day = highlighted everywhere.
+- 29 Oct 2026 – W-031: ensemble twice a day (00z + 12z), AIFS four times a day.

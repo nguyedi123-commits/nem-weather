@@ -22,6 +22,7 @@
 | W-029 | **Linked charts**: hover one state = same time on all; click a day = highlight everywhere | Released 23 Oct |
 | W-030 | **Click a city on the map** opens its chart; **keyboard shortcuts** (1–4 pages, T / R / S / W field) | Released 23 Oct |
 | W-014 | **Forecast check**: yesterday's forecasts vs what BOM measured, per model (better from ~mid Nov) | Released 23 Oct |
+| W-031 | **Fresher runs**: ensemble twice a day (+12z, 6:45 am), AIFS 4 a day; one smart cloud job (fetches whatever is new); started every 30 min by an online timer (cron-job.org) so it runs on time when this PC is off | Agreed 29 Oct |
 | W-011a | **CFS (US, NOAA CFSv2)** seasonal as a third model on L1 + map (Copernicus monthly, same key) | Built 21 Oct – not released |
 | W-011 | Other seasonal centres on Copernicus (UK Met Office, Météo-France, DWD, Japan, Canada) | Idea – later |
 | W-012 | Automatic refresh: Weather.exe checks the cloud (hourly; every 15 min since W-024), fetches only new NEM-only runs (~60 MB each) | Built 20 Oct (with W-019) |

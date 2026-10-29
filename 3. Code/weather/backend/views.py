@@ -49,8 +49,8 @@ def latest(feed):
 
 
 def latest_long(feed):
-    """Newest 15-day run (00z / 12z). IFS 06z / 18z only go to 90 h – fine for Short, too short for Medium / AI vs IFS."""
-    r = [x for x in runs(feed) if x[-2:] in ("00", "12")]
+    """Newest 15-day run. IFS 06z / 18z only go to 90 h – fine for Short, too short for Medium / AI vs IFS (AIFS: all 4)."""
+    r = [x for x in runs(feed) if C.FEEDS.get(feed, {}).get("runs", {}).get(int(x[-2:]), [360])[-1] >= 300]
     return r[0] if r else None
 
 

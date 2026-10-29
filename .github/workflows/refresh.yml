@@ -1,11 +1,11 @@
 # Weather cloud refresh (W-019): downloads ECMWF / BOM / Copernicus on GitHub's computer, keeps only the NEM east coast,
 # publishes small files on the release "data". Weather.exe checks for them every 15 minutes.
-# Times are UTC (GitHub has no daylight saving; ECMWF works in UTC too, so these suit summer and winter):
-#   19:52 light – ECMWF's overnight (12z) IFS + AIFS are complete at 19:34 UTC. = 6:52 am Sydney summer / 5:52 am winter
-#   20:22 light – back-up if 19:52 is skipped or late; also picks up BOM's later morning issues. = 7:22 am / 6:22 am
-#   00:47 light – midday IFS (18z, to 90 h) is complete at 00:27 UTC.               = 11:47 am / 10:47 am
-#   08:17 full  – day IFS + AIFS (00z, 07:34 UTC) + ensemble (08:01 UTC).           = 7:17 pm / 6:17 pm
-#   Every job: forecasts are published first, then a new seasonal month if one is due (Copernicus queue can be slow).
+# W-031 (29 Oct): every timed job is "auto" = fetch whatever is new for every model (IFS 4 runs, AIFS 4, ensemble 00z + 12z).
+# Main starter: an online timer (cron-job.org) starts this job every 30 min through GitHub's API (workflow_dispatch,
+# mode auto) – GitHub's own timer below starts 2–7 h late, so it is only the back-up. Nothing new = done in ~1 min.
+# Times are UTC (Sydney summer = +11). ECMWF finishes (28 Oct): AIFS 12z 17:30, IFS 12z 19:34, ensemble 12z 19:45,
+# AIFS 18z 23:25, IFS 18z 00:27, AIFS 00z 05:25, IFS 00z 07:34, ensemble 00z 08:01, AIFS 06z 11:24, IFS 06z 12:27.
+# Seasonal (Copernicus, slow queue) only in auto jobs 12–16 UTC (11 pm – 4 am Sydney), or a by-hand full / light job.
 # Off the round :00 / :30 minutes – GitHub starts round-time schedules late or skips them when busy (seen 21 Oct).
 name: Weather refresh
 
@@ -14,14 +14,16 @@ on:
     - cron: "52 19 * * *"
     - cron: "22 20 * * *"
     - cron: "47 0 * * *"
+    - cron: "47 5 * * *"
     - cron: "17 8 * * *"
+    - cron: "47 12 * * *"
   workflow_dispatch:
     inputs:
       mode:
-        description: "full (~20 min, with ensemble) · light (BOM + IFS + AIFS) · bom (BOM only). Seasonal when a new month is due"
+        description: "auto (whatever is new, all models) · full (all + seasonal check now) · light (BOM + IFS + AIFS + seasonal check) · bom (BOM only)"
         type: choice
-        options: [light, full, bom]
-        default: light
+        options: [auto, full, light, bom]
+        default: auto
 
 permissions:
   contents: write   # to publish the release files
@@ -33,7 +35,7 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 330   # the Copernicus queue (seasonal, evening job) took 4.5 h on 21 Oct; forecasts are published before it
+    timeout-minutes: 330   # the Copernicus queue (seasonal, night jobs) took 4.5 h on 21 Oct; forecasts are published before it
     steps:
       - uses: actions/checkout@v4
 
@@ -57,5 +59,5 @@ jobs:
       - name: Download, keep the NEM east coast, publish
         env:
           GH_TOKEN: ${{ github.token }}
-          MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || (github.event.schedule == '17 8 * * *' && 'full' || 'light') }}
+          MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'auto' }}
         run: python "3. Code/weather/cloud/publish.py" --mode "$MODE"

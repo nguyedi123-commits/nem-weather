@@ -21,7 +21,7 @@ weather is harder to call.
 
 ## Model and data
 - **IFS** single run (latest 00z/12z), 3-hourly to day 6, then 6-hourly.
-- **AIFS Single** (latest 00z/12z), 6-hourly. See [MODELS.md](../MODELS.md).
+- **AIFS Single** (latest run – 4 a day, all 15 days), 6-hourly. See [MODELS.md](../MODELS.md).
 
 ## How to read it
 - Agreement = more confidence. A yellow cell = check M1: is the ensemble range wide on that day too?
@@ -37,3 +37,4 @@ weather is harder to call.
 - 23 Oct 2026 – IFS always the newest 15-day run (00z / 12z), not the midday 18z run (to 90 h only).
 - 23 Oct 2026 – AI vs IFS page removed (user: Short, Medium, Seasonal, Map are enough). Panel kept for Edit mode;
   it follows the page's field picker like S1 / M1 / L1. AIFS stays as the purple line on Short / Medium (W-025).
+- 29 Oct 2026 – W-031: AIFS four runs a day (all to 15 days).

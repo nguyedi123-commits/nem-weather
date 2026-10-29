@@ -16,7 +16,7 @@ heat event, a wind lull, a dull or wet spell?
   follow it; each page remembers its own choice (user, 23 Oct). Region is remembered per panel.
 - **Run pickers (W-017)**, after the title: **run** (default: latest) and **vs** (– none – or any earlier run on
   disk; default: the same time yesterday, else the run before). Remembered per panel.
-  Runs here are **ensemble** runs (00z, once a day).
+  Runs here are **ensemble** runs (00z and 12z, twice a day – W-031).
 - **With a vs run:** temperature / wind – the vs run's middle line **dashed** and its 10–90 % range as thin dashed
   edges; rain / solar – a hollow marker for the vs run's middle. Table **Change** column: high / low middle and
   rain chance vs that run (e.g. `+1.5 / +0.8 · rain 20→70%`). Big changes in yellow.
@@ -38,10 +38,10 @@ heat event, a wind lull, a dull or wet spell?
 ## Model and data
 - **Wind and solar = the state's farm areas** (average of 1–3 squares, W-027, list in MODELS.md); temperature, rain
   and cloud = the city square. Runs from before 23 Oct evening: city (About says which).
-- **IFS ensemble** (ECMWF, 50 runs, 00z run) – 6-hourly to day 7, then 4 am and 4 pm NEM time to day 15.
+- **IFS ensemble** (ECMWF, 50 runs, latest 00z or 12z run) – 6-hourly to day 7, then 4 am and 4 pm NEM time to day 15.
   Fields: temperature + true max/min, 100 m wind, rain, solar.
 - **IFS** single run (latest 00z/12z) – 3-hourly to day 6, 6-hourly after.
-- **AIFS Single** (ECMWF AI model, latest 00z/12z) – 6-hourly.
+- **AIFS Single** (ECMWF AI model, latest run – all 4 runs go to 15 days) – 6-hourly.
 - **BOM city forecast** (latest, 7 days).
 - See [MODELS.md](../MODELS.md).
 
@@ -71,3 +71,4 @@ heat event, a wind lull, a dull or wet spell?
   needs 18 h, not 20 h, of ensemble data). The 2 night hours count to the next day.
 - 23 Oct 2026 – W-027: wind and solar = average of the state's farm areas (MODELS.md), not the city square.
 - 23 Oct 2026 – W-029: linked hover across the page's charts; click a day = highlighted everywhere.
+- 29 Oct 2026 – W-031: ensemble twice a day (00z + 12z), AIFS four times a day.

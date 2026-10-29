@@ -5,9 +5,10 @@ small zip on the GitHub release "data", plus manifest.json = the list of what is
 every 15 minutes and fetches only what it doesn't have (backend/cloud.py). Cloud copies are deleted after 30 days
 (seasonal after 400) – each trading PC keeps its own history.
 
-  python cloud/publish.py --mode full|light|bom      needs GH_TOKEN + GITHUB_REPOSITORY (set by GitHub) and the gh tool
+  python cloud/publish.py --mode auto|full|light|bom      needs GH_TOKEN + GITHUB_REPOSITORY (set by GitHub) and the gh tool
 """
 import argparse
+import hashlib
 from datetime import datetime, timedelta, timezone
 import json
 import logging
@@ -23,7 +24,9 @@ from backend import bom, config as C, ecmwf, obs, seasonal   # noqa: E402
 
 TAG = "data"
 KEEP_DAYS = {"seasonal": 400, "seasonal_bom": 400, "seasonal_cfs": 400}   # others: 30
-MODES = {"full": ("ifs", "aifs", "ens", "ensx"), "light": ("ifs", "aifs"), "bom": ()}
+# auto (W-031, the timed jobs): whatever is new for every model; seasonal only at night (SEASONAL_UTC). full: + seasonal now
+MODES = {"auto": ("ifs", "aifs", "ens", "ensx"), "full": ("ifs", "aifs", "ens", "ensx"), "light": ("ifs", "aifs"), "bom": ()}
+SEASONAL_UTC = range(12, 17)   # 11 pm – 4 am Sydney: the Copernicus queue can take hours, and day jobs would wait behind it
 REPO = os.environ.get("GITHUB_REPOSITORY", "nguyedi123-commits/nem-weather")
 URL = f"https://github.com/{REPO}/releases/download/{TAG}"
 OUT = C.DATA / "publish"
@@ -86,9 +89,10 @@ def publish(man, now, mode, errors, new):
             runs.setdefault(feed, {})[rid] = {"asset": z.name, "size": z.stat().st_size,
                                               "finished": info.get("finished") or now.isoformat(timespec="seconds")}
     obs_files = [f for f in (C.DATA / "obs" / "daily.parquet", C.DATA / "obs" / "halfhourly.parquet") if f.exists()]
-    if obs_files and man.get("obs", {}).get("updated") != now.isoformat(timespec="seconds"):
+    sig = hashlib.sha1(b"".join(f.read_bytes() for f in obs_files)).hexdigest()[:16] if obs_files else None
+    if obs_files and man.get("obs", {}).get("sig") != sig:   # W-031: unchanged -> no upload (jobs every 30 min)
         uploads.append(pack("obs.zip", obs_files))
-        man["obs"] = {"asset": "obs.zip", "updated": now.isoformat(timespec="seconds")}
+        man["obs"] = {"asset": "obs.zip", "updated": now.isoformat(timespec="seconds"), "sig": sig}
     lsm = C.DATA / "static" / "lsm.npz"
     if lsm.exists() and "static" not in man:
         uploads.append(pack("static.zip", [lsm]))
@@ -117,7 +121,7 @@ def publish(man, now, mode, errors, new):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--mode", choices=list(MODES), default="light")
+    ap.add_argument("--mode", choices=list(MODES), default="auto")
     a = ap.parse_args()
     C.DATA.mkdir(parents=True, exist_ok=True)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(message)s", datefmt="%H:%M:%S")
@@ -148,7 +152,8 @@ def main():
     if MODES[a.mode]:
         run("ECMWF", lambda: ecmwf.update(MODES[a.mode]))
     publish(man, now, a.mode, errors, new)   # forecasts out first: the Copernicus queue below can take hours
-    if MODES[a.mode]:   # only asks Copernicus when a new month is due (5th / 10th / 13th) – a no-op on other days
+    # only asks Copernicus when a new month is due (5th / 10th / 13th) – a no-op on other days
+    if a.mode in ("full", "light") or (a.mode == "auto" and now.hour in SEASONAL_UTC):
         run("Seasonal", seasonal.update)
         publish(man, now, a.mode, errors, new)
     return 1 if errors else 0

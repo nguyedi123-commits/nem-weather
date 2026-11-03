@@ -140,6 +140,7 @@ def loop(is_busy):
     """Every 15 minutes (first time shortly after start): pick up new cloud data, unless a refresh is running."""
     time.sleep(15)
     while True:
+        due = time.time() + EVERY_S
         if not is_busy():
             lock = ecmwf.DownloadLock()
             try:
@@ -155,4 +156,7 @@ def loop(is_busy):
                     progress.finish(error=f"Cloud: {e}")
                 finally:
                     lock.__exit__(None, None, None)
-        time.sleep(EVERY_S)
+        # wall clock in short steps: Windows doesn't count sleep / standby time inside one long time.sleep,
+        # so a PC waking after a night would otherwise wait another 15 awake minutes (seen 3 Nov)
+        while time.time() < due:
+            time.sleep(30)

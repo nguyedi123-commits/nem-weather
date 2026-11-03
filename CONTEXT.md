@@ -1,5 +1,5 @@
 # CONTEXT – Weather (ECMWF)
-*Last updated: 23 Oct 2026 (7:10 pm Sydney)*
+*Last updated: 3 Nov 2026 (2:30 pm Sydney)*
 
 ## In one line
 Weather.exe (one window) shows ECMWF + BOM forecasts for the NEM east coast. A **GitHub cloud job** downloads twice a
@@ -71,6 +71,13 @@ day and keeps only the NEM region; Weather.exe picks the small files up **by its
   86 checks OK. **All 6 steps released 23 Oct evening** (58 checks also run on the built exe). Fix found in release
   testing: a fresh install / a PC catching up flooded alerts with old runs → alerts wait for downloads to finish and
   skip runs > 30 h old.
+- [ ] **W-031 fresher runs (29 Oct, cloud live)**: ensemble 00z + **12z** (done 6:45 am Sydney), AIFS all 4 runs (15 days
+  each); one `auto` cloud job = whatever is new; seasonal only in jobs 12–16 UTC; GitHub timer back-up + 05:47 / 12:47.
+  Checked 3 Nov: cloud has ens 12z every morning since 30 Oct, dev screen draws it (15 full days), 58 page checks OK.
+  3 Nov fix (dev copy, **not in an exe**): pick-up loop counts wall-clock time – a PC waking from sleep picks up within
+  30 s (before: up to 15 awake minutes). Medium's newest-AIFS fix also waits for the next release.
+  **Open: user sets up cron-job.org** (every 30 min, POST to GitHub's workflow dispatch with a fine-grained key,
+  Actions read/write on nem-weather only) → then decide whether to switch off this PC's Task Scheduler jobs.
 - [ ] User review of the screen → changes. Offered: daily high / low range markers on the Medium chart (days 8–15).
 - Later: W-020 keep the GitHub schedule alive (monthly upload, due before ~19 Dec), W-008b BOM correction (~mid Nov),
   W-014 forecast-check panel, backlog W-009 AIFS ENS / W-010 NOAA GFS (user: not wanted – poor) / W-011 other seasonal centres.

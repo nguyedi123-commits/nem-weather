@@ -77,6 +77,18 @@ def _read(path, scale_by_unit):
     return arr, lat, lon, months, members
 
 
+class NotOutYet(Exception):
+    """Copernicus has no data for this month yet (it answers "Bad Request" / MARS error) – try again next night."""
+
+
+LATE_DAY = 20   # still nothing after the 20th of the month = a real problem, not just early (6 Nov: ECMWF not out on the 5th)
+
+
+def _not_published(err):
+    s = str(err)
+    return "400" in s or "MarsRuntimeError" in s or "MARS has returned an error" in s
+
+
 def get_issue(year, month, feed="seasonal"):
     centre, system, _ = CENTRES[feed]
     issue = f"{year}{month:02d}"
@@ -84,7 +96,7 @@ def get_issue(year, month, feed="seasonal"):
     raw.mkdir(parents=True, exist_ok=True)
     client = cdsapi.Client(quiet=True, progress=False)
     area = [C.GRID["north"], C.GRID["west"], C.GRID["south"], C.GRID["east"]]
-    grid, rows, members = {}, None, []
+    grid, rows, members, failed = {}, None, [], []
     progress.start(f"Seasonal {NAMES[feed]} (Copernicus queue)", len(VARS), "", issue)
     for var, (name, scale) in VARS.items():
         target = raw / f"{feed}_{issue}_{name}.grib"
@@ -100,6 +112,7 @@ def get_issue(year, month, feed="seasonal"):
                     "area": area, "data_format": "grib"}).download(str(target.with_suffix(".part")))
             except Exception as e:   # a model may not offer every field – leave it blank
                 log.warning("%s %s: %s not available (%s)", feed, issue, var, str(e)[:150])
+                failed.append(e)
                 continue
             C.replace(target.with_suffix(".part"), target)
         progress.step(target.stat().st_size)
@@ -121,6 +134,8 @@ def get_issue(year, month, feed="seasonal"):
         rows = df if rows is None else rows.merge(df, on=["region", "city", "member", "month"], how="outer")
 
     if rows is None:
+        if failed and all(_not_published(e) for e in failed) and datetime.now(timezone.utc).day <= LATE_DAY:
+            raise NotOutYet(f"{NAMES[feed]} {issue}: not out yet")
         raise RuntimeError(f"{feed} {issue}: nothing downloaded")
     rows.insert(0, "issue", issue)
     rows["month"] = pd.to_datetime(rows["month"], format="%Y%m").dt.strftime("%Y-%m")
@@ -152,6 +167,8 @@ def update():
         if f"{y}{m:02d}" not in load_catalog().get(feed, {}):
             try:
                 get_issue(y, m, feed)
+            except NotOutYet as e:   # normal early in the month: keep last month, ask again next night
+                log.info("%s – keeping the previous month", e)
             except Exception as e:
                 log.exception("%s %d-%02d failed", feed, y, m)
                 errors.append(f"{NAMES[feed]}: {str(e)[:150]}")

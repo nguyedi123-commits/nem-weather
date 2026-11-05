@@ -10,7 +10,7 @@ ECMWF is widely rated the most accurate global forecaster for the medium range.
 | Short · 3 days | **IFS** main model (line) + **IFS ensemble** range band + **AIFS** line + **BOM** city forecast | IFS 4 runs a day (06z/18z to 90 h), AIFS 4 a day, ensemble 00z + 12z | IFS 3-hourly, band and AIFS 6-hourly |
 | Medium · 15 days | **IFS ensemble** (50 runs) + IFS line + AIFS line + **BOM** city forecast (7 days) | ensemble 00z + 12z, IFS 00z/12z, AIFS all 4 | 6-hourly to day 7, then 4 am / 4 pm |
 | AI vs IFS | **IFS** vs **AIFS Single** | 00z, 12z | IFS 3-hourly, AIFS 6-hourly |
-| Seasonal · 6 months | **ECMWF SEAS5** (51 runs) + **BOM ACCESS-S2** (110 runs) + **NCEP CFSv2** (US, 120 runs) | monthly (ECMWF 5th, BOM by 10th, CFS by 13th) | monthly averages vs normal |
+| Seasonal · 6 months | **ECMWF SEAS5** (51 runs) + **BOM ACCESS-S2** (110 runs) + **NCEP CFSv2** (US, 120 runs) | monthly (checked nightly from: ECMWF 5th, BOM 10th, CFS 13th) | monthly averages vs normal |
 | Map | any of the above | | 0.25° (seasonal 1°) |
 
 (00z = 10:00 NEM time, 06z = 16:00, 12z = 22:00, 18z = 04:00. AI vs IFS page removed 23 Oct – the C1 panel remains.)
@@ -57,7 +57,7 @@ trading PC picks it up within 15 min after that (~45 min in all).
 - ECMWF also runs **AIFS ENS** (50-run AI ensemble) – in the free data, not used yet (see options).
 
 ### SEAS5 – seasonal forecast system
-- IFS-based coupled atmosphere–ocean model, 51 runs, started on the 1st, published on the 5th of each month.
+- IFS-based coupled atmosphere–ocean model, 51 runs, started on the 1st, published from the 5th of each month (on Copernicus not always on the 5th – Nov 2026 was not; the cloud asks every night until it is there).
 - Says whether a month is likely **warmer/cooler, wetter/drier than normal** (normal = 1993–2016), not daily weather.
 
 ### CFSv2 – the US seasonal model (NOAA / NCEP) – since 21 Oct (W-011a)

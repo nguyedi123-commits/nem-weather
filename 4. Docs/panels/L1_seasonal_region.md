@@ -28,7 +28,9 @@ and do **ECMWF, BOM and the US model (CFS)** agree? The backdrop for monthly and
 ## Model and data
 - **ECMWF SEAS5**, 51 runs; **BOM ACCESS-S2**, ~110 runs; **NCEP CFSv2** (US, NOAA), 120 runs. All from Copernicus (C3S, dataset
   seasonal-postprocessed-single-levels), same 1° grid, nearest square per city, same key.
-- ECMWF new forecast on the 5th of each month; the Copernicus multi-model set (incl. BOM, CFS) by the 10th–13th.
+- ECMWF new forecast from the 5th of each month; BOM from the 10th, CFS from the 13th. The cloud asks Copernicus every night
+  from those days; until the month is out the page keeps showing the previous month (normal, not an error – a real
+  problem only if still missing after the 20th).
   Checked by the late-night cloud jobs (11 pm – 3 am Sydney) → a new month is on screen by the next morning.
   CFS here is the monthly Copernicus version – NOAA's own daily CFS runs (e.g. on Tropical Tidbits) can move in between.
 - Normal = each model's own 1993–2016 average for that month (so the three are fair to compare).
@@ -56,3 +58,4 @@ and do **ECMWF, BOM and the US model (CFS)** agree? The backdrop for monthly and
 - 23 Oct 2026 – field picker moved to the top bar: one choice for every region chart on the page (W-025).
 - 23 Oct 2026 – W-029: linked hover across the page's charts.
 - 29 Oct 2026 – W-031: seasonal checked only in the late-night cloud jobs.
+- 6 Nov 2026 – a month not out yet on Copernicus is no longer a failed cloud job (ECMWF November was not out on the 5th).
